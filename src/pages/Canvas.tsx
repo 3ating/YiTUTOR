@@ -2,8 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import 'firebase/compat/auth';
-// import { doc, setDoc } from 'firebase/firestore';
-// import { log } from 'console';
 
 const firebaseConfig = {
     apiKey: 'AIzaSyDrG9uBznJyP7Fe_4JRwVG7pvR7SjScQsg',
@@ -33,6 +31,15 @@ const Canvas = ({ roomId }: ChatroomProps) => {
     const [lines, setLines] = useState<any>([]);
     const [tempLine, setTempLine] = useState<any>([]);
 
+    const [shape, setShape] = useState<string | null>(null);
+    const [startX, setStartX] = useState<number>(0);
+    const [startY, setStartY] = useState<number>(0);
+    const [lastMouseX, setLastMouseX] = useState<number>(0);
+    const [lastMouseY, setLastMouseY] = useState<number>(0);
+
+    const [shapes, setShapes] = useState<any[]>([]);
+    const [distanceMoved, setDistanceMoved] = useState<number>(0);
+
     useEffect(() => {
         if (!roomId) return;
 
@@ -52,20 +59,80 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         // Set canvas background to white
         ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }, [lineWidth, roomId]);
+    }, [lineWidth, roomId, lines, shapes]);
 
     const startDrawing: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const rect = canvas.getBoundingClientRect();
+        setStartX(e.clientX - rect.left);
+        setStartY(e.clientY - rect.top);
+
+        // setStartX(e.clientX - canvas.offsetLeft);
+        // setStartY(e.clientY - canvas.offsetTop);
+
+        if (shape) {
+            setIsDrawing(true);
+        } else {
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+
+            ctx.strokeStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+
+            setIsDrawing(true);
+        }
+    };
+
+    const drawShape: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
+        if (!isDrawing) return;
+
         const canvas = canvasRef.current;
         if (!canvas) return;
 
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        ctx.strokeStyle = color;
-        ctx.beginPath();
-        ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
 
-        setIsDrawing(true);
+        // const x = e.clientX - canvas.offsetLeft;
+        // const y = e.clientY - canvas.offsetTop;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // 清除畫布
+        ctx.fillStyle = 'white'; // 將背景設置為白色
+        ctx.fillRect(0, 0, canvas.width, canvas.height); // 填充白色背景
+        renderLines(); // 重新繪製線條
+
+        ctx.strokeStyle = color;
+        ctx.lineWidth = lineWidth;
+
+        switch (shape) {
+            case 'circle':
+                ctx.beginPath();
+                const radius = Math.sqrt(Math.pow(x - startX, 2) + Math.pow(y - startY, 2));
+                ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
+                ctx.stroke();
+                break;
+            case 'rectangle':
+                ctx.beginPath();
+                ctx.rect(Math.min(x, startX), Math.min(y, startY), Math.abs(x - startX), Math.abs(y - startY));
+                ctx.stroke();
+                break;
+            case 'triangle':
+                ctx.beginPath();
+                ctx.moveTo(startX, startY - Math.abs(y - startY));
+                ctx.lineTo(startX - Math.abs(x - startX) / 2, startY + Math.abs(y - startY));
+                ctx.lineTo(startX + Math.abs(x - startX) / 2, startY + Math.abs(y - startY));
+                ctx.closePath();
+                ctx.stroke();
+                break;
+            default:
+                break;
+        }
     };
 
     const draw: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
@@ -77,8 +144,20 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        const x = e.clientX - canvas.offsetLeft;
-        const y = e.clientY - canvas.offsetTop;
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const dx = x - (tempLine.length > 0 ? tempLine[tempLine.length - 1].x : x);
+        const dy = y - (tempLine.length > 0 ? tempLine[tempLine.length - 1].y : y);
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        setDistanceMoved((prevDistance) => prevDistance + distance);
+
+        // const x = e.clientX - canvas.offsetLeft;
+        // const y = e.clientY - canvas.offsetTop;
+
+        setLastMouseX(e.clientX);
+        setLastMouseY(e.clientY);
 
         ctx.lineTo(x, y);
         ctx.stroke();
@@ -115,13 +194,40 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         }
     };
 
-    useEffect(() => {
-        renderLines();
-    }, [lines]);
-
     const endDrawing = () => {
         setIsDrawing(false);
-        if (tempLine.length > 0) {
+
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        if (distanceMoved < 5) {
+            setDistanceMoved(0);
+            return;
+        }
+
+        const rect = canvas.getBoundingClientRect();
+        const endX = lastMouseX - rect.left;
+        const endY = lastMouseY - rect.top;
+
+        if (shape) {
+            const shapeData = {
+                type: shape,
+                startX,
+                startY,
+                endX,
+                endY,
+                color,
+                lineWidth,
+            };
+
+            setShapes((prevShapes) => [...prevShapes, shapeData]);
+
+            db.collection('rooms')
+                .doc(roomId || '')
+                .update({
+                    shapes: firebase.firestore.FieldValue.arrayUnion(shapeData),
+                });
+        } else if (tempLine.length > 0) {
             db.collection('rooms')
                 .doc(roomId || '')
                 .update({
@@ -147,12 +253,12 @@ const Canvas = ({ roomId }: ChatroomProps) => {
 
         db.collection('rooms')
             .doc(roomId || '')
-            .update({ lines: [] });
+            .update({ lines: [], shapes: [] });
     };
 
     useEffect(() => {
         if (!roomId) return;
-        const unsubscribe = db
+        const unsubscribeLines = db
             .collection('rooms')
             .doc(roomId)
             .onSnapshot((doc) => {
@@ -164,17 +270,88 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                 }
             });
 
+        const unsubscribeShapes = db
+            .collection('rooms')
+            .doc(roomId)
+            .onSnapshot((doc) => {
+                const roomData = doc.data();
+                if (roomData && roomData.shapes) {
+                    setShapes(roomData.shapes);
+                } else {
+                    setShapes([]);
+                }
+            });
+
         return () => {
-            unsubscribe();
+            unsubscribeLines();
+            unsubscribeShapes();
         };
     }, [roomId]);
+
+    const renderShapes = () => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        for (const shapeData of shapes) {
+            ctx.strokeStyle = shapeData.color;
+            ctx.lineWidth = shapeData.lineWidth;
+
+            switch (shapeData.type) {
+                case 'circle':
+                    ctx.beginPath();
+                    const radius = Math.sqrt(
+                        Math.pow(shapeData.endX - shapeData.startX, 2) + Math.pow(shapeData.endY - shapeData.startY, 2)
+                    );
+                    ctx.arc(shapeData.startX, shapeData.startY, radius, 0, 2 * Math.PI);
+                    ctx.stroke();
+                    break;
+                case 'rectangle':
+                    ctx.beginPath();
+                    ctx.rect(
+                        Math.min(shapeData.endX, shapeData.startX),
+                        Math.min(shapeData.endY, shapeData.startY),
+                        Math.abs(shapeData.endX - shapeData.startX),
+                        Math.abs(shapeData.endY - shapeData.startY)
+                    );
+                    ctx.stroke();
+                    break;
+                case 'triangle':
+                    ctx.beginPath();
+                    ctx.moveTo(shapeData.startX, shapeData.startY - Math.abs(shapeData.endY - shapeData.startY));
+                    ctx.lineTo(
+                        shapeData.startX - Math.abs(shapeData.endX - shapeData.startX) / 2,
+                        shapeData.startY + Math.abs(shapeData.endY - shapeData.startY)
+                    );
+                    ctx.lineTo(
+                        shapeData.startX + Math.abs(shapeData.endX - shapeData.startX) / 2,
+                        shapeData.startY + Math.abs(shapeData.endY - shapeData.startY)
+                    );
+                    ctx.closePath();
+                    ctx.stroke();
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
+    useEffect(() => {
+        renderLines();
+        renderShapes();
+    }, [lines, shapes]);
+
+    console.log('lines:', lines);
+    console.log('shapes:', shapes);
 
     return (
         <div>
             <canvas
                 ref={canvasRef}
                 onMouseDown={startDrawing}
-                onMouseMove={draw}
+                onMouseMove={shape ? drawShape : draw} // 添加這一行
                 onMouseUp={endDrawing}
                 onMouseOut={endDrawing}
                 style={{ border: '1px solid black', width: '100%' }}
@@ -194,6 +371,16 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                     <button onClick={handleClearCanvas}>Clear</button>
                 </div>
             </div>
+            <div>
+                <label>Shape:</label>
+                <select value={shape || ''} onChange={(e) => setShape(e.target.value)}>
+                    <option value=''>Free Draw</option>
+                    <option value='circle'>Circle</option>
+                    <option value='rectangle'>Rectangle</option>
+                    <option value='triangle'>Triangle</option>
+                </select>
+            </div>
+
             <div>
                 {lines.map((line: { points: any[] }, index: React.Key | null | undefined) => (
                     <div key={index}>

@@ -103,6 +103,7 @@ const ScreenSharing: React.FC<ScreenSharingProps> = ({
     //     setIsScreenSharing(false);
     // };
 
+    //replaceTrack()
     const openScreenShare = async () => {
         try {
             const stream = await navigator.mediaDevices.getDisplayMedia({
