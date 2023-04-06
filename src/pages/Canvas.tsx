@@ -1,23 +1,43 @@
 import React, { useState, useRef, useEffect } from 'react';
+import styled from 'styled-components';
 import firebase from 'firebase/compat/app';
-import 'firebase/compat/firestore';
-import 'firebase/compat/auth';
+// import 'firebase/compat/firestore';
+// import 'firebase/compat/auth';
+import { db } from '../../firebase';
 
-const firebaseConfig = {
-    apiKey: 'AIzaSyDrG9uBznJyP7Fe_4JRwVG7pvR7SjScQsg',
-    authDomain: 'board-12c3c.firebaseapp.com',
-    projectId: 'board-12c3c',
-    storageBucket: 'board-12c3c.appspot.com',
-    messagingSenderId: '662676665549',
-    appId: '1:662676665549:web:d2d23417c365f3ec666584',
-    measurementId: 'G-YY6Q81WPY9',
-};
+const Container = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Roboto', sans-serif;
+`;
 
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
+const StyledCanvas = styled.canvas`
+    border: 1px solid black;
+    width: 100%;
+    height: 300px;
+`;
 
-const db = firebase.firestore();
+const ControlBar = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+`;
+
+const Label = styled.label`
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: 5px;
+`;
+
+const ShapeSelection = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+`;
 
 interface ChatroomProps {
     roomId: string | null;
@@ -30,13 +50,11 @@ const Canvas = ({ roomId }: ChatroomProps) => {
     const [isDrawing, setIsDrawing] = useState<boolean>(false);
     const [lines, setLines] = useState<any>([]);
     const [tempLine, setTempLine] = useState<any>([]);
-
     const [shape, setShape] = useState<string | null>(null);
     const [startX, setStartX] = useState<number>(0);
     const [startY, setStartY] = useState<number>(0);
     const [lastMouseX, setLastMouseX] = useState<number>(0);
     const [lastMouseY, setLastMouseY] = useState<number>(0);
-
     const [shapes, setShapes] = useState<any[]>([]);
     const [distanceMoved, setDistanceMoved] = useState<number>(0);
 
@@ -155,9 +173,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         const distance = Math.sqrt(dx * dx + dy * dy);
         setDistanceMoved((prevDistance) => prevDistance + distance);
 
-        // const x = e.clientX - canvas.offsetLeft;
-        // const y = e.clientY - canvas.offsetTop;
-
         setLastMouseX(e.clientX);
         setLastMouseY(e.clientY);
 
@@ -195,96 +210,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
             }
         }
     };
-
-    // const endDrawing = () => {
-    //     setIsDrawing(false);
-
-    //     const canvas = canvasRef.current;
-    //     if (!canvas) return;
-
-    //     if (distanceMoved < 5) {
-    //         setDistanceMoved(0);
-    //         // return;
-    //     }
-
-    //     const rect = canvas.getBoundingClientRect();
-    //     const endX = lastMouseX - rect.left;
-    //     const endY = lastMouseY - rect.top;
-
-    //     if (shape) {
-    //         const shapeData = {
-    //             type: shape,
-    //             startX,
-    //             startY,
-    //             endX,
-    //             endY,
-    //             color,
-    //             lineWidth,
-    //         };
-
-    //         setShapes((prevShapes) => [...prevShapes, shapeData]);
-
-    //         db.collection('rooms')
-    //             .doc(roomId || '')
-    //             .update({
-    //                 shapes: firebase.firestore.FieldValue.arrayUnion(shapeData),
-    //             });
-    //     } else if (tempLine.length > 0) {
-    //         db.collection('rooms')
-    //             .doc(roomId || '')
-    //             .update({
-    //                 lines: firebase.firestore.FieldValue.arrayUnion({ points: tempLine }),
-    //             })
-    //             .then(() => {
-    //                 setTempLine([]);
-    //             });
-    //     }
-    // };
-
-    // const endDrawing = () => {
-    //     setIsDrawing(false);
-
-    //     const canvas = canvasRef.current;
-    //     if (!canvas || distanceMoved < 1) {
-    //         console.log('!canvas || distanceMoved < 10');
-    //         return;
-    //     }
-
-    //     const rect = canvas.getBoundingClientRect();
-    //     const endX = lastMouseX - rect.left;
-    //     const endY = lastMouseY - rect.top;
-
-    //     if (shape) {
-    //         const shapeData = {
-    //             type: shape,
-    //             startX,
-    //             startY,
-    //             endX,
-    //             endY,
-    //             color,
-    //             lineWidth,
-    //         };
-
-    //         setShapes((prevShapes) => [...prevShapes, shapeData]);
-
-    //         // Move this part to the end of the function
-    //         db.collection('rooms')
-    //             .doc(roomId || '')
-    //             .update({
-    //                 shapes: firebase.firestore.FieldValue.arrayUnion(shapeData),
-    //             });
-    //     } else if (tempLine.length > 0) {
-    //         db.collection('rooms')
-    //             .doc(roomId || '')
-    //             .update({
-    //                 lines: firebase.firestore.FieldValue.arrayUnion({ points: tempLine }),
-    //             })
-    //             .then(() => {
-    //                 setTempLine([]);
-    //             });
-    //     }
-    //     setDistanceMoved(0);
-    // };
 
     const endDrawing = () => {
         setIsDrawing(false);
@@ -434,24 +359,24 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         renderShapes();
     }, [lines, shapes]);
 
-    // console.log('lines:', lines);
     console.log('shapes in firestore:', shapes);
 
     return (
-        <div>
-            <canvas
+        <Container>
+            <StyledCanvas
                 ref={canvasRef}
                 onMouseDown={startDrawing}
-                onMouseMove={shape ? drawShape : draw} // 添加這一行
+                onMouseMove={shape ? drawShape : draw}
                 onMouseUp={endDrawing}
                 onMouseOut={endDrawing}
-                style={{ border: '1px solid black', width: '100%', height: '300px' }}
             />
-            <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <label>Color:</label>
+            <ControlBar>
+                <div>
+                    <Label>Color:</Label>
                     <input type='color' value={color} onChange={(e) => setColor(e.target.value)} />
-                    <label>Line Width:</label>
+                </div>
+                <div>
+                    <Label>Line Width:</Label>
                     <input
                         type='range'
                         min='1'
@@ -459,18 +384,19 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                         value={lineWidth}
                         onChange={(e) => setLineWidth(Number(e.target.value))}
                     />
-                    <button onClick={handleClearCanvas}>Clear</button>
                 </div>
-            </div>
-            <div>
-                <label>Shape:</label>
+                <button onClick={handleClearCanvas}>Clear</button>
+            </ControlBar>
+            <ShapeSelection>
+                <Label>Shape:</Label>
                 <select value={shape || ''} onChange={(e) => setShape(e.target.value)}>
                     <option value=''>Free Draw</option>
                     <option value='circle'>Circle</option>
                     <option value='rectangle'>Rectangle</option>
                     <option value='triangle'>Triangle</option>
+                    <option value='move'>Move</option>
                 </select>
-            </div>
+            </ShapeSelection>
 
             <div>
                 {lines.map((line: { points: any[] }, index: React.Key | null | undefined) => (
@@ -491,7 +417,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                     </div>
                 ))}
             </div>
-        </div>
+        </Container>
     );
 };
 

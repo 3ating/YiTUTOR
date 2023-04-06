@@ -6,22 +6,7 @@ import 'firebase/compat/firestore';
 import ScreenSharing from './ScreenSharing';
 import Chatroom from './Chatroom';
 import Canvas from './Canvas';
-
-const firebaseConfig = {
-    apiKey: 'AIzaSyDrG9uBznJyP7Fe_4JRwVG7pvR7SjScQsg',
-    authDomain: 'board-12c3c.firebaseapp.com',
-    projectId: 'board-12c3c',
-    storageBucket: 'board-12c3c.appspot.com',
-    messagingSenderId: '662676665549',
-    appId: '1:662676665549:web:d2d23417c365f3ec666584',
-    measurementId: 'G-YY6Q81WPY9',
-};
-
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
-
-const db = firebase.firestore();
+import { db } from '../../firebase';
 
 const configuration: RTCConfiguration = {
     iceServers: [
