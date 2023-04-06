@@ -110,7 +110,7 @@ const VideoChat: React.FC = () => {
 
         const callerCandidatesCollection = roomRef.collection('callerCandidates');
         pc.onicecandidate = (event) => {
-            console.log('event.candidate in create room:', event.candidate);
+            // console.log('event.candidate in create room:', event.candidate);
             if (event.candidate) {
                 callerCandidatesCollection.add(event.candidate.toJSON());
             }
@@ -127,7 +127,7 @@ const VideoChat: React.FC = () => {
 
         await roomRef.set(roomWithOffer);
         setRoomId(roomRef.id);
-        console.log('pc in createroom:', pc);
+        // console.log('pc in createroom:', pc);
 
         // Listen for remote description
         roomRef.onSnapshot(async (snapshot) => {
@@ -135,14 +135,14 @@ const VideoChat: React.FC = () => {
             if (data?.answer && !pc.currentRemoteDescription) {
                 const rtcSessionDescription = new RTCSessionDescription(data.answer);
                 await pc.setRemoteDescription(rtcSessionDescription);
-                console.log('Remote description set:', rtcSessionDescription);
+                // console.log('Remote description set:', rtcSessionDescription);
             }
         });
 
         roomRef.collection('calleeCandidates').onSnapshot((snapshot: { docChanges: () => any[] }) => {
             snapshot.docChanges().forEach(async (change) => {
                 if (change.type === 'added') {
-                    console.log('pc in createroom(onSnapshot):', pc);
+                    // console.log('pc in createroom(onSnapshot):', pc);
                     const data = change.doc.data();
                     await pc.addIceCandidate(new RTCIceCandidate(data));
                 }
@@ -171,7 +171,7 @@ const VideoChat: React.FC = () => {
             };
 
             pc.oniceconnectionstatechange = (event) => {
-                console.log('ICE connection state change:', pc.iceConnectionState);
+                // console.log('ICE connection state change:', pc.iceConnectionState);
                 // handle ICE connection state change here
             };
 
@@ -185,9 +185,9 @@ const VideoChat: React.FC = () => {
             await pc.setRemoteDescription(new RTCSessionDescription(offer));
 
             pc.onicecandidate = (event) => {
-                console.log('event.candidate in joinRoomById:', event.candidate);
+                // console.log('event.candidate in joinRoomById:', event.candidate);
                 if (event.candidate) {
-                    console.log('add calleeCandidates in joinroom()');
+                    // console.log('add calleeCandidates in joinroom()');
                     roomRef.collection('calleeCandidates').add(event.candidate.toJSON());
                 }
             };
@@ -208,11 +208,11 @@ const VideoChat: React.FC = () => {
             roomRef.collection('callerCandidates').onSnapshot((snapshot) => {
                 snapshot.docChanges().forEach(async (change) => {
                     if (change.type === 'added') {
-                        console.log('onSnapshot callerCandidates in joinroom()');
+                        // console.log('onSnapshot callerCandidates in joinroom()');
 
                         const data = change.doc.data();
                         await pc.addIceCandidate(new RTCIceCandidate(data));
-                        console.log('pc.addIceCandidate in joinroom:', pc.addIceCandidate);
+                        // console.log('pc.addIceCandidate in joinroom:', pc.addIceCandidate);
                     }
                 });
             });

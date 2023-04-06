@@ -45,65 +45,6 @@ const ScreenSharing: React.FC<ScreenSharingProps> = ({
             .update(data);
     };
 
-    // const openScreenShare = async () => {
-    //     try {
-    //         const stream = await navigator.mediaDevices.getDisplayMedia({
-    //             video: {
-    //                 width: { ideal: 1920 },
-    //                 height: { ideal: 1080 },
-    //                 frameRate: { ideal: 30 },
-    //             },
-    //         });
-
-    //         const newVideoTrack = stream.getVideoTracks()[0];
-    //         const newVideoTrackId = newVideoTrack.id;
-    //         sendSignalData({ screenSharingTrackId: newVideoTrackId });
-
-    //         if (peerConnection) {
-    //             const sender = peerConnection.addTrack(newVideoTrack, stream);
-    //             console.log('sender:', sender);
-    //         }
-
-    //         // Set the new remote stream for screen sharing video
-    //         const newRemoteStream = new MediaStream(stream.getVideoTracks());
-    //         setRemoteScreen(newRemoteStream);
-
-    //         // Set the video srcObject for the screen sharing video element
-    //         if (remoteScreenRef.current) {
-    //             remoteScreenRef.current.srcObject = newRemoteStream;
-    //         }
-    //     } catch (err) {
-    //         console.error('Error: ' + err);
-    //     }
-    //     setIsScreenSharing(true);
-    // };
-
-    // console.log('roomid in screensharing:', roomId);
-
-    // const stopScreenShare = async () => {
-    //     if (remoteScreen) {
-    //         const screenVideoTrack = remoteScreen
-    //             .getVideoTracks()
-    //             .find((track) => track.kind === 'video' && track.label.includes('screen'));
-    //         if (screenVideoTrack) {
-    //             if (peerConnection) {
-    //                 const sender = peerConnection.getSenders().find((sender) => sender.track === screenVideoTrack);
-    //                 if (sender) {
-    //                     peerConnection.removeTrack(sender);
-    //                 }
-    //             }
-    //             screenVideoTrack.stop();
-    //         }
-    //         setRemoteScreen(null);
-
-    //         // Notify the remote user to stop receiving the screen sharing stream
-    //         sendSignalData({ stopScreenShare: true });
-    //         sendSignalData({ screenSharingTrackId: firebase.firestore.FieldValue.delete() });
-    //     }
-    //     setIsScreenSharing(false);
-    // };
-
-    //replaceTrack()
     const openScreenShare = async () => {
         try {
             const stream = await navigator.mediaDevices.getDisplayMedia({
@@ -115,18 +56,16 @@ const ScreenSharing: React.FC<ScreenSharingProps> = ({
             });
 
             const newVideoTrack = stream.getVideoTracks()[0];
+            const newVideoTrackId = newVideoTrack.id;
+            sendSignalData({ screenSharingTrackId: newVideoTrackId });
 
-            if (peerConnection && localStream) {
-                const sender = peerConnection
-                    .getSenders()
-                    .find((sender) => sender.track && sender.track.kind === 'video');
-                if (sender) {
-                    await sender.replaceTrack(newVideoTrack);
-                }
+            if (peerConnection) {
+                const sender = peerConnection.addTrack(newVideoTrack, stream);
+                console.log('sender:', sender);
             }
 
             // Set the new remote stream for screen sharing video
-            const newRemoteStream = new MediaStream([newVideoTrack]);
+            const newRemoteStream = new MediaStream(stream.getVideoTracks());
             setRemoteScreen(newRemoteStream);
 
             // Set the video srcObject for the screen sharing video element
@@ -139,25 +78,86 @@ const ScreenSharing: React.FC<ScreenSharingProps> = ({
         setIsScreenSharing(true);
     };
 
+    console.log('roomid in screensharing:', roomId);
+
     const stopScreenShare = async () => {
-        if (remoteScreen && localStream) {
+        if (remoteScreen) {
             const screenVideoTrack = remoteScreen
                 .getVideoTracks()
                 .find((track) => track.kind === 'video' && track.label.includes('screen'));
-            const originalVideoTrack = localStream.getVideoTracks().find((track) => track.kind === 'video');
-            if (screenVideoTrack && originalVideoTrack) {
+            if (screenVideoTrack) {
                 if (peerConnection) {
                     const sender = peerConnection.getSenders().find((sender) => sender.track === screenVideoTrack);
                     if (sender) {
-                        await sender.replaceTrack(originalVideoTrack);
+                        peerConnection.removeTrack(sender);
                     }
                 }
                 screenVideoTrack.stop();
             }
             setRemoteScreen(null);
+
+            // Notify the remote user to stop receiving the screen sharing stream
+            sendSignalData({ stopScreenShare: true });
+            sendSignalData({ screenSharingTrackId: firebase.firestore.FieldValue.delete() });
         }
         setIsScreenSharing(false);
     };
+
+    //replaceTrack()
+    // const openScreenShare = async () => {
+    //     try {
+    //         const stream = await navigator.mediaDevices.getDisplayMedia({
+    //             video: {
+    //                 width: { ideal: 1920 },
+    //                 height: { ideal: 1080 },
+    //                 frameRate: { ideal: 30 },
+    //             },
+    //         });
+
+    //         const newVideoTrack = stream.getVideoTracks()[0];
+
+    //         if (peerConnection && localStream) {
+    //             const sender = peerConnection
+    //                 .getSenders()
+    //                 .find((sender) => sender.track && sender.track.kind === 'video');
+    //             if (sender) {
+    //                 await sender.replaceTrack(newVideoTrack);
+    //             }
+    //         }
+
+    //         // Set the new remote stream for screen sharing video
+    //         const newRemoteStream = new MediaStream([newVideoTrack]);
+    //         setRemoteScreen(newRemoteStream);
+
+    //         // Set the video srcObject for the screen sharing video element
+    //         if (remoteScreenRef.current) {
+    //             remoteScreenRef.current.srcObject = newRemoteStream;
+    //         }
+    //     } catch (err) {
+    //         console.error('Error: ' + err);
+    //     }
+    //     setIsScreenSharing(true);
+    // };
+
+    // const stopScreenShare = async () => {
+    //     if (remoteScreen && localStream) {
+    //         const screenVideoTrack = remoteScreen
+    //             .getVideoTracks()
+    //             .find((track) => track.kind === 'video' && track.label.includes('screen'));
+    //         const originalVideoTrack = localStream.getVideoTracks().find((track) => track.kind === 'video');
+    //         if (screenVideoTrack && originalVideoTrack) {
+    //             if (peerConnection) {
+    //                 const sender = peerConnection.getSenders().find((sender) => sender.track === screenVideoTrack);
+    //                 if (sender) {
+    //                     await sender.replaceTrack(originalVideoTrack);
+    //                 }
+    //             }
+    //             screenVideoTrack.stop();
+    //         }
+    //         setRemoteScreen(null);
+    //     }
+    //     setIsScreenSharing(false);
+    // };
 
     useEffect(() => {
         if (!roomId || !peerConnection) {

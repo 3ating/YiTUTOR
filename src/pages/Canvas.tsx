@@ -69,9 +69,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         setStartX(e.clientX - rect.left);
         setStartY(e.clientY - rect.top);
 
-        // setStartX(e.clientX - canvas.offsetLeft);
-        // setStartY(e.clientY - canvas.offsetTop);
-
         if (shape) {
             setIsDrawing(true);
         } else {
@@ -101,6 +98,9 @@ const Canvas = ({ roomId }: ChatroomProps) => {
 
         // const x = e.clientX - canvas.offsetLeft;
         // const y = e.clientY - canvas.offsetTop;
+
+        console.log('in drawshap x:', x);
+        console.log('in drawshap y:', y);
 
         ctx.clearRect(0, 0, canvas.width, canvas.height); // 清除畫布
         ctx.fillStyle = 'white'; // 將背景設置為白色
@@ -133,6 +133,8 @@ const Canvas = ({ roomId }: ChatroomProps) => {
             default:
                 break;
         }
+        setLastMouseX(e.clientX);
+        setLastMouseY(e.clientY);
     };
 
     const draw: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
@@ -194,14 +196,102 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         }
     };
 
+    // const endDrawing = () => {
+    //     setIsDrawing(false);
+
+    //     const canvas = canvasRef.current;
+    //     if (!canvas) return;
+
+    //     if (distanceMoved < 5) {
+    //         setDistanceMoved(0);
+    //         // return;
+    //     }
+
+    //     const rect = canvas.getBoundingClientRect();
+    //     const endX = lastMouseX - rect.left;
+    //     const endY = lastMouseY - rect.top;
+
+    //     if (shape) {
+    //         const shapeData = {
+    //             type: shape,
+    //             startX,
+    //             startY,
+    //             endX,
+    //             endY,
+    //             color,
+    //             lineWidth,
+    //         };
+
+    //         setShapes((prevShapes) => [...prevShapes, shapeData]);
+
+    //         db.collection('rooms')
+    //             .doc(roomId || '')
+    //             .update({
+    //                 shapes: firebase.firestore.FieldValue.arrayUnion(shapeData),
+    //             });
+    //     } else if (tempLine.length > 0) {
+    //         db.collection('rooms')
+    //             .doc(roomId || '')
+    //             .update({
+    //                 lines: firebase.firestore.FieldValue.arrayUnion({ points: tempLine }),
+    //             })
+    //             .then(() => {
+    //                 setTempLine([]);
+    //             });
+    //     }
+    // };
+
+    // const endDrawing = () => {
+    //     setIsDrawing(false);
+
+    //     const canvas = canvasRef.current;
+    //     if (!canvas || distanceMoved < 1) {
+    //         console.log('!canvas || distanceMoved < 10');
+    //         return;
+    //     }
+
+    //     const rect = canvas.getBoundingClientRect();
+    //     const endX = lastMouseX - rect.left;
+    //     const endY = lastMouseY - rect.top;
+
+    //     if (shape) {
+    //         const shapeData = {
+    //             type: shape,
+    //             startX,
+    //             startY,
+    //             endX,
+    //             endY,
+    //             color,
+    //             lineWidth,
+    //         };
+
+    //         setShapes((prevShapes) => [...prevShapes, shapeData]);
+
+    //         // Move this part to the end of the function
+    //         db.collection('rooms')
+    //             .doc(roomId || '')
+    //             .update({
+    //                 shapes: firebase.firestore.FieldValue.arrayUnion(shapeData),
+    //             });
+    //     } else if (tempLine.length > 0) {
+    //         db.collection('rooms')
+    //             .doc(roomId || '')
+    //             .update({
+    //                 lines: firebase.firestore.FieldValue.arrayUnion({ points: tempLine }),
+    //             })
+    //             .then(() => {
+    //                 setTempLine([]);
+    //             });
+    //     }
+    //     setDistanceMoved(0);
+    // };
+
     const endDrawing = () => {
         setIsDrawing(false);
 
         const canvas = canvasRef.current;
-        if (!canvas) return;
-
-        if (distanceMoved < 5) {
-            setDistanceMoved(0);
+        if (!canvas) {
+            console.log('!canvas');
             return;
         }
 
@@ -227,7 +317,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                 .update({
                     shapes: firebase.firestore.FieldValue.arrayUnion(shapeData),
                 });
-        } else if (tempLine.length > 0) {
+        } else if (tempLine.length > 0 && distanceMoved >= 5) {
             db.collection('rooms')
                 .doc(roomId || '')
                 .update({
@@ -237,6 +327,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                     setTempLine([]);
                 });
         }
+        setDistanceMoved(0);
     };
 
     const handleClearCanvas = () => {
@@ -343,8 +434,8 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         renderShapes();
     }, [lines, shapes]);
 
-    console.log('lines:', lines);
-    console.log('shapes:', shapes);
+    // console.log('lines:', lines);
+    console.log('shapes in firestore:', shapes);
 
     return (
         <div>
@@ -354,7 +445,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                 onMouseMove={shape ? drawShape : draw} // 添加這一行
                 onMouseUp={endDrawing}
                 onMouseOut={endDrawing}
-                style={{ border: '1px solid black', width: '100%' }}
+                style={{ border: '1px solid black', width: '100%', height: '300px' }}
             />
             <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
