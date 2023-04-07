@@ -91,7 +91,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         ctx.lineCap = 'round';
         ctx.lineWidth = lineWidth;
 
-        // Set canvas background to white
         ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
     }, [lineWidth, roomId, lines, shapes]);
@@ -173,6 +172,43 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         setLastMouseY(e.clientY);
     };
 
+    // const draw: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
+    //     if (!isDrawing) return;
+
+    //     const canvas = canvasRef.current;
+    //     if (!canvas) return;
+
+    //     const ctx = canvas.getContext('2d');
+    //     if (!ctx) return;
+
+    //     const rect = canvas.getBoundingClientRect();
+    //     const x = e.clientX - rect.left;
+    //     const y = e.clientY - rect.top;
+
+    //     const dx = x - (tempLine.length > 0 ? tempLine[tempLine.length - 1].x : x);
+    //     const dy = y - (tempLine.length > 0 ? tempLine[tempLine.length - 1].y : y);
+    //     const distance = Math.sqrt(dx * dx + dy * dy);
+    //     setDistanceMoved((prevDistance) => prevDistance + distance);
+
+    //     setLastMouseX(e.clientX);
+    //     setLastMouseY(e.clientY);
+
+    //     ctx.lineTo(x, y);
+    //     ctx.stroke();
+
+    //     setTempLine((prevLine: any) => [
+    //         ...prevLine,
+    //         {
+    //             x,
+    //             y,
+    //             prevX: prevLine.length > 0 ? prevLine[prevLine.length - 1].x : x,
+    //             prevY: prevLine.length > 0 ? prevLine[prevLine.length - 1].y : y,
+    //             color,
+    //             lineWidth,
+    //         },
+    //     ]);
+    // };
+
     const draw: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
         if (!isDrawing) return;
 
@@ -194,6 +230,11 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         setLastMouseX(e.clientX);
         setLastMouseY(e.clientY);
 
+        ctx.beginPath();
+        ctx.moveTo(
+            tempLine.length > 0 ? tempLine[tempLine.length - 1].x : x,
+            tempLine.length > 0 ? tempLine[tempLine.length - 1].y : y
+        );
         ctx.lineTo(x, y);
         ctx.stroke();
 
@@ -242,8 +283,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         const endY = lastMouseY - rect.top;
 
         if (shape && distanceMoved >= minDistance) {
-            console.log('123');
-
             const shapeData = {
                 type: shape,
                 startX,
@@ -379,7 +418,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
     }, [lines, shapes]);
 
     console.log('shapes in firestore:', shapes);
-    console.log('distancedmove', distanceMoved);
 
     return (
         <Container>
@@ -414,7 +452,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                     <option value='circle'>Circle</option>
                     <option value='rectangle'>Rectangle</option>
                     <option value='triangle'>Triangle</option>
-                    {/* <option value='move'>Move</option> */}
                 </select>
             </ShapeSelection>
         </Container>

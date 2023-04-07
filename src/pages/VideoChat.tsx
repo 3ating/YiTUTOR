@@ -42,7 +42,6 @@ const VideoChat: React.FC = () => {
     const [roomDialogOpen, setRoomDialogOpen] = useState(false);
     const [roomIdInput, setRoomIdInput] = useState('');
     const [isScreenSharing, setIsScreenSharing] = useState(false);
-
     const [isMicMuted, setIsMicMuted] = useState(false);
     const [isAudioMuted, setIsAudioMuted] = useState(false);
 
@@ -174,8 +173,7 @@ const VideoChat: React.FC = () => {
             };
 
             pc.oniceconnectionstatechange = (event) => {
-                // console.log('ICE connection state change:', pc.iceConnectionState);
-                // handle ICE connection state change here
+                console.log('ICE connection state change:', pc.iceConnectionState);
             };
 
             setPeerConnection(pc);
