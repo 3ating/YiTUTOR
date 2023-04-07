@@ -10,6 +10,7 @@ import {
 } from '@chatscope/chat-ui-kit-react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
+import styled from 'styled-components';
 
 const firebaseConfig = {
     apiKey: process.env.FIRESTORE_API_KEY,
@@ -27,22 +28,78 @@ if (!firebase.apps.length) {
 
 const db = firebase.firestore();
 
-const API_KEY = process.env.OPENAI_API_KEY; // 替換為您的 OpenAI API Key
+const API_KEY = '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';
 
-const systemMessage = {
-    role: 'system',
-    content: "Explain things like you're talking to a software professional with 2 years of experience.",
-};
+const StyledApp = styled.div`
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f5f5f5;
+    height: 100vh;
+`;
+
+const StyledMainContainer = styled(MainContainer)`
+    height: 100%;
+`;
+
+const StyledChatContainer = styled(ChatContainer)`
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+    border-radius: 6px;
+    margin: 50px auto;
+    max-width: 600px;
+    height: 80%;
+`;
 
 const AskGPTPage = () => {
     const [messages, setMessages] = useState([
         {
-            message: "Hello, I'm ChatGPT! Ask me anything!",
+            message: '我是智慧解題機器人🤖，我會盡我所能為你解答任何考題！',
             sentTime: 'just now',
             sender: 'ChatGPT',
         },
     ]);
     const [isTyping, setIsTyping] = useState(false);
+
+    // function checkExamRelatedQuestion(question: string): boolean {
+    //     // 在此添加關鍵字或短語，用於檢查問題是否與考試相關
+    //     const examKeywords = ['請問', '測驗', '試卷', '學期', '成績'];
+
+    //     for (const keyword of examKeywords) {
+    //         if (question.includes(keyword)) {
+    //             return true;
+    //         }
+    //     }
+
+    //     return false;
+    // }
+
+    // const handleSend = async (message: string) => {
+    //     const newMessage = {
+    //         message,
+    //         direction: 'outgoing',
+    //         sender: 'user',
+    //         sentTime: new Date().toLocaleString(),
+    //     };
+
+    //     const newMessages = [...messages, newMessage];
+
+    //     setMessages(newMessages);
+
+    //     // 檢查問題是否與考試有關
+    //     const isExamRelated = checkExamRelatedQuestion(message);
+
+    //     if (isExamRelated) {
+    //         setIsTyping(true);
+    //         await processMessageToChatGPT(newMessages);
+    //     } else {
+    //         // 如果問題與考試無關，返回提示信息
+    //         const notRelatedMessage = {
+    //             message: '請重新發問一次',
+    //             sender: 'ChatGPT',
+    //             sentTime: new Date().toLocaleString(),
+    //         };
+    //         setMessages([...newMessages, notRelatedMessage]);
+    //     }
+    // };
 
     const handleSend = async (message: string) => {
         const newMessage = {
@@ -87,15 +144,18 @@ const AskGPTPage = () => {
 
         const apiRequestBody = {
             model: 'gpt-3.5-turbo',
-            messages: [systemMessage, ...apiMessages],
+            messages: apiMessages,
         };
+
+        console.log('apiMessages:', apiMessages);
+        console.log('apiRequestBody:', apiRequestBody);
 
         await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
 
             headers: {
-                Authorization: `Bearer ${API_KEY}`,
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${API_KEY}`,
             },
             body: JSON.stringify(apiRequestBody),
         })
@@ -111,7 +171,12 @@ const AskGPTPage = () => {
                         message: data.choices[0].message.content,
                         sender: 'ChatGPT',
                     };
-                    storeQuestionAndAnswer(messages, chatGPTMessage);
+                    const lastUserMessage = chatMessages
+                        .filter((messageObject) => messageObject.sender === 'user')
+                        .pop();
+                    if (lastUserMessage) {
+                        storeQuestionAndAnswer({ message: lastUserMessage.message }, chatGPTMessage);
+                    }
                     setMessages([...chatMessages, chatGPTMessage]);
                 } else {
                     console.error('No choices returned from the API.');
@@ -125,10 +190,10 @@ const AskGPTPage = () => {
     }
 
     return (
-        <div className='App'>
+        <StyledApp>
             <div style={{ position: 'relative', height: '100vh', width: '100%' }}>
-                <MainContainer>
-                    <ChatContainer>
+                <StyledMainContainer>
+                    <StyledChatContainer>
                         <MessageList
                             scrollBehavior='smooth'
                             typingIndicator={isTyping ? <TypingIndicator content='ChatGPT is typing' /> : null}
@@ -149,10 +214,10 @@ const AskGPTPage = () => {
                             })}
                         </MessageList>
                         <MessageInput placeholder='Type message here' onSend={handleSend} />
-                    </ChatContainer>
-                </MainContainer>
+                    </StyledChatContainer>
+                </StyledMainContainer>
             </div>
-        </div>
+        </StyledApp>
     );
 };
 

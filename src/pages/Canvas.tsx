@@ -172,43 +172,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         setLastMouseY(e.clientY);
     };
 
-    // const draw: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
-    //     if (!isDrawing) return;
-
-    //     const canvas = canvasRef.current;
-    //     if (!canvas) return;
-
-    //     const ctx = canvas.getContext('2d');
-    //     if (!ctx) return;
-
-    //     const rect = canvas.getBoundingClientRect();
-    //     const x = e.clientX - rect.left;
-    //     const y = e.clientY - rect.top;
-
-    //     const dx = x - (tempLine.length > 0 ? tempLine[tempLine.length - 1].x : x);
-    //     const dy = y - (tempLine.length > 0 ? tempLine[tempLine.length - 1].y : y);
-    //     const distance = Math.sqrt(dx * dx + dy * dy);
-    //     setDistanceMoved((prevDistance) => prevDistance + distance);
-
-    //     setLastMouseX(e.clientX);
-    //     setLastMouseY(e.clientY);
-
-    //     ctx.lineTo(x, y);
-    //     ctx.stroke();
-
-    //     setTempLine((prevLine: any) => [
-    //         ...prevLine,
-    //         {
-    //             x,
-    //             y,
-    //             prevX: prevLine.length > 0 ? prevLine[prevLine.length - 1].x : x,
-    //             prevY: prevLine.length > 0 ? prevLine[prevLine.length - 1].y : y,
-    //             color,
-    //             lineWidth,
-    //         },
-    //     ]);
-    // };
-
     const draw: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
         if (!isDrawing) return;
 

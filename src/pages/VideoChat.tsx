@@ -6,6 +6,7 @@ import 'firebase/compat/firestore';
 import ScreenSharing from './ScreenSharing';
 import Chatroom from './Chatroom';
 import Canvas from './Canvas';
+import * as bodyPix from '@tensorflow-models/body-pix';
 
 const firebaseConfig = {
     apiKey: process.env.FIRESTORE_API_KEY,
