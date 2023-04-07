@@ -12,7 +12,7 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 
 const firebaseConfig = {
-    apiKey: 'AIzaSyDrG9uBznJyP7Fe_4JRwVG7pvR7SjScQsg',
+    apiKey: process.env.FIRESTORE_API_KEY,
     authDomain: 'board-12c3c.firebaseapp.com',
     projectId: 'board-12c3c',
     storageBucket: 'board-12c3c.appspot.com',
@@ -27,7 +27,7 @@ if (!firebase.apps.length) {
 
 const db = firebase.firestore();
 
-const API_KEY = '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'; // 替換為您的 OpenAI API Key
+const API_KEY = process.env.OPENAI_API_KEY; // 替換為您的 OpenAI API Key
 
 const systemMessage = {
     role: 'system',
@@ -44,12 +44,12 @@ const AskGPTPage = () => {
     ]);
     const [isTyping, setIsTyping] = useState(false);
 
-    const handleSend = async (message: any) => {
+    const handleSend = async (message: string) => {
         const newMessage = {
             message,
             direction: 'outgoing',
             sender: 'user',
-            sentTime: new Date().toLocaleString(), // 加上 sentTime 屬性
+            sentTime: new Date().toLocaleString(),
         };
 
         const newMessages = [...messages, newMessage];
@@ -111,7 +111,7 @@ const AskGPTPage = () => {
                         message: data.choices[0].message.content,
                         sender: 'ChatGPT',
                     };
-                    storeQuestionAndAnswer(newMessage, chatGPTMessage);
+                    storeQuestionAndAnswer(messages, chatGPTMessage);
                     setMessages([...chatMessages, chatGPTMessage]);
                 } else {
                     console.error('No choices returned from the API.');

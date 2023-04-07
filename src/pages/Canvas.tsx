@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import firebase from 'firebase/compat/app';
-// import 'firebase/compat/firestore';
-// import 'firebase/compat/auth';
-import { db } from '../../firebase';
+import 'firebase/compat/firestore';
+import 'firebase/compat/auth';
 
 const Container = styled.div`
     display: flex;
@@ -38,6 +37,22 @@ const ShapeSelection = styled.div`
     align-items: center;
     margin-top: 10px;
 `;
+
+const firebaseConfig = {
+    apiKey: process.env.FIRESTORE_API_KEY,
+    authDomain: 'board-12c3c.firebaseapp.com',
+    projectId: 'board-12c3c',
+    storageBucket: 'board-12c3c.appspot.com',
+    messagingSenderId: '662676665549',
+    appId: '1:662676665549:web:d2d23417c365f3ec666584',
+    measurementId: 'G-YY6Q81WPY9',
+};
+
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+
+const db = firebase.firestore();
 
 interface ChatroomProps {
     roomId: string | null;
@@ -116,9 +131,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
 
         // const x = e.clientX - canvas.offsetLeft;
         // const y = e.clientY - canvas.offsetTop;
-
-        console.log('in drawshap x:', x);
-        console.log('in drawshap y:', y);
 
         ctx.clearRect(0, 0, canvas.width, canvas.height); // 清除畫布
         ctx.fillStyle = 'white'; // 將背景設置為白色
@@ -216,7 +228,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
 
         const canvas = canvasRef.current;
         if (!canvas) {
-            console.log('!canvas');
             return;
         }
 
