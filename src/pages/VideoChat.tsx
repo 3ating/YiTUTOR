@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@material-ui/core';
-import { Videocam, GroupAdd, Group, CallEnd } from '@material-ui/icons';
+import { Videocam, GroupAdd, Group, CallEnd, VolumeUp, Mic } from '@material-ui/icons';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import ScreenSharing from './ScreenSharing';
@@ -42,6 +42,9 @@ const VideoChat: React.FC = () => {
     const [roomDialogOpen, setRoomDialogOpen] = useState(false);
     const [roomIdInput, setRoomIdInput] = useState('');
     const [isScreenSharing, setIsScreenSharing] = useState(false);
+
+    const [isMicMuted, setIsMicMuted] = useState(false);
+    const [isAudioMuted, setIsAudioMuted] = useState(false);
 
     useEffect(() => {
         if (localStream && remoteStream && localVideoRef.current && remoteVideoRef.current) {
@@ -247,6 +250,23 @@ const VideoChat: React.FC = () => {
         }
     }, [peerConnection, roomId, localStream, remoteStream]);
 
+    const toggleMic = () => {
+        if (localStream) {
+            const audioTracks = localStream.getAudioTracks();
+            if (audioTracks.length > 0) {
+                audioTracks[0].enabled = !audioTracks[0].enabled;
+                setIsMicMuted(!isMicMuted);
+            }
+        }
+    };
+
+    const toggleAudio = () => {
+        if (remoteVideoRef.current) {
+            remoteVideoRef.current.muted = !remoteVideoRef.current.muted;
+            setIsAudioMuted(!isAudioMuted);
+        }
+    };
+
     return (
         <div>
             {peerConnection && <Canvas roomId={roomId} />}
@@ -291,6 +311,24 @@ const VideoChat: React.FC = () => {
                 </Button>
                 <Button variant='contained' color='primary' onClick={hangUp} disabled={!roomId} startIcon={<CallEnd />}>
                     掛斷
+                </Button>
+                <Button
+                    variant='contained'
+                    color={isMicMuted ? 'secondary' : 'primary'}
+                    onClick={toggleMic}
+                    disabled={!localStream || !roomId}
+                    startIcon={<Mic />}
+                >
+                    {isMicMuted ? '開啟麥克風' : '關閉麥克風'}
+                </Button>
+                <Button
+                    variant='contained'
+                    color={isAudioMuted ? 'secondary' : 'primary'}
+                    onClick={toggleAudio}
+                    disabled={!remoteStream || !roomId}
+                    startIcon={<VolumeUp />}
+                >
+                    {isAudioMuted ? '開啟音量' : '關閉音量'}
                 </Button>
             </div>
             <Dialog open={roomDialogOpen} onClose={() => setRoomDialogOpen(false)}>
