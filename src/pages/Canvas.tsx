@@ -60,6 +60,8 @@ interface ChatroomProps {
 
 const Canvas = ({ roomId }: ChatroomProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const tempCanvasRef = useRef<HTMLCanvasElement>(null);
+
     const [color, setColor] = useState<string>('black');
     const [lineWidth, setLineWidth] = useState<number>(5);
     const [isDrawing, setIsDrawing] = useState<boolean>(false);
@@ -129,13 +131,12 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
-        // const x = e.clientX - canvas.offsetLeft;
-        // const y = e.clientY - canvas.offsetTop;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // 清除畫布
-        ctx.fillStyle = 'white'; // 將背景設置為白色
-        ctx.fillRect(0, 0, canvas.width, canvas.height); // 填充白色背景
-        renderLines(); // 重新繪製線條
+        renderShapes();
+        renderLines();
 
         ctx.strokeStyle = color;
         ctx.lineWidth = lineWidth;
@@ -405,29 +406,9 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                     <option value='circle'>Circle</option>
                     <option value='rectangle'>Rectangle</option>
                     <option value='triangle'>Triangle</option>
-                    <option value='move'>Move</option>
+                    {/* <option value='move'>Move</option> */}
                 </select>
             </ShapeSelection>
-
-            <div>
-                {lines.map((line: { points: any[] }, index: React.Key | null | undefined) => (
-                    <div key={index}>
-                        {line.points.map((point: any, idx: number) => (
-                            <div
-                                key={idx}
-                                style={{
-                                    position: 'absolute',
-                                    left: point.x,
-                                    top: point.y,
-                                    width: point.lineWidth,
-                                    height: 0,
-                                    border: `1px solid ${point.color}`,
-                                }}
-                            ></div>
-                        ))}
-                    </div>
-                ))}
-            </div>
         </Container>
     );
 };
