@@ -60,8 +60,6 @@ interface ChatroomProps {
 
 const Canvas = ({ roomId }: ChatroomProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const tempCanvasRef = useRef<HTMLCanvasElement>(null);
-
     const [color, setColor] = useState<string>('black');
     const [lineWidth, setLineWidth] = useState<number>(5);
     const [isDrawing, setIsDrawing] = useState<boolean>(false);
@@ -74,6 +72,8 @@ const Canvas = ({ roomId }: ChatroomProps) => {
     const [lastMouseY, setLastMouseY] = useState<number>(0);
     const [shapes, setShapes] = useState<any[]>([]);
     const [distanceMoved, setDistanceMoved] = useState<number>(0);
+
+    const minDistance = 5;
 
     useEffect(() => {
         if (!roomId) return;
@@ -130,6 +130,11 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         const rect = canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
+
+        const dx = x - startX;
+        const dy = y - startY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        setDistanceMoved(distance);
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = 'white';
@@ -236,7 +241,9 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         const endX = lastMouseX - rect.left;
         const endY = lastMouseY - rect.top;
 
-        if (shape) {
+        if (shape && distanceMoved >= minDistance) {
+            console.log('123');
+
             const shapeData = {
                 type: shape,
                 startX,
@@ -254,7 +261,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                 .update({
                     shapes: firebase.firestore.FieldValue.arrayUnion(shapeData),
                 });
-        } else if (tempLine.length > 0 && distanceMoved >= 5) {
+        } else if (tempLine.length > 0 && distanceMoved >= minDistance) {
             db.collection('rooms')
                 .doc(roomId || '')
                 .update({
@@ -372,6 +379,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
     }, [lines, shapes]);
 
     console.log('shapes in firestore:', shapes);
+    console.log('distancedmove', distanceMoved);
 
     return (
         <Container>
