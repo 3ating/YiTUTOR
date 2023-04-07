@@ -28,7 +28,7 @@ if (!firebase.apps.length) {
 
 const db = firebase.firestore();
 
-const API_KEY = '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';
+const API_KEY = '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';
 
 const StyledApp = styled.div`
     font-family: Arial, Helvetica, sans-serif;
