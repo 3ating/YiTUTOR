@@ -6,7 +6,6 @@ import 'firebase/compat/firestore';
 import ScreenSharing from './ScreenSharing';
 import Chatroom from './Chatroom';
 import Canvas from './Canvas';
-import * as bodyPix from '@tensorflow-models/body-pix';
 
 const firebaseConfig = {
     apiKey: process.env.FIRESTORE_API_KEY,
@@ -45,6 +44,7 @@ const VideoChat: React.FC = () => {
     const [isScreenSharing, setIsScreenSharing] = useState(false);
     const [isMicMuted, setIsMicMuted] = useState(false);
     const [isAudioMuted, setIsAudioMuted] = useState(false);
+    const [isBackgroundBlurred, setIsBackgroundBlurred] = useState(false);
 
     useEffect(() => {
         if (localStream && remoteStream && localVideoRef.current && remoteVideoRef.current) {
