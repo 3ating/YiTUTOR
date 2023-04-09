@@ -60,7 +60,6 @@ interface ChatroomProps {
 
 const Canvas = ({ roomId }: ChatroomProps) => {
     const minDistance = 5;
-
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [color, setColor] = useState<string>('black');
     const [lineWidth, setLineWidth] = useState<number>(5);
@@ -74,7 +73,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
     const [lastMouseY, setLastMouseY] = useState<number>(0);
     const [shapes, setShapes] = useState<any[]>([]);
     const [distanceMoved, setDistanceMoved] = useState<number>(0);
-
     const [moveEnabled, setMoveEnabled] = useState<boolean>(false);
     const [selectedShapeIndex, setSelectedShapeIndex] = useState<number | null>(null);
     const [selectedLineIndex, setSelectedLineIndex] = useState<number | null>(null);
@@ -122,10 +120,10 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                         y: shapeData.startY + Math.abs(shapeData.endY - shapeData.startY),
                     };
 
-                    const area = (p1.x * (p2.y - p3.y) + p2.x * (p3.y - p1.y) + p3.x * (p1.y - p2.y)) / 2;
-                    const area1 = (x * (p2.y - p3.y) + p2.x * (p3.y - y) + p3.x * (y - p2.y)) / 2;
-                    const area2 = (p1.x * (y - p3.y) + x * (p3.y - p1.y) + p3.x * (p1.y - y)) / 2;
-                    const area3 = (p1.x * (p2.y - y) + p2.x * (y - p1.y) + x * (p1.y - p2.y)) / 2;
+                    const area = Math.abs((p1.x * (p2.y - p3.y) + p2.x * (p3.y - p1.y) + p3.x * (p1.y - p2.y)) / 2);
+                    const area1 = Math.abs((x * (p2.y - p3.y) + p2.x * (p3.y - y) + p3.x * (y - p2.y)) / 2);
+                    const area2 = Math.abs((p1.x * (y - p3.y) + x * (p3.y - p1.y) + p3.x * (p1.y - y)) / 2);
+                    const area3 = Math.abs((p1.x * (p2.y - y) + p2.x * (y - p1.y) + x * (p1.y - p2.y)) / 2);
 
                     if (area === area1 + area2 + area3) {
                         return i;
@@ -135,7 +133,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                     break;
             }
         }
-
         return null;
     };
 
@@ -306,7 +303,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
 
         ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }, [lineWidth, roomId, lines, shapes]);
+    }, [roomId, lines, shapes]);
 
     const startDrawing: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
         const canvas = canvasRef.current;
@@ -393,6 +390,8 @@ const Canvas = ({ roomId }: ChatroomProps) => {
 
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
+
+        ctx.lineWidth = lineWidth;
 
         const rect = canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
@@ -593,17 +592,8 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         renderShapes();
     }, [lines, shapes]);
 
-    console.log('shapes in firestore:', shapes);
-
     return (
         <Container>
-            {/* <StyledCanvas
-                ref={canvasRef}
-                onMouseDown={startDrawing}
-                onMouseMove={shape ? drawShape : draw}
-                onMouseUp={endDrawing}
-                onMouseOut={endDrawing}
-            /> */}
             <StyledCanvas
                 ref={canvasRef}
                 onMouseDown={moveEnabled ? startMoving : startDrawing}
@@ -631,7 +621,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
             <ShapeSelection>
                 <Label>Shape:</Label>
                 <select value={shape || ''} onChange={(e) => setShape(e.target.value)}>
-                    <option value=''>Free Draw</option>
+                    <option value=''>Line</option>
                     <option value='circle'>Circle</option>
                     <option value='rectangle'>Rectangle</option>
                     <option value='triangle'>Triangle</option>
