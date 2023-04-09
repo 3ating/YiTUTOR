@@ -79,8 +79,15 @@ const Canvas = ({ roomId }: ChatroomProps) => {
     const [moveStartX, setMoveStartX] = useState<number>(0);
     const [moveStartY, setMoveStartY] = useState<number>(0);
 
+    const [scaleEnabled, setScaleEnabled] = useState<boolean>(false);
+    const [selectedShape, setSelectedShape] = useState<any>(null);
+
     const handleMoveCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setMoveEnabled(e.target.checked);
+    };
+
+    const handleScaleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setScaleEnabled(e.target.checked);
     };
 
     const findShape = (x: number, y: number) => {
@@ -592,15 +599,135 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         renderShapes();
     }, [lines, shapes]);
 
+    const startScaling: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const shape = shapes.find((shape) => {
+            switch (shape.type) {
+                case 'rectangle':
+                    return (
+                        x >= Math.min(shape.startX, shape.endX) &&
+                        x <= Math.max(shape.startX, shape.endX) &&
+                        y >= Math.min(shape.startY, shape.endY) &&
+                        y <= Math.max(shape.startY, shape.endY)
+                    );
+                case 'circle':
+                    const radius = Math.sqrt(
+                        Math.pow(shape.endX - shape.startX, 2) + Math.pow(shape.endY - shape.startY, 2)
+                    );
+                    const distanceFromCenter = Math.sqrt(Math.pow(x - shape.startX, 2) + Math.pow(y - shape.startY, 2));
+                    return distanceFromCenter <= radius;
+                case 'triangle':
+                    const path = new Path2D();
+                    path.moveTo(shape.startX, shape.startY);
+                    path.lineTo(shape.startX + (shape.endX - shape.startX) / 2, shape.endY);
+                    path.lineTo(shape.endX, shape.startY);
+                    path.closePath();
+                    return ctx.isPointInPath(path, x, y);
+                default:
+                    return false;
+            }
+        });
+
+        if (shape) {
+            setSelectedShape(shape);
+            setIsDrawing(true);
+        }
+    };
+
+    const scale: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
+        if (!isDrawing || !selectedShape) return;
+
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        switch (selectedShape.type) {
+            case 'rectangle':
+                selectedShape.endX = x;
+                selectedShape.endY = y;
+                break;
+            case 'circle':
+                const radius = Math.sqrt(Math.pow(x - selectedShape.startX, 2) + Math.pow(y - selectedShape.startY, 2));
+                selectedShape.endX = selectedShape.startX + radius;
+                selectedShape.endY = selectedShape.startY;
+                break;
+            case 'triangle':
+                const topVertex = {
+                    x: selectedShape.startX + (selectedShape.endX - selectedShape.startX) / 2,
+                    y: selectedShape.endY,
+                };
+                const scaleX = (x - selectedShape.startX) / (selectedShape.endX - selectedShape.startX);
+                const scaleY = (y - selectedShape.startY) / (selectedShape.endY - selectedShape.startY);
+
+                const scaledTopVertex = {
+                    x: selectedShape.startX + (topVertex.x - selectedShape.startX) * scaleX,
+                    y: selectedShape.startY + (topVertex.y - selectedShape.startY) * scaleY,
+                };
+
+                selectedShape.endX = 2 * scaledTopVertex.x - selectedShape.startX;
+                selectedShape.endY = scaledTopVertex.y;
+                break;
+            default:
+                break;
+        }
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        renderShapes();
+        renderLines();
+    };
+
+    const endScaling = async () => {
+        if (selectedShape) {
+            const shapeIndex = shapes.findIndex((shape) => shape === selectedShape);
+
+            setShapes(shapes.map((shape, index) => (index === shapeIndex ? selectedShape : shape)));
+
+            await db
+                .collection('rooms')
+                .doc(roomId || '')
+                .update({
+                    shapes: shapes.map((shape, index) => (index === shapeIndex ? selectedShape : shape)),
+                });
+        }
+        setIsDrawing(false);
+        setSelectedShape(null);
+    };
+
     return (
         <Container>
-            <StyledCanvas
+            {/* <StyledCanvas
                 ref={canvasRef}
                 onMouseDown={moveEnabled ? startMoving : startDrawing}
                 onMouseMove={moveEnabled ? move : shape ? drawShape : draw}
                 onMouseUp={moveEnabled ? endMoving : endDrawing}
                 onMouseOut={moveEnabled ? endMoving : endDrawing}
+            /> */}
+            <StyledCanvas
+                ref={canvasRef}
+                onMouseDown={moveEnabled ? startMoving : scaleEnabled ? startScaling : startDrawing}
+                onMouseMove={moveEnabled ? move : scaleEnabled ? scale : shape ? drawShape : draw}
+                onMouseUp={moveEnabled ? endMoving : scaleEnabled ? endScaling : endDrawing}
+                onMouseOut={moveEnabled ? endMoving : scaleEnabled ? endScaling : endDrawing}
             />
+
             <ControlBar>
                 <div>
                     <Label>Color:</Label>
@@ -630,6 +757,8 @@ const Canvas = ({ roomId }: ChatroomProps) => {
             <div>
                 <Label>Move:</Label>
                 <input type='checkbox' checked={moveEnabled} onChange={handleMoveCheckboxChange} />
+                <Label>Scale:</Label>
+                <input type='checkbox' checked={scaleEnabled} onChange={handleScaleCheckboxChange} />
             </div>
         </Container>
     );
