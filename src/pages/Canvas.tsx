@@ -59,6 +59,8 @@ interface ChatroomProps {
 }
 
 const Canvas = ({ roomId }: ChatroomProps) => {
+    const minDistance = 5;
+
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [color, setColor] = useState<string>('black');
     const [lineWidth, setLineWidth] = useState<number>(5);
@@ -73,7 +75,216 @@ const Canvas = ({ roomId }: ChatroomProps) => {
     const [shapes, setShapes] = useState<any[]>([]);
     const [distanceMoved, setDistanceMoved] = useState<number>(0);
 
-    const minDistance = 5;
+    const [moveEnabled, setMoveEnabled] = useState<boolean>(false);
+    const [selectedShapeIndex, setSelectedShapeIndex] = useState<number | null>(null);
+    const [selectedLineIndex, setSelectedLineIndex] = useState<number | null>(null);
+    const [moveStartX, setMoveStartX] = useState<number>(0);
+    const [moveStartY, setMoveStartY] = useState<number>(0);
+
+    const handleMoveCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setMoveEnabled(e.target.checked);
+    };
+
+    console.log('moveEnabled', moveEnabled);
+
+    const findShape = (x: number, y: number) => {
+        console.log('findShape');
+        for (let i = shapes.length - 1; i >= 0; i--) {
+            const shapeData = shapes[i];
+
+            switch (shapeData.type) {
+                case 'circle':
+                    const radius = Math.sqrt(
+                        Math.pow(shapeData.endX - shapeData.startX, 2) + Math.pow(shapeData.endY - shapeData.startY, 2)
+                    );
+                    const distance = Math.sqrt(Math.pow(x - shapeData.startX, 2) + Math.pow(y - shapeData.startY, 2));
+                    if (distance <= radius) {
+                        return i;
+                    }
+                    break;
+                case 'rectangle':
+                    const minX = Math.min(shapeData.endX, shapeData.startX);
+                    const minY = Math.min(shapeData.endY, shapeData.startY);
+                    const width = Math.abs(shapeData.endX - shapeData.startX);
+                    const height = Math.abs(shapeData.endY - shapeData.startY);
+                    if (x >= minX && x <= minX + width && y >= minY && y <= minY + height) {
+                        return i;
+                    }
+                    break;
+                case 'triangle':
+                    const p1 = {
+                        x: shapeData.startX,
+                        y: shapeData.startY - Math.abs(shapeData.endY - shapeData.startY),
+                    };
+                    const p2 = {
+                        x: shapeData.startX - Math.abs(shapeData.endX - shapeData.startX) / 2,
+                        y: shapeData.startY + Math.abs(shapeData.endY - shapeData.startY),
+                    };
+                    const p3 = {
+                        x: shapeData.startX + Math.abs(shapeData.endX - shapeData.startX) / 2,
+                        y: shapeData.startY + Math.abs(shapeData.endY - shapeData.startY),
+                    };
+
+                    const area = (p1.x * (p2.y - p3.y) + p2.x * (p3.y - p1.y) + p3.x * (p1.y - p2.y)) / 2;
+                    const area1 = (x * (p2.y - p3.y) + p2.x * (p3.y - y) + p3.x * (y - p2.y)) / 2;
+                    const area2 = (p1.x * (y - p3.y) + x * (p3.y - p1.y) + p3.x * (p1.y - y)) / 2;
+                    const area3 = (p1.x * (p2.y - y) + p2.x * (y - p1.y) + x * (p1.y - p2.y)) / 2;
+
+                    if (area === area1 + area2 + area3) {
+                        return i;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return null;
+    };
+
+    const findLine = (x: number, y: number, threshold = 5) => {
+        console.log('findLine');
+        for (let i = lines.length - 1; i >= 0; i--) {
+            const line = lines[i];
+            for (let j = 0; j < line.points.length - 1; j++) {
+                const point1 = line.points[j];
+                const point2 = line.points[j + 1];
+
+                const dx = point2.x - point1.x;
+                const dy = point2.y - point1.y;
+                const length = Math.sqrt(dx * dx + dy * dy);
+
+                const t = ((x - point1.x) * dx + (y - point1.y) * dy) / (length * length);
+
+                if (t < 0 || t > 1) {
+                    continue;
+                }
+
+                const closestX = point1.x + t * dx;
+                const closestY = point1.y + t * dy;
+
+                const distance = Math.sqrt(Math.pow(x - closestX, 2) + Math.pow(y - closestY, 2));
+
+                if (distance <= threshold) {
+                    return i;
+                }
+            }
+        }
+
+        return null;
+    };
+
+    const startMoving: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
+        console.log('startMoving');
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const shapeIndex = findShape(x, y);
+        const lineIndex = findLine(x, y);
+
+        setSelectedShapeIndex(shapeIndex);
+        setSelectedLineIndex(lineIndex);
+
+        setMoveStartX(x);
+        setMoveStartY(y);
+    };
+
+    const move: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
+        console.log('move');
+        if (selectedShapeIndex === null && selectedLineIndex === null) return;
+
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const dx = x - moveStartX;
+        const dy = y - moveStartY;
+
+        if (selectedShapeIndex !== null) {
+            const movedShape = {
+                ...shapes[selectedShapeIndex],
+                startX: shapes[selectedShapeIndex].startX + dx,
+                startY: shapes[selectedShapeIndex].startY + dy,
+                endX: shapes[selectedShapeIndex].endX + dx,
+                endY: shapes[selectedShapeIndex].endY + dy,
+            };
+
+            setShapes(shapes.map((shape, index) => (index === selectedShapeIndex ? movedShape : shape)));
+        }
+
+        if (selectedLineIndex !== null) {
+            const movedLine = {
+                ...lines[selectedLineIndex],
+                points: lines[selectedLineIndex].points.map(
+                    (point: { x: number; y: number; prevX: number; prevY: number }) => ({
+                        ...point,
+                        x: point.x + dx,
+                        y: point.y + dy,
+                        prevX: point.prevX + dx,
+                        prevY: point.prevY + dy,
+                    })
+                ),
+            };
+
+            setLines(lines.map((line: any, index: number) => (index === selectedLineIndex ? movedLine : line)));
+        }
+
+        setMoveStartX(x);
+        setMoveStartY(y);
+    };
+
+    const endMoving = () => {
+        if (selectedShapeIndex !== null) {
+            const movedShape = shapes[selectedShapeIndex];
+            const deltaX = moveStartX - movedShape.startX;
+            const deltaY = moveStartY - movedShape.startY;
+
+            movedShape.startX += deltaX;
+            movedShape.startY += deltaY;
+            movedShape.endX += deltaX;
+            movedShape.endY += deltaY;
+
+            db.collection('rooms')
+                .doc(roomId || '')
+                .update({
+                    shapes: shapes.map((shape, index) => (index === selectedShapeIndex ? movedShape : shape)),
+                });
+
+            setSelectedShapeIndex(null);
+        } else if (selectedLineIndex !== null) {
+            const movedLine = lines[selectedLineIndex];
+            const deltaX = moveStartX - movedLine.points[0].x;
+            const deltaY = moveStartY - movedLine.points[0].y;
+
+            movedLine.points = movedLine.points.map(
+                (point: { x: number; y: number; prevX: number; prevY: number }) => ({
+                    ...point,
+                    x: point.x + deltaX,
+                    y: point.y + deltaY,
+                    prevX: point.prevX + deltaX,
+                    prevY: point.prevY + deltaY,
+                })
+            );
+
+            db.collection('rooms')
+                .doc(roomId || '')
+                .update({
+                    lines: lines.map((line: any, index: number) => (index === selectedLineIndex ? movedLine : line)),
+                });
+
+            setSelectedLineIndex(null);
+        }
+
+        setMoveStartX(0);
+        setMoveStartY(0);
+    };
 
     useEffect(() => {
         if (!roomId) return;
@@ -384,12 +595,19 @@ const Canvas = ({ roomId }: ChatroomProps) => {
 
     return (
         <Container>
-            <StyledCanvas
+            {/* <StyledCanvas
                 ref={canvasRef}
                 onMouseDown={startDrawing}
                 onMouseMove={shape ? drawShape : draw}
                 onMouseUp={endDrawing}
                 onMouseOut={endDrawing}
+            /> */}
+            <StyledCanvas
+                ref={canvasRef}
+                onMouseDown={moveEnabled ? startMoving : startDrawing}
+                onMouseMove={moveEnabled ? move : shape ? drawShape : draw}
+                onMouseUp={moveEnabled ? endMoving : endDrawing}
+                onMouseOut={moveEnabled ? endMoving : endDrawing}
             />
             <ControlBar>
                 <div>
@@ -417,6 +635,10 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                     <option value='triangle'>Triangle</option>
                 </select>
             </ShapeSelection>
+            <div>
+                <Label>Move:</Label>
+                <input type='checkbox' checked={moveEnabled} onChange={handleMoveCheckboxChange} />
+            </div>
         </Container>
     );
 };

@@ -46,6 +46,10 @@ const VideoChat: React.FC = () => {
     const [isAudioMuted, setIsAudioMuted] = useState(false);
     const [isBackgroundBlurred, setIsBackgroundBlurred] = useState(false);
 
+    const toggleBackgroundBlur = () => {
+        setIsBackgroundBlurred(!isBackgroundBlurred);
+    };
+
     useEffect(() => {
         if (localStream && remoteStream && localVideoRef.current && remoteVideoRef.current) {
             localVideoRef.current.srcObject = localStream;
