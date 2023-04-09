@@ -85,13 +85,10 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         setMoveEnabled(e.target.checked);
     };
 
-    console.log('moveEnabled', moveEnabled);
-
     const findShape = (x: number, y: number) => {
         console.log('findShape');
         for (let i = shapes.length - 1; i >= 0; i--) {
             const shapeData = shapes[i];
-
             switch (shapeData.type) {
                 case 'circle':
                     const radius = Math.sqrt(
@@ -194,7 +191,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
     };
 
     const move: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
-        console.log('move');
         if (selectedShapeIndex === null && selectedLineIndex === null) return;
 
         const canvas = canvasRef.current;
@@ -240,11 +236,19 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         setMoveStartY(y);
     };
 
-    const endMoving = () => {
+    const endMoving: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const deltaX = x - moveStartX;
+        const deltaY = y - moveStartY;
+
         if (selectedShapeIndex !== null) {
             const movedShape = shapes[selectedShapeIndex];
-            const deltaX = moveStartX - movedShape.startX;
-            const deltaY = moveStartY - movedShape.startY;
 
             movedShape.startX += deltaX;
             movedShape.startY += deltaY;
@@ -260,8 +264,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
             setSelectedShapeIndex(null);
         } else if (selectedLineIndex !== null) {
             const movedLine = lines[selectedLineIndex];
-            const deltaX = moveStartX - movedLine.points[0].x;
-            const deltaY = moveStartY - movedLine.points[0].y;
 
             movedLine.points = movedLine.points.map(
                 (point: { x: number; y: number; prevX: number; prevY: number }) => ({
