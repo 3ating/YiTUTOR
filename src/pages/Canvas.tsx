@@ -12,10 +12,11 @@ const Container = styled.div`
     font-family: 'Roboto', sans-serif;
 `;
 
-const StyledCanvas = styled.canvas`
+const StyledCanvas = styled.canvas<IStyledCanvasProps>`
     border: 1px solid black;
     width: 100%;
     height: 300px;
+    cursor: ${(props) => props.cursorStyle};
 `;
 
 const ControlBar = styled.div`
@@ -57,6 +58,9 @@ const db = firebase.firestore();
 interface ChatroomProps {
     roomId: string | null;
 }
+interface IStyledCanvasProps {
+    cursorStyle: string;
+}
 
 const Canvas = ({ roomId }: ChatroomProps) => {
     const minDistance = 5;
@@ -82,6 +86,29 @@ const Canvas = ({ roomId }: ChatroomProps) => {
     const [scaleEnabled, setScaleEnabled] = useState<boolean>(false);
     const [selectedShape, setSelectedShape] = useState<any>(null);
 
+    const [cursorStyle, setCursorStyle] = useState('default');
+
+    const [eraserEnabled, setEraserEnabled] = useState(false);
+
+    const updateCursor: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
+        const rect = canvasRef.current?.getBoundingClientRect();
+        if (!rect) return;
+
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const shapeIndex = findShape(x, y);
+        const lineIndex = findLine(x, y);
+
+        if (shapeIndex !== null || lineIndex !== null) {
+            setCursorStyle('move');
+            setMoveEnabled(true);
+        } else {
+            setCursorStyle('default');
+            setMoveEnabled(false);
+        }
+    };
+
     const handleMoveCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setMoveEnabled(e.target.checked);
     };
@@ -90,8 +117,12 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         setScaleEnabled(e.target.checked);
     };
 
+    const toggleEraser = () => {
+        setEraserEnabled(!eraserEnabled);
+    };
+
     const findShape = (x: number, y: number) => {
-        console.log('findShape');
+        // console.log('findShape');
         for (let i = shapes.length - 1; i >= 0; i--) {
             const shapeData = shapes[i];
             switch (shapeData.type) {
@@ -144,7 +175,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
     };
 
     const findLine = (x: number, y: number, threshold = 5) => {
-        console.log('findLine');
+        // console.log('findLine');
         for (let i = lines.length - 1; i >= 0; i--) {
             const line = lines[i];
             for (let j = 0; j < line.points.length - 1; j++) {
@@ -176,7 +207,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
     };
 
     const startMoving: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
-        console.log('startMoving');
+        // console.log('startMoving');
         const canvas = canvasRef.current;
         if (!canvas) return;
 
@@ -711,23 +742,29 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         setSelectedShape(null);
     };
 
+    console.log('eraserEnabled:', eraserEnabled);
+
     return (
         <Container>
             {/* <StyledCanvas
-                ref={canvasRef}
-                onMouseDown={moveEnabled ? startMoving : startDrawing}
-                onMouseMove={moveEnabled ? move : shape ? drawShape : draw}
-                onMouseUp={moveEnabled ? endMoving : endDrawing}
-                onMouseOut={moveEnabled ? endMoving : endDrawing}
-            /> */}
-            <StyledCanvas
                 ref={canvasRef}
                 onMouseDown={moveEnabled ? startMoving : scaleEnabled ? startScaling : startDrawing}
                 onMouseMove={moveEnabled ? move : scaleEnabled ? scale : shape ? drawShape : draw}
                 onMouseUp={moveEnabled ? endMoving : scaleEnabled ? endScaling : endDrawing}
                 onMouseOut={moveEnabled ? endMoving : scaleEnabled ? endScaling : endDrawing}
+            /> */}
+            <StyledCanvas
+                ref={canvasRef}
+                cursorStyle={cursorStyle}
+                onMouseDown={moveEnabled ? startMoving : scaleEnabled ? startScaling : startDrawing}
+                onMouseMove={(e) => {
+                    updateCursor(e);
+                    const action = moveEnabled ? move : scaleEnabled ? scale : shape ? drawShape : draw;
+                    action(e);
+                }}
+                onMouseUp={moveEnabled ? endMoving : scaleEnabled ? endScaling : endDrawing}
+                onMouseOut={moveEnabled ? endMoving : scaleEnabled ? endScaling : endDrawing}
             />
-
             <ControlBar>
                 <div>
                     <Label>Color:</Label>
@@ -759,6 +796,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                 <input type='checkbox' checked={moveEnabled} onChange={handleMoveCheckboxChange} />
                 <Label>Scale:</Label>
                 <input type='checkbox' checked={scaleEnabled} onChange={handleScaleCheckboxChange} />
+                <button onClick={toggleEraser}>{eraserEnabled ? 'Disable Eraser' : 'Enable Eraser'}</button>
             </div>
         </Container>
     );
