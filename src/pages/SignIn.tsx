@@ -13,6 +13,7 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import { Input } from '@material-ui/core';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface UserInfo {
     name: string;
@@ -20,6 +21,7 @@ interface UserInfo {
     phone: string;
     userType: string;
     courses?: object;
+    avatar?: string;
 }
 
 const firebaseConfig = {
@@ -98,9 +100,6 @@ const SignIn = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-
-    const [phone, setPhone] = useState('');
-    const [userType, setUserType] = useState('');
 
     useEffect(() => {
         const auth = getAuth();
@@ -184,13 +183,20 @@ const SignIn = () => {
     }, [user]);
 
     console.log('user', user);
-    console.log('userInfo', userInfo?.userType);
+    console.log('userInfo', userInfo);
 
     return (
         <Container>
             {user ? (
                 <UserInfo>
                     <p>歡迎, {userInfo?.name}！</p>
+                    {userInfo?.avatar && (
+                        <img
+                            src={userInfo.avatar}
+                            alt={`${userInfo.name} 的大頭照`}
+                            style={{ width: '100px', borderRadius: '50%' }}
+                        />
+                    )}
                     <LogoutButton onClick={handleLogout}>登出</LogoutButton>
                 </UserInfo>
             ) : (

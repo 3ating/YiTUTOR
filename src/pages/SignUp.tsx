@@ -1,10 +1,29 @@
-import React, { useState } from 'react';
+import React, { CSSProperties, useState } from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import 'firebase/compat/auth';
 import 'firebase/compat/storage';
 import Link from 'next/link';
 
+const styles: { [key: string]: CSSProperties } = {
+    form: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+    },
+    label: {
+        marginBottom: '1rem',
+    },
+    input: {
+        marginLeft: '0.5rem',
+    },
+    select: {
+        marginLeft: '0.5rem',
+    },
+    button: {
+        marginTop: '1rem',
+    },
+};
 const firebaseConfig = {
     apiKey: 'AIzaSyDrG9uBznJyP7Fe_4JRwVG7pvR7SjScQsg',
     authDomain: 'board-12c3c.firebaseapp.com',
@@ -39,6 +58,7 @@ const RegistrationForm = () => {
     const [subjects, setSubjects] = useState(['']);
     const [documentFile, setDocumentFile] = useState<File | null>(null);
     const [certification, setCertification] = useState(false);
+    const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
     const addSubject = () => {
         setSubjects([...subjects, '']);
@@ -48,6 +68,12 @@ const RegistrationForm = () => {
         const newSubjects = [...subjects];
         newSubjects[index] = value;
         setSubjects(newSubjects);
+    };
+
+    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            setAvatarFile(e.target.files[0]);
+        }
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,6 +97,14 @@ const RegistrationForm = () => {
             documentUrl = await snapshot.ref.getDownloadURL();
         }
 
+        let avatarUrl = '';
+        if (avatarFile) {
+            const storageRef = storage.ref();
+            const avatarRef = storageRef.child(`avatars/${avatarFile.name}`);
+            const snapshot = await avatarRef.put(avatarFile);
+            avatarUrl = await snapshot.ref.getDownloadURL();
+        }
+
         const priceArray = Object.entries(price).map(([key, value]) => {
             return { qty: parseInt(key), price: value };
         });
@@ -86,6 +120,7 @@ const RegistrationForm = () => {
                             phone,
                             userType,
                             courses,
+                            avatar: avatarUrl, // 保存头像URL
                             ...(userType === 'teacher' && {
                                 description,
                                 subject: subjects,
@@ -122,7 +157,12 @@ const RegistrationForm = () => {
 
     return (
         <>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} style={styles.form}>
+                <label style={styles.label}>
+                    大頭貼：
+                    <input type='file' accept='image/*' onChange={(e) => handleAvatarChange(e)} />
+                </label>
+
                 <label>
                     姓名：
                     <input type='text' value={name} onChange={(e) => setName(e.target.value)} />
@@ -197,7 +237,9 @@ const RegistrationForm = () => {
                         </label>
                     </>
                 )}
-                <button type='submit'>提交</button>
+                <button type='submit' style={styles.button}>
+                    提交
+                </button>
                 {message && <p>{message}</p>}
             </form>
             <Link href='/SignIn'>已經有帳號，前往登入</Link>
