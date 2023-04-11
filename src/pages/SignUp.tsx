@@ -71,13 +71,17 @@ const RegistrationForm = () => {
             documentUrl = await snapshot.ref.getDownloadURL();
         }
 
+        const priceArray = Object.entries(price).map(([key, value]) => {
+            return { qty: parseInt(key), price: value };
+        });
+
         auth.createUserWithEmailAndPassword(email, password)
             .then((result) => {
                 if (result.user) {
                     db.collection('users')
                         .doc(result.user.uid)
                         .set({
-                            displayname: name,
+                            name,
                             email,
                             phone,
                             userType,
@@ -85,7 +89,7 @@ const RegistrationForm = () => {
                             ...(userType === 'teacher' && {
                                 description,
                                 subject: subjects,
-                                price,
+                                price: priceArray,
                                 document: documentUrl,
                                 certification,
                             }),
@@ -101,6 +105,7 @@ const RegistrationForm = () => {
                             setSubject('');
                             setPrice({});
                             setDocument('');
+                            setSubjects(['']);
                         })
                         .catch((error) => {
                             console.error('Error writing document: ', error);

@@ -15,7 +15,7 @@ import { Input } from '@material-ui/core';
 import Link from 'next/link';
 
 interface UserInfo {
-    displayname: string;
+    name: string;
     email: string;
     phone: string;
     userType: string;
@@ -99,6 +99,9 @@ const SignIn = () => {
     const [password, setPassword] = useState('');
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
+    const [phone, setPhone] = useState('');
+    const [userType, setUserType] = useState('');
+
     useEffect(() => {
         const auth = getAuth();
         const unsubscribe = onAuthStateChanged(auth, (user: React.SetStateAction<User | null>) => {
@@ -116,15 +119,17 @@ const SignIn = () => {
         signInWithPopup(auth, provider)
             .then(async (result) => {
                 setUser(result.user);
-
                 if (result.user) {
-                    const userDocRef = db.collection('users').doc();
+                    const userDocRef = db.collection('users').doc(result.user.uid);
 
-                    await userDocRef.set({
-                        name: result.user.displayName,
-                        email: result.user.email,
-                        photoURL: result.user.photoURL,
-                    });
+                    const docSnapshot = await userDocRef.get();
+                    if (!docSnapshot.exists) {
+                        await userDocRef.set({
+                            name: result.user.displayName,
+                            email: result.user.email,
+                            photoURL: result.user.photoURL,
+                        });
+                    }
                 }
             })
             .catch((error) => {
@@ -179,12 +184,13 @@ const SignIn = () => {
     }, [user]);
 
     console.log('user', user);
+    console.log('userInfo', userInfo?.userType);
 
     return (
         <Container>
             {user ? (
                 <UserInfo>
-                    <p>歡迎, {userInfo?.displayname}！</p>
+                    <p>歡迎, {userInfo?.name}！</p>
                     <LogoutButton onClick={handleLogout}>登出</LogoutButton>
                 </UserInfo>
             ) : (
@@ -213,9 +219,5 @@ const SignIn = () => {
 
 export default SignIn;
 function doc(db: firebase.firestore.Firestore, arg1: string, uid: string) {
-    throw new Error('Function not implemented.');
-}
-
-function setDoc(userDocRef: void, arg1: { displayName: string | null; email: string | null; photoURL: string | null }) {
     throw new Error('Function not implemented.');
 }
