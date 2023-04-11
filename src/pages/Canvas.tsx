@@ -357,6 +357,11 @@ const Canvas = ({ roomId }: ChatroomProps) => {
             const ctx = canvas.getContext('2d');
             if (!ctx) return;
 
+            ctx.globalCompositeOperation = eraserEnabled ? 'destination-out' : 'source-over';
+            ctx.lineWidth = eraserEnabled ? 50 : lineWidth; // 如果需要，可以調整橡皮擦的大小
+
+            console.log('globalCompositeOperation', ctx.globalCompositeOperation);
+
             ctx.strokeStyle = color;
             ctx.beginPath();
             ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
@@ -364,6 +369,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
             setIsDrawing(true);
         }
     };
+    // console.log('eraserEnabled', eraserEnabled);
 
     const drawShape: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
         if (!isDrawing) return;
@@ -420,6 +426,50 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         setLastMouseY(e.clientY);
     };
 
+    // const draw: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
+    //     if (!isDrawing) return;
+
+    //     const canvas = canvasRef.current;
+    //     if (!canvas) return;
+
+    //     const ctx = canvas.getContext('2d');
+    //     if (!ctx) return;
+
+    //     ctx.lineWidth = lineWidth;
+
+    //     const rect = canvas.getBoundingClientRect();
+    //     const x = e.clientX - rect.left;
+    //     const y = e.clientY - rect.top;
+
+    //     const dx = x - (tempLine.length > 0 ? tempLine[tempLine.length - 1].x : x);
+    //     const dy = y - (tempLine.length > 0 ? tempLine[tempLine.length - 1].y : y);
+    //     const distance = Math.sqrt(dx * dx + dy * dy);
+    //     setDistanceMoved((prevDistance) => prevDistance + distance);
+
+    //     setLastMouseX(e.clientX);
+    //     setLastMouseY(e.clientY);
+
+    //     ctx.beginPath();
+    //     ctx.moveTo(
+    //         tempLine.length > 0 ? tempLine[tempLine.length - 1].x : x,
+    //         tempLine.length > 0 ? tempLine[tempLine.length - 1].y : y
+    //     );
+    //     ctx.lineTo(x, y);
+    //     ctx.stroke();
+
+    //     setTempLine((prevLine: any) => [
+    //         ...prevLine,
+    //         {
+    //             x,
+    //             y,
+    //             prevX: prevLine.length > 0 ? prevLine[prevLine.length - 1].x : x,
+    //             prevY: prevLine.length > 0 ? prevLine[prevLine.length - 1].y : y,
+    //             color,
+    //             lineWidth,
+    //         },
+    //     ]);
+    // };
+
     const draw: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
         if (!isDrawing) return;
 
@@ -429,7 +479,11 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        ctx.lineWidth = lineWidth;
+        // 將 globalCompositeOperation 和 lineWidth 設置應用到 draw 函數中
+        ctx.globalCompositeOperation = eraserEnabled ? 'destination-out' : 'source-over';
+        ctx.lineWidth = eraserEnabled ? 50 : lineWidth;
+
+        console.log('draw globalCompositeOperation', ctx.globalCompositeOperation);
 
         const rect = canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
@@ -742,8 +796,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         setSelectedShape(null);
     };
 
-    console.log('eraserEnabled:', eraserEnabled);
-
     return (
         <Container>
             {/* <StyledCanvas
@@ -759,12 +811,20 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                 onMouseDown={moveEnabled ? startMoving : scaleEnabled ? startScaling : startDrawing}
                 onMouseMove={(e) => {
                     updateCursor(e);
-                    const action = moveEnabled ? move : scaleEnabled ? scale : shape ? drawShape : draw;
-                    action(e);
+                    if (moveEnabled) {
+                        move(e);
+                    } else if (scaleEnabled) {
+                        scale(e);
+                    } else if (shape) {
+                        drawShape(e);
+                    } else {
+                        draw(e);
+                    }
                 }}
                 onMouseUp={moveEnabled ? endMoving : scaleEnabled ? endScaling : endDrawing}
                 onMouseOut={moveEnabled ? endMoving : scaleEnabled ? endScaling : endDrawing}
             />
+
             <ControlBar>
                 <div>
                     <Label>Color:</Label>

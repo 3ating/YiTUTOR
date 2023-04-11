@@ -1,10 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut, User } from 'firebase/auth';
+import {
+    getAuth,
+    GoogleAuthProvider,
+    onAuthStateChanged,
+    signInWithEmailAndPassword,
+    signInWithPopup,
+    signOut,
+    User,
+} from 'firebase/auth';
 import styled from 'styled-components';
-import { log } from 'console';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
+import { Input } from '@material-ui/core';
+import Link from 'next/link';
+
+interface UserInfo {
+    displayname: string;
+    email: string;
+    phone: string;
+    userType: string;
+    courses?: object;
+}
 
 const firebaseConfig = {
     apiKey: 'AIzaSyDrG9uBznJyP7Fe_4JRwVG7pvR7SjScQsg',
@@ -79,6 +95,9 @@ const UserInfo = styled.div`
 
 const SignIn = () => {
     const [user, setUser] = useState<User | null>(null);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
     useEffect(() => {
         const auth = getAuth();
@@ -102,13 +121,24 @@ const SignIn = () => {
                     const userDocRef = db.collection('users').doc();
 
                     await userDocRef.set({
-                        displayName: result.user.displayName,
+                        name: result.user.displayName,
                         email: result.user.email,
                         photoURL: result.user.photoURL,
                     });
                 }
             })
             .catch((error) => {
+                console.log(error);
+            });
+    };
+
+    const handleLoginWithEmail = () => {
+        const auth = getAuth();
+        signInWithEmailAndPassword(auth, email, password)
+            .then(async (result: { user: React.SetStateAction<User | null> }) => {
+                setUser(result.user);
+            })
+            .catch((error: any) => {
                 console.log(error);
             });
     };
@@ -123,19 +153,58 @@ const SignIn = () => {
                 console.log(error);
             });
     };
+
+    useEffect(() => {
+        const auth = getAuth();
+        const unsubscribeAuth = onAuthStateChanged(auth, (user: React.SetStateAction<User | null>) => {
+            setUser(user);
+        });
+
+        if (user) {
+            const userDocRef = db.collection('users').doc(user.uid);
+            const unsubscribeFirestore = userDocRef.onSnapshot((doc) => {
+                const userData = doc.data();
+
+                if (doc.exists && userData) {
+                    setUserInfo(userData as UserInfo);
+                }
+            });
+            return () => {
+                unsubscribeFirestore();
+            };
+        }
+        return () => {
+            unsubscribeAuth();
+        };
+    }, [user]);
+
     console.log('user', user);
 
     return (
         <Container>
             {user ? (
                 <UserInfo>
-                    <p>歡迎, {user.displayName}！</p>
+                    <p>歡迎, {userInfo?.displayname}！</p>
                     <LogoutButton onClick={handleLogout}>登出</LogoutButton>
                 </UserInfo>
             ) : (
                 <>
                     <Title>會員登入</Title>
+                    <Input
+                        type='email'
+                        placeholder='輸入帳號'
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                    <Input
+                        type='password'
+                        placeholder='輸入密碼'
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <LoginButton onClick={handleLoginWithEmail}>使用帳號密碼登入</LoginButton>
                     <LoginButton onClick={handleLoginGoogle}>使用 Google 登入</LoginButton>
+                    <Link href='/SignIn'>還沒有帳號，前往註冊</Link>
                 </>
             )}
         </Container>
