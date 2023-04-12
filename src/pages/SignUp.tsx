@@ -120,7 +120,7 @@ const RegistrationForm = () => {
                             phone,
                             userType,
                             courses,
-                            avatar: avatarUrl, // 保存头像URL
+                            avatar: avatarUrl,
                             ...(userType === 'teacher' && {
                                 description,
                                 subject: subjects,
@@ -141,6 +141,7 @@ const RegistrationForm = () => {
                             setPrice({});
                             setDocument('');
                             setSubjects(['']);
+                            setAvatarFile(null);
                         })
                         .catch((error) => {
                             console.error('Error writing document: ', error);
