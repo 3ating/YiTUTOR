@@ -59,6 +59,7 @@ const RegistrationForm = () => {
     const [documentFile, setDocumentFile] = useState<File | null>(null);
     const [certification, setCertification] = useState(false);
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
+    const [evaluation, setEvaluation] = useState('');
 
     const addSubject = () => {
         setSubjects([...subjects, '']);
