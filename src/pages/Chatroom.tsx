@@ -1,115 +1,87 @@
-import React, { useEffect, useRef, useState } from 'react';
+// components/ChatRoom.tsx
+import React, { useEffect, useState } from 'react';
 import firebase from 'firebase/compat/app';
-import 'firebase/compat/firestore';
-import { db } from '../../firebase';
+import 'firebase/compat/database';
+import styled from 'styled-components';
 
-interface MessageType {
-    id: string;
-    name: string;
-    content: string;
-    timestamp: firebase.firestore.Timestamp;
+const ChatContainer = styled.div`
+    // 根据需要添加聊天容器样式
+`;
+
+const MessageList = styled.ul`
+    // 根据需要添加消息列表样式
+`;
+
+const Message = styled.li`
+    // 根据需要添加消息样式
+`;
+
+const ChatInput = styled.input`
+    // 根据需要添加聊天输入样式
+`;
+
+const ChatForm = styled.form`
+    // 根据需要添加聊天表单样式
+`;
+
+interface ChatRoomProps {
+    teacherId: string;
 }
 
-interface ChatroomProps {
-    roomId: string | null;
-}
+const ChatRoom: React.FC<ChatRoomProps> = ({ teacherId }) => {
+    const [messages, setMessages] = useState<any[]>([]);
+    const [input, setInput] = useState('');
 
-export default function Chatroom({ roomId }: ChatroomProps) {
-    const [messages, setMessages] = useState<MessageType[]>([]);
-    const [inputValue, setInputValue] = useState('');
-    const [name, setName] = useState('');
-    const messagesEndRef = useRef<HTMLDivElement | null>(null);
-
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
+    const user = firebase.auth().currentUser;
 
     useEffect(() => {
-        if (!roomId) return;
-
-        const unsubscribe = db
-            .collection('rooms')
-            .doc(roomId)
-            .collection('messages') //rooms/{roomId}/messages
-            .orderBy('timestamp', 'asc')
-            .onSnapshot((snapshot) => {
-                const messagesData: MessageType[] = snapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                })) as MessageType[];
-
-                setMessages(messagesData);
-                scrollToBottom();
-            });
+        const messagesRef = firebase.database().ref('messages').child(teacherId);
+        messagesRef.on('child_added', (snapshot) => {
+            const message = snapshot.val();
+            setMessages((prevMessages) => [...prevMessages, message]);
+        });
 
         return () => {
-            unsubscribe();
+            messagesRef.off();
         };
-    }, [roomId]);
+    }, [teacherId]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setInputValue(e.target.value);
+        setInput(e.target.value);
     };
 
-    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setName(e.target.value);
-    };
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
 
-    const sendMessage = async () => {
-        if (!inputValue.trim() || !name.trim() || !roomId) return;
+        if (input.trim() === '') return;
 
-        await db
-            .collection('rooms')
-            .doc(roomId)
-            .collection('messages')
-            .add({
-                // 存到 rooms/{roomId}/messages
-                name,
-                content: inputValue,
-                timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
-            });
+        const newMessage = {
+            text: input,
+            userId: user?.uid,
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+        };
 
-        setInputValue('');
-    };
+        firebase.database().ref('messages').child(teacherId).push(newMessage);
 
-    const handleKeyPress = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
+        setInput('');
     };
 
     return (
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-            <h1>Chatroom</h1>
-            <div style={{ marginBottom: '16px' }}>
-                <input
-                    type='text'
-                    placeholder='Your name'
-                    value={name}
-                    onChange={handleNameChange}
-                    style={{ marginRight: '8px', width: '25%' }}
-                />
-                <input
-                    type='text'
-                    placeholder='Type your message'
-                    value={inputValue}
-                    onChange={handleInputChange}
-                    onKeyPress={handleKeyPress}
-                    style={{ width: '50%' }}
-                />
-                <button onClick={sendMessage} style={{ marginLeft: '8px' }}>
-                    Send
-                </button>
-            </div>
-            <div style={{ overflowY: 'scroll', maxHeight: '400px' }}>
-                {messages.map((message) => (
-                    <div key={message.id}>
-                        <strong>{message.name}:</strong> {message.content}
-                        <br />
-                    </div>
+        <ChatContainer>
+            <MessageList>
+                {messages.map((message, index) => (
+                    <Message key={index}>
+                        <span>{message.userId === user?.uid ? '我: ' : '教師: '}</span>
+                        {message.text}
+                    </Message>
                 ))}
-                <div ref={messagesEndRef}></div>
-            </div>
-        </div>
+            </MessageList>
+            <ChatForm onSubmit={handleSubmit}>
+                <ChatInput type='text' value={input} onChange={handleInputChange} placeholder='輸入您的訊息' />
+                <button type='submit'>發送</button>
+            </ChatForm>
+        </ChatContainer>
     );
-}
+};
+
+export default ChatRoom;

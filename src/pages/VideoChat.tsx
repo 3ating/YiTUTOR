@@ -4,7 +4,7 @@ import { Videocam, GroupAdd, Group, CallEnd, VolumeUp, Mic } from '@material-ui/
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import ScreenSharing from './ScreenSharing';
-import Chatroom from './Chatroom';
+import ClassChatroom from './ClassChatroom';
 import Canvas from './Canvas';
 
 const firebaseConfig = {
@@ -360,7 +360,7 @@ const VideoChat: React.FC = () => {
                     房間ID: {roomId}
                 </Typography>
             )}
-            {peerConnection && <Chatroom roomId={roomId} />}
+            {peerConnection && <ClassChatroom roomId={roomId} />}
         </div>
     );
 };

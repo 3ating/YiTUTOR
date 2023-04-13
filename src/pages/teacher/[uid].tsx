@@ -4,6 +4,9 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import styled from 'styled-components';
 import Link from 'next/link';
+import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
+import ChatRoom from '../ChatRoom';
 
 const Container = styled.div`
     max-width: 800px;
@@ -81,8 +84,17 @@ const TeacherDetails = () => {
     const { uid } = router.query;
 
     const [teacher, setTeacher] = useState<Teacher | null>(null);
+    const [openChat, setOpenChat] = useState(false);
 
     console.log(uid);
+
+    const handleOpenChat = () => {
+        setOpenChat(true);
+    };
+
+    const handleCloseChat = () => {
+        setOpenChat(false);
+    };
 
     useEffect(() => {
         if (uid) {
@@ -153,6 +165,12 @@ const TeacherDetails = () => {
             <DirectLink href={'/Teachers'}>
                 <button>尋找其他教師</button>
             </DirectLink>
+            <button onClick={handleOpenChat}>與我聊聊</button>
+            <Dialog open={openChat} onClose={handleCloseChat} maxWidth='md' fullWidth>
+                <DialogContent>
+                    <ChatRoom teacherId={teacher.uid} />
+                </DialogContent>
+            </Dialog>
         </Container>
     );
 };

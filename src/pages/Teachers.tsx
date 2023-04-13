@@ -66,48 +66,7 @@ interface Teacher {
 const Teachers = () => {
     const [teachers, setTeachers] = useState<Teacher[]>([]);
     const [search, setSearch] = useState('');
-
     const [selectedSubject, setSelectedSubject] = useState('');
-
-    // const handleSearch = () => {
-    //     db.collection('users')
-    //         .where('userType', '==', 'teacher')
-    //         .get()
-    //         .then((snapshot) => {
-    //             const filteredTeachersData = snapshot.docs
-    //                 .map((doc) => {
-    //                     return {
-    //                         ...doc.data(),
-    //                         uid: doc.id,
-    //                     } as unknown as Teacher;
-    //                 })
-    //                 .filter((teacher) => teacher.name.toLowerCase().includes(search.toLowerCase()));
-    //             setTeachers(filteredTeachersData);
-    //         });
-    // };
-
-    // const handleSubjectFilter = () => {
-    //     console.log('selectedSubject 上一層');
-    //     if (selectedSubject) {
-    //         console.log('selectedSubject 內層');
-
-    //         db.collection('users')
-    //             .where('userType', '==', 'teacher')
-    //             .where('subject', 'array-contains', selectedSubject)
-    //             .get()
-    //             .then((snapshot) => {
-    //                 const filteredTeachersData = snapshot.docs.map((doc) => {
-    //                     return {
-    //                         ...doc.data(),
-    //                         uid: doc.id,
-    //                     } as unknown as Teacher;
-    //                 });
-    //                 setTeachers(filteredTeachersData);
-    //             });
-    //     } else {
-    //         handleSearch();
-    //     }
-    // };
 
     const handleFilter = () => {
         let query = db.collection('users').where('userType', '==', 'teacher');
@@ -200,21 +159,7 @@ const Teachers = () => {
                             )}
                             <p>{teacher.description}</p>
                             <p>{teacher.evaluation && <span>&#9733;{teacher.evaluation} </span>}</p>
-
                             <p>科目: {teacher.subject.join(', ')}</p>
-                            {/* <p>
-                            課程價格:{' '}
-                            {teacher.price &&
-                                teacher.price.map(
-                                    (priceObj: { qty: number; price: number }, idx: Key | null | undefined) => {
-                                        return (
-                                            <span key={idx}>
-                                                {priceObj.qty} 堂課: {priceObj.price} 元
-                                            </span>
-                                        );
-                                    }
-                                )}
-                        </p> */}
                         </TeacherCard>
                     </DirectLink>
                 ))}

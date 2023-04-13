@@ -4,6 +4,31 @@ import { getFirestore, doc, getDoc, collection, updateDoc } from 'firebase/fires
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import { Button, TextField } from '@material-ui/core';
+import styled from 'styled-components';
+
+const Container = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+`;
+
+const Avatar = styled.img`
+    width: 100px;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+`;
+
+const UserInfoRow = styled.p`
+    margin-bottom: 0.5rem;
+`;
+
+const ButtonContainer = styled.div`
+    margin-top: 1rem;
+`;
 
 interface UserInfo {
     name: string;
@@ -90,7 +115,7 @@ const UserProfile = () => {
     }
 
     return (
-        <div>
+        <Container>
             <h1>{userInfo.name} 的個人資料</h1>
             {isEditing ? (
                 <>
@@ -102,42 +127,32 @@ const UserProfile = () => {
                         onChange={handleChange}
                     />
                     <TextField label='電話' name='phone' value={editedUserInfo?.phone || ''} onChange={handleChange} />
-                    {/* <TextField
-                        label='使用者類型'
-                        name='userType'
-                        value={editedUserInfo?.userType || ''}
-                        onChange={handleChange}
-                    /> */}
-                    <Button onClick={handleSave} variant='contained' color='primary'>
-                        保存
-                    </Button>
-                    <Button onClick={handleCancel} variant='contained' color='secondary'>
-                        取消
-                    </Button>
+                    <ButtonContainer>
+                        <Button onClick={handleSave} variant='contained' color='primary'>
+                            保存
+                        </Button>
+                        <Button onClick={handleCancel} variant='contained' color='secondary'>
+                            取消
+                        </Button>
+                    </ButtonContainer>
                 </>
             ) : (
                 <>
-                    {userInfo && (
-                        <img
-                            src={userInfo.avatar}
-                            alt={`${name} 的大頭照`}
-                            style={{ width: '100px', borderRadius: '50%' }}
-                        />
-                    )}
-                    <p>姓名: {userInfo.name}</p>
-                    <p>電子郵件: {userInfo.email}</p>
-                    <p>電話: {userInfo.phone}</p>
-                    <p>使用者類型: {userInfo.userType}</p>
+                    {userInfo.avatar && <Avatar src={userInfo.avatar} alt={`${name} 的大頭照`} />}
+                    <UserInfoRow>姓名: {userInfo.name}</UserInfoRow>
+                    <UserInfoRow>電子郵件: {userInfo.email}</UserInfoRow>
+                    <UserInfoRow>電話: {userInfo.phone}</UserInfoRow>
+                    <UserInfoRow>使用者類型: {userInfo.userType}</UserInfoRow>
                 </>
             )}
-            <div>
+            <ButtonContainer>
                 {!isEditing && (
                     <Button onClick={handleEdit} variant='contained' color='primary'>
                         編輯個人資料
                     </Button>
                 )}
-            </div>
-        </div>
+            </ButtonContainer>
+        </Container>
     );
 };
 
