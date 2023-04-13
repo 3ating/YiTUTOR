@@ -93,6 +93,27 @@ const LogoutButton = styled.button`
 const UserInfo = styled.div`
     text-align: center;
     color: #444;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+`;
+
+const ProfileButton = styled.button`
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 12px 40px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(76, 175, 80, 0.3);
+    transition: background-color 0.3s;
+    margin-top: 20px;
+
+    &:hover {
+        background-color: #388e3c;
+    }
 `;
 
 const SignIn = () => {
@@ -198,6 +219,9 @@ const SignIn = () => {
                         />
                     )}
                     <LogoutButton onClick={handleLogout}>登出</LogoutButton>
+                    <Link href={`/profile/${user.uid}`} passHref>
+                        <ProfileButton>查看個人資料</ProfileButton>
+                    </Link>
                 </UserInfo>
             ) : (
                 <>

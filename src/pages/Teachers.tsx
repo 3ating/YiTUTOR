@@ -42,6 +42,7 @@ const firebaseConfig = {
     appId: '1:662676665549:web:d2d23417c365f3ec666584',
     measurementId: 'G-YY6Q81WPY9',
 };
+
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
@@ -65,6 +66,7 @@ interface Teacher {
 const Teachers = () => {
     const [teachers, setTeachers] = useState<Teacher[]>([]);
     const [search, setSearch] = useState('');
+
     const [selectedSubject, setSelectedSubject] = useState('');
 
     // const handleSearch = () => {
