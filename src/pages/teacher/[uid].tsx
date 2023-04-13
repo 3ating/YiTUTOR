@@ -64,6 +64,10 @@ interface Teacher {
     userType?: string;
 }
 
+interface ChatRoomProps {
+    teacherId?: string | string[] | undefined;
+}
+
 const firebaseConfig = {
     apiKey: process.env.FIRESTORE_API_KEY,
     authDomain: 'board-12c3c.firebaseapp.com',
@@ -85,8 +89,6 @@ const TeacherDetails = () => {
 
     const [teacher, setTeacher] = useState<Teacher | null>(null);
     const [openChat, setOpenChat] = useState(false);
-
-    console.log(uid);
 
     const handleOpenChat = () => {
         setOpenChat(true);
@@ -117,6 +119,8 @@ const TeacherDetails = () => {
     if (!teacher) {
         return <div>Loading...</div>;
     }
+
+    console.log('teacher.uid', uid);
 
     return (
         <Container>
@@ -168,7 +172,7 @@ const TeacherDetails = () => {
             <button onClick={handleOpenChat}>與我聊聊</button>
             <Dialog open={openChat} onClose={handleCloseChat} maxWidth='md' fullWidth>
                 <DialogContent>
-                    <ChatRoom teacherId={teacher.uid} />
+                    <ChatRoom teacherId={uid ? (uid as string) : ''} />
                 </DialogContent>
             </Dialog>
         </Container>

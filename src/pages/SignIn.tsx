@@ -1,43 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import {
-    getAuth,
-    GoogleAuthProvider,
-    onAuthStateChanged,
-    signInWithEmailAndPassword,
-    signInWithPopup,
-    signOut,
-    User,
-} from 'firebase/auth';
-import styled from 'styled-components';
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/firestore';
-import { Input } from '@material-ui/core';
+import React, { useState } from 'react';
+import { useAuth } from './AuthContext';
+import { Input, TextField } from '@material-ui/core';
 import Link from 'next/link';
-import Image from 'next/image';
-
-interface UserInfo {
-    name: string;
-    email: string;
-    phone: string;
-    userType: string;
-    courses?: object;
-    avatar?: string;
-}
-
-const firebaseConfig = {
-    apiKey: 'AIzaSyDrG9uBznJyP7Fe_4JRwVG7pvR7SjScQsg',
-    authDomain: 'board-12c3c.firebaseapp.com',
-    projectId: 'board-12c3c',
-    storageBucket: 'board-12c3c.appspot.com',
-    messagingSenderId: '662676665549',
-    appId: '1:662676665549:web:d2d23417c365f3ec666584',
-    measurementId: 'G-YY6Q81WPY9',
-};
-
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
-const db = firebase.firestore();
+import styled from 'styled-components';
 
 const Container = styled.div`
     display: flex;
@@ -117,94 +82,12 @@ const ProfileButton = styled.button`
 `;
 
 const SignIn = () => {
-    const [user, setUser] = useState<User | null>(null);
+    const { user, userInfo, handleLoginWithEmail, handleLogout } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
-    useEffect(() => {
-        const auth = getAuth();
-        const unsubscribe = onAuthStateChanged(auth, (user: React.SetStateAction<User | null>) => {
-            setUser(user);
-        });
-
-        return () => {
-            unsubscribe();
-        };
-    }, []);
-
-    const handleLoginGoogle = async () => {
-        const provider = new GoogleAuthProvider();
-        const auth = getAuth();
-        signInWithPopup(auth, provider)
-            .then(async (result) => {
-                setUser(result.user);
-                if (result.user) {
-                    const userDocRef = db.collection('users').doc(result.user.uid);
-
-                    const docSnapshot = await userDocRef.get();
-                    if (!docSnapshot.exists) {
-                        await userDocRef.set({
-                            name: result.user.displayName,
-                            email: result.user.email,
-                            photoURL: result.user.photoURL,
-                        });
-                    }
-                }
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    };
-
-    const handleLoginWithEmail = () => {
-        const auth = getAuth();
-        signInWithEmailAndPassword(auth, email, password)
-            .then(async (result: { user: React.SetStateAction<User | null> }) => {
-                setUser(result.user);
-            })
-            .catch((error: any) => {
-                console.log(error);
-            });
-    };
-
-    const handleLogout = () => {
-        const auth = getAuth();
-        signOut(auth)
-            .then(() => {
-                setUser(null);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    };
-
-    useEffect(() => {
-        const auth = getAuth();
-        const unsubscribeAuth = onAuthStateChanged(auth, (user: React.SetStateAction<User | null>) => {
-            setUser(user);
-        });
-
-        if (user) {
-            const userDocRef = db.collection('users').doc(user.uid);
-            const unsubscribeFirestore = userDocRef.onSnapshot((doc) => {
-                const userData = doc.data();
-
-                if (doc.exists && userData) {
-                    setUserInfo(userData as UserInfo);
-                }
-            });
-            return () => {
-                unsubscribeFirestore();
-            };
-        }
-        return () => {
-            unsubscribeAuth();
-        };
-    }, [user]);
-
-    console.log('user', user);
-    console.log('userInfo', userInfo);
+    console.log('userInfo in sign page:', userInfo);
+    console.log('use in sign page:', user);
 
     return (
         <Container>
@@ -226,20 +109,22 @@ const SignIn = () => {
             ) : (
                 <>
                     <Title>會員登入</Title>
-                    <Input
+                    <TextField
                         type='email'
-                        placeholder='輸入帳號'
+                        label='輸入帳號'
+                        variant='outlined'
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
-                    <Input
+                    <TextField
                         type='password'
-                        placeholder='輸入密碼'
+                        label='輸入密碼'
+                        variant='outlined'
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
-                    <LoginButton onClick={handleLoginWithEmail}>使用帳號密碼登入</LoginButton>
-                    <LoginButton onClick={handleLoginGoogle}>使用 Google 登入</LoginButton>
+                    <LoginButton onClick={() => handleLoginWithEmail(email, password)}>登入</LoginButton>
+                    {/* <LoginButton onClick={handleLoginGoogle}>使用 Google 登入</LoginButton> */}
                     <Link href='/SignIn'>還沒有帳號，前往註冊</Link>
                 </>
             )}
@@ -248,6 +133,3 @@ const SignIn = () => {
 };
 
 export default SignIn;
-function doc(db: firebase.firestore.Firestore, arg1: string, uid: string) {
-    throw new Error('Function not implemented.');
-}

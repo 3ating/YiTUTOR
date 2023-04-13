@@ -28,7 +28,7 @@ interface ChatRoomProps {
     teacherId: string;
 }
 
-const ChatRoom: React.FC<ChatRoomProps> = ({ teacherId }) => {
+const ChatRoom: React.FC<ChatRoomProps> = ({ teacherId }: ChatRoomProps) => {
     const [messages, setMessages] = useState<any[]>([]);
     const [input, setInput] = useState('');
 

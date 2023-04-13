@@ -159,6 +159,7 @@ const Teachers = () => {
                             )}
                             <p>{teacher.description}</p>
                             <p>{teacher.evaluation && <span>&#9733;{teacher.evaluation} </span>}</p>
+
                             <p>科目: {teacher.subject.join(', ')}</p>
                         </TeacherCard>
                     </DirectLink>

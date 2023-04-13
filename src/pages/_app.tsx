@@ -7,6 +7,7 @@
 import React from 'react';
 import { AppProps } from 'next/app';
 import { createGlobalStyle, ThemeProvider, StyleSheetManager } from 'styled-components';
+import { AuthProvider } from './AuthContext';
 
 const GlobalStyle = createGlobalStyle`
     body {
@@ -25,12 +26,14 @@ const theme = {
 function App({ Component, pageProps }: AppProps) {
     return (
         <>
-            <GlobalStyle />
-            {/* <StyleSheetManager disableVendorPrefixes> */}
-            {/* <ThemeProvider theme={theme}> */}
-            <Component {...pageProps} />
-            {/* </ThemeProvider> */}
-            {/* </StyleSheetManager> */}
+            <AuthProvider>
+                <GlobalStyle />
+                {/* <StyleSheetManager disableVendorPrefixes> */}
+                {/* <ThemeProvider theme={theme}> */}
+                <Component {...pageProps} />
+                {/* </ThemeProvider> */}
+                {/* </StyleSheetManager> */}
+            </AuthProvider>
         </>
     );
 }
