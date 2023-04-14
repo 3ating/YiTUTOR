@@ -1,8 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Button } from '@material-ui/core';
-import { ScreenShare } from '@material-ui/icons';
+// import { Button } from '@material-ui/core';
+// import { ScreenShare } from '@material-ui/icons';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
+import styled from 'styled-components';
 // import { db } from '../../firebase';
 
 const firebaseConfig = {
@@ -28,6 +29,46 @@ interface ScreenSharingProps {
     setIsScreenSharing: React.Dispatch<React.SetStateAction<boolean>>;
     roomId: string | null;
 }
+
+const ShareButton = styled.button`
+    display: flex;
+    align-items: center;
+    padding: 6px 12px;
+    background-color: #3f51b5;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    &:hover {
+        background-color: #303f9f;
+    }
+    &:disabled {
+        background-color: #c5cae9;
+        cursor: not-allowed;
+    }
+`;
+
+const StopSharingButton = styled(ShareButton)`
+    background-color: #f44336;
+    &:hover {
+        background-color: #d32f2f;
+    }
+`;
+
+const ScreenShareIcon = styled.svg`
+    width: 24px;
+    height: 24px;
+    margin-right: 4px;
+`;
+
+const RemoteScreen = styled.video`
+    width: 100%;
+    display: ${({ show }: { show: boolean }) => (show ? 'block' : 'none')};
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    margin-top: 8px;
+`;
 
 const ScreenSharing: React.FC<ScreenSharingProps> = ({
     localStream,
@@ -202,38 +243,21 @@ const ScreenSharing: React.FC<ScreenSharingProps> = ({
     return (
         <>
             {!isScreenSharing ? (
-                <Button
-                    variant='contained'
-                    color='primary'
-                    onClick={openScreenShare}
-                    disabled={!localStream}
-                    startIcon={<ScreenShare />}
-                >
+                <ShareButton onClick={openScreenShare} disabled={!localStream}>
+                    <ScreenShareIcon viewBox='0 0 24 24'>
+                        <path d='M4 17h16v2H4zm13-6.2l2.2-2.2 1.4 1.4-3.6 3.6-3.6-3.6 1.4-1.4 2.2 2.2V3h2zm3 2.2h2v6c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2v-6h2v6h16z' />
+                    </ScreenShareIcon>
                     開啟螢幕共享
-                </Button>
+                </ShareButton>
             ) : (
-                <Button
-                    variant='contained'
-                    color='secondary'
-                    onClick={stopScreenShare}
-                    disabled={!remoteScreen}
-                    startIcon={<ScreenShare />}
-                >
+                <StopSharingButton onClick={stopScreenShare} disabled={!remoteScreen}>
+                    <ScreenShareIcon viewBox='0 0 24 24'>
+                        <path d='M4 17h16v2H4zm13-6.2l2.2-2.2 1.4 1.4-3.6 3.6-3.6-3.6 1.4-1.4 2.2 2.2V3h2zm3 2.2h2v6c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2v-6h2v6h16z' />
+                    </ScreenShareIcon>
                     停止螢幕分享
-                </Button>
+                </StopSharingButton>
             )}
-            <video
-                ref={remoteScreenRef}
-                style={{
-                    width: '100%',
-                    display: remoteScreen ? 'block' : 'none',
-                    borderRadius: '4px',
-                    border: '1px solid #ddd',
-                    marginTop: '8px',
-                }}
-                autoPlay
-                muted
-            />
+            <RemoteScreen ref={remoteScreenRef} show={!!remoteScreen} autoPlay muted />
         </>
     );
 };

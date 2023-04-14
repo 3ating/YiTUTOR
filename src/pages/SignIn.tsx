@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from './AuthContext';
-import { Input, TextField, CircularProgress } from '@material-ui/core';
 import Link from 'next/link';
-import styled from 'styled-components';
-import Image from 'next/image';
+import styled, { keyframes } from 'styled-components';
+// import Image from 'next/image';
 
 const Container = styled.div`
     display: flex;
@@ -21,6 +20,15 @@ const Title = styled.h2`
     margin-bottom: 30px;
 `;
 
+const InputField = styled.input`
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    padding: 8px 12px;
+    margin: 5px 0;
+    width: 60%;
+`;
+
 const LoginButton = styled.button`
     background-color: #4285f4;
     color: white;
@@ -32,6 +40,7 @@ const LoginButton = styled.button`
     cursor: pointer;
     box-shadow: 0 2px 6px rgba(66, 133, 244, 0.3);
     transition: background-color 0.3s;
+    margin-top: 10px;
 
     &:hover {
         background-color: #2a75d9;
@@ -82,6 +91,24 @@ const ProfileButton = styled.button`
     }
 `;
 
+const spin = keyframes`
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+`;
+
+const LoadingSpinner = styled.div`
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-left-color: #4285f4;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: ${spin} 1s linear infinite;
+`;
+
 const SignIn = () => {
     const { user, userInfo, isLoading, userUid, handleLoginWithEmail, handleLogout } = useAuth();
     const [email, setEmail] = useState('');
@@ -111,22 +138,20 @@ const SignIn = () => {
                         </Link>
                     </UserInfo>
                 ) : (
-                    <CircularProgress />
+                    <LoadingSpinner />
                 )
             ) : (
                 <>
                     <Title>會員登入</Title>
-                    <TextField
+                    <InputField
                         type='email'
-                        label='輸入帳號'
-                        variant='outlined'
+                        placeholder='輸入帳號'
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
-                    <TextField
+                    <InputField
                         type='password'
-                        label='輸入密碼'
-                        variant='outlined'
+                        placeholder='輸入密碼'
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />

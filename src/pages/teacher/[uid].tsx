@@ -4,10 +4,12 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import styled from 'styled-components';
 import Link from 'next/link';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
 import ChatRoom from '../ChatRoom';
 import { useAuth } from '../AuthContext';
+
+interface StyledDialogProps {
+    open: boolean;
+}
 
 const Container = styled.div`
     max-width: 800px;
@@ -47,6 +49,28 @@ const Section = styled.div`
 const DirectLink = styled(Link)`
     text-decoration: none;
     color: black;
+`;
+
+const StyledDialog = styled.div<StyledDialogProps>`
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: ${(props) => (props.open ? 'flex' : 'none')};
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+`;
+
+const StyledDialogContent = styled.div`
+    background-color: #fff;
+    border-radius: 4px;
+    padding: 2rem;
+    max-width: 800px;
+    width: 100%;
+    box-sizing: border-box;
 `;
 
 interface Teacher {
@@ -173,11 +197,16 @@ const TeacherDetails = () => {
                 <button>尋找其他教師</button>
             </DirectLink>
             <button onClick={handleOpenChat}>與我聊聊</button>
-            <Dialog open={openChat} onClose={handleCloseChat} maxWidth='md' fullWidth>
+            {/* <Dialog open={openChat} onClose={handleCloseChat} maxWidth='md' fullWidth>
                 <DialogContent>
                     <ChatRoom teacherId={uid ? (uid as string) : ''} />
                 </DialogContent>
-            </Dialog>
+            </Dialog> */}
+            <StyledDialog open={openChat} onClick={handleCloseChat}>
+                <StyledDialogContent onClick={(e) => e.stopPropagation()}>
+                    <ChatRoom teacherId={uid ? (uid as string) : ''} />
+                </StyledDialogContent>
+            </StyledDialog>
         </Container>
     );
 };

@@ -133,15 +133,33 @@ const AskGPTPage = () => {
     }
 
     async function processMessageToChatGPT(chatMessages: any[]) {
-        let apiMessages = chatMessages.map((messageObject) => {
-            let role = '';
-            if (messageObject.sender === 'ChatGPT') {
-                role = 'assistant';
-            } else {
-                role = 'user';
-            }
-            return { role: role, content: messageObject.message };
-        });
+        // let apiMessages = chatMessages.map((messageObject) => {
+        //     let role = '';
+        //     if (messageObject.sender === 'ChatGPT') {
+        //         role = 'assistant';
+        //     } else {
+        //         role = 'user';
+        //     }
+        //     return { role: role, content: messageObject.message };
+        // });
+
+        let apiMessages = [
+            {
+                role: 'system',
+                content:
+                    '你是一個專業的補習班老師，個性一板一眼，只能回答國文、數學、英文、物理和化學等科目的相關考題，若是被問到考題以外的問題請你告訴使用者「此問題與學習無關，請您重新發問！」',
+            },
+        ].concat(
+            chatMessages.map((messageObject) => {
+                let role = '';
+                if (messageObject.sender === 'ChatGPT') {
+                    role = 'assistant';
+                } else {
+                    role = 'user';
+                }
+                return { role: role, content: messageObject.message };
+            })
+        );
 
         const apiRequestBody = {
             model: 'gpt-3.5-turbo',

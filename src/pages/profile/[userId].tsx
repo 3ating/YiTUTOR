@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import { getFirestore, doc, getDoc, collection, updateDoc } from 'firebase/firestore';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
-import { Button, TextField } from '@material-ui/core';
 import styled from 'styled-components';
 
 const Container = styled.div`
@@ -28,6 +27,32 @@ const UserInfoRow = styled.p`
 
 const ButtonContainer = styled.div`
     margin-top: 1rem;
+`;
+
+const StyledInput = styled.input`
+    display: block;
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+`;
+
+const StyledButton = styled.button<{ primary?: boolean }>`
+    background-color: ${(props) => (props.primary ? '#3f51b5' : '#f44336')};
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-right: ${(props) => (props.primary ? '1rem' : '0')};
+    &:hover {
+        background-color: ${(props) => (props.primary ? '#303f9f' : '#d32f2f')};
+    }
 `;
 
 interface UserInfo {
@@ -119,21 +144,35 @@ const UserProfile = () => {
             <h1>{userInfo.name} 的個人資料</h1>
             {isEditing ? (
                 <>
-                    <TextField label='姓名' name='name' value={editedUserInfo?.name || ''} onChange={handleChange} />
-                    <TextField
-                        label='電子郵件'
+                    <label htmlFor='name'>姓名</label>
+                    <StyledInput
+                        type='text'
+                        id='name'
+                        name='name'
+                        value={editedUserInfo?.name || ''}
+                        onChange={handleChange}
+                    />
+                    <label htmlFor='email'>電子郵件</label>
+                    <StyledInput
+                        type='email'
+                        id='email'
                         name='email'
                         value={editedUserInfo?.email || ''}
                         onChange={handleChange}
                     />
-                    <TextField label='電話' name='phone' value={editedUserInfo?.phone || ''} onChange={handleChange} />
+                    <label htmlFor='phone'>電話</label>
+                    <StyledInput
+                        type='tel'
+                        id='phone'
+                        name='phone'
+                        value={editedUserInfo?.phone || ''}
+                        onChange={handleChange}
+                    />
                     <ButtonContainer>
-                        <Button onClick={handleSave} variant='contained' color='primary'>
+                        <StyledButton primary onClick={handleSave}>
                             保存
-                        </Button>
-                        <Button onClick={handleCancel} variant='contained' color='secondary'>
-                            取消
-                        </Button>
+                        </StyledButton>
+                        <StyledButton onClick={handleCancel}>取消</StyledButton>
                     </ButtonContainer>
                 </>
             ) : (
@@ -145,11 +184,18 @@ const UserProfile = () => {
                     <UserInfoRow>使用者類型: {userInfo.userType}</UserInfoRow>
                 </>
             )}
-            <ButtonContainer>
+            {/* <ButtonContainer>
                 {!isEditing && (
                     <Button onClick={handleEdit} variant='contained' color='primary'>
                         編輯個人資料
                     </Button>
+                )}
+            </ButtonContainer> */}
+            <ButtonContainer>
+                {!isEditing && (
+                    <StyledButton primary onClick={handleEdit}>
+                        編輯個人資料
+                    </StyledButton>
                 )}
             </ButtonContainer>
         </Container>

@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@material-ui/core';
-import { Videocam, GroupAdd, Group, CallEnd, VolumeUp, Mic } from '@material-ui/icons';
+import React, { HTMLAttributes, useEffect, useRef, useState, ButtonHTMLAttributes } from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import ScreenSharing from './ScreenSharing';
 import ClassChatroom from './ClassChatroom';
 import Canvas from './Canvas';
+import styled from 'styled-components';
 
 const firebaseConfig = {
     apiKey: process.env.FIRESTORE_API_KEY,
@@ -22,6 +21,97 @@ if (!firebase.apps.length) {
 }
 
 const db = firebase.firestore();
+
+interface DialogProps extends HTMLAttributes<HTMLDivElement> {
+    open?: boolean;
+}
+
+interface TypographyProps extends HTMLAttributes<HTMLParagraphElement> {
+    variant?: 'h6' | 'body';
+    gutterBottom?: boolean;
+}
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+    primary?: boolean;
+}
+
+const Button = styled.button<ButtonProps>`
+    background-color: ${({ primary }) => (primary ? 'blue' : 'gray')};
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    &:hover {
+        background-color: ${({ primary }) => (primary ? 'darkblue' : 'darkgray')};
+    }
+    &:disabled {
+        background-color: lightgray;
+        color: gray;
+        cursor: not-allowed;
+    }
+`;
+
+const Dialog = styled.div<DialogProps>`
+    display: ${({ open }) => (open ? 'block' : 'none')};
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+`;
+
+const DialogActions = styled.div`
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px;
+    gap: 8px;
+`;
+
+const DialogContent = styled.div`
+    background-color: white;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+`;
+
+const DialogTitle = styled.h2`
+    margin: 0;
+    padding-bottom: 10px;
+`;
+
+const TextField = styled.input`
+    display: block;
+    width: 100%;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    margin-bottom: 10px;
+`;
+
+const Typography = styled.p<TypographyProps>`
+    font-size: ${({ variant }) => (variant === 'h6' ? '1.25rem' : '1rem')};
+    margin-bottom: ${({ gutterBottom }) => (gutterBottom ? '0.35em' : '0')};
+`;
+
+const StyledIcon = styled.i`
+    font-size: 1.2rem;
+    margin-right: 4px;
+`;
 
 const configuration: RTCConfiguration = {
     iceServers: [
@@ -278,13 +368,8 @@ const VideoChat: React.FC = () => {
                 <video ref={remoteVideoRef} autoPlay style={{ width: '50%', border: '1px solid black' }}></video>
             </div>
             <div>
-                <Button
-                    variant='contained'
-                    color='primary'
-                    onClick={openUserMedia}
-                    disabled={!!localStream}
-                    startIcon={<Videocam />}
-                >
+                <Button primary onClick={openUserMedia} disabled={!!localStream}>
+                    <StyledIcon />
                     開啟鏡頭
                 </Button>
                 <ScreenSharing
@@ -294,63 +379,40 @@ const VideoChat: React.FC = () => {
                     setIsScreenSharing={setIsScreenSharing}
                     roomId={roomId}
                 />
-                <Button
-                    variant='contained'
-                    color='primary'
-                    onClick={handleCreateRoom}
-                    disabled={!localStream || !!roomId}
-                    startIcon={<GroupAdd />}
-                >
+                <Button primary onClick={handleCreateRoom} disabled={!localStream || !!roomId}>
+                    <StyledIcon />
                     建立房間
                 </Button>
-                <Button
-                    variant='contained'
-                    color='primary'
-                    onClick={() => setRoomDialogOpen(true)}
-                    disabled={!localStream || !!roomId}
-                    startIcon={<Group />}
-                >
+                <Button primary onClick={() => setRoomDialogOpen(true)} disabled={!localStream || !!roomId}>
+                    <StyledIcon />
                     加入房間
                 </Button>
-                <Button variant='contained' color='primary' onClick={hangUp} disabled={!roomId} startIcon={<CallEnd />}>
+                <Button primary onClick={hangUp} disabled={!roomId}>
+                    <StyledIcon />
                     掛斷
                 </Button>
-                <Button
-                    variant='contained'
-                    color={isMicMuted ? 'secondary' : 'primary'}
-                    onClick={toggleMic}
-                    disabled={!localStream || !roomId}
-                    startIcon={<Mic />}
-                >
+                <Button primary={!isMicMuted} onClick={toggleMic} disabled={!localStream || !roomId}>
+                    <StyledIcon />
                     {isMicMuted ? '開啟麥克風' : '關閉麥克風'}
                 </Button>
-                <Button
-                    variant='contained'
-                    color={isAudioMuted ? 'secondary' : 'primary'}
-                    onClick={toggleAudio}
-                    disabled={!remoteStream || !roomId}
-                    startIcon={<VolumeUp />}
-                >
+                <Button primary={!isAudioMuted} onClick={toggleAudio} disabled={!remoteStream || !roomId}>
+                    <StyledIcon />
                     {isAudioMuted ? '開啟音量' : '關閉音量'}
                 </Button>
             </div>
-            <Dialog open={roomDialogOpen} onClose={() => setRoomDialogOpen(false)}>
+            <Dialog open={roomDialogOpen}>
                 <DialogTitle>加入房間</DialogTitle>
                 <DialogContent>
                     <TextField
                         autoFocus
-                        margin='dense'
-                        label='房間ID'
-                        fullWidth
                         value={roomIdInput}
                         onChange={handleRoomIdInputChange}
+                        style={{ width: '100%', marginBottom: '16px' }}
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setRoomDialogOpen(false)} color='primary'>
-                        取消
-                    </Button>
-                    <Button onClick={joinRoomById} color='primary' disabled={!localStream || roomIdInput === ''}>
+                    <Button onClick={() => setRoomDialogOpen(false)}>取消</Button>
+                    <Button onClick={joinRoomById} disabled={!localStream || roomIdInput === ''}>
                         加入
                     </Button>
                 </DialogActions>
