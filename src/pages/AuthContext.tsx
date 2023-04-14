@@ -30,7 +30,9 @@ const db = firebase.firestore();
 
 interface AuthContextValue {
     user: User | null;
-    userInfo: any;
+    userInfo: UserInfo | null;
+    isLoading: boolean;
+    userUid: string | null;
     handleLoginWithEmail: (email: string, password: string) => Promise<void>;
     handleLogout: () => Promise<void>;
 }
@@ -42,6 +44,8 @@ interface AuthProviderProps {
 const AuthContext = createContext<AuthContextValue>({
     user: null,
     userInfo: null,
+    isLoading: false,
+    userUid: null,
     handleLoginWithEmail: async () => {},
     handleLogout: async () => {},
 });
@@ -53,6 +57,8 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [userUid, setUserUid] = useState<string | null>(null);
 
     useEffect(() => {
         const auth = getAuth();
@@ -75,15 +81,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             const userDocRef = db.collection('users').doc(user.uid);
             const unsubscribeFirestore = userDocRef.onSnapshot((doc) => {
                 const userData = doc.data();
-
+                setIsLoading(true);
                 if (doc.exists && userData) {
                     setUserInfo(userData as UserInfo);
+                    setUserUid(user.uid);
                 }
             });
+            setIsLoading(false);
             return () => {
                 unsubscribeFirestore();
             };
         }
+
         return () => {
             unsubscribeAuth();
         };
@@ -94,8 +103,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         try {
             const result = await signInWithEmailAndPassword(auth, email, password);
             setUser(result.user);
+            setIsLoading(true);
         } catch (error) {
             console.log(error);
+            setIsLoading(false); // 登錄出錯時將 isLoading 設置為 false
         }
     };
 
@@ -104,6 +115,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         try {
             await signOut(auth);
             setUser(null);
+            setIsLoading(false);
         } catch (error) {
             console.log(error);
         }
@@ -112,6 +124,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const value = {
         user,
         userInfo,
+        isLoading,
+        userUid,
         handleLoginWithEmail,
         handleLogout,
     };

@@ -2,26 +2,77 @@
 import React, { useEffect, useState } from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/database';
+import 'firebase/compat/firestore';
+import 'firebase/compat/auth';
 import styled from 'styled-components';
+import { useAuth } from './AuthContext';
 
 const ChatContainer = styled.div`
-    // 根据需要添加聊天容器样式
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    max-height: 600px;
+    width: 100%;
+    max-width: 800px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f0f2f5;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 `;
 
 const MessageList = styled.ul`
-    // 根据需要添加消息列表样式
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    height: calc(100% - 60px);
+    overflow-y: auto;
 `;
 
 const Message = styled.li`
-    // 根据需要添加消息样式
+    margin-bottom: 12px;
+    font-size: 16px;
+    color: #444;
+    word-wrap: break-word;
+
+    span {
+        font-weight: bold;
+    }
 `;
 
 const ChatInput = styled.input`
-    // 根据需要添加聊天输入样式
+    flex-grow: 1;
+    outline: none;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 16px;
+    margin-right: 10px;
 `;
 
 const ChatForm = styled.form`
-    // 根据需要添加聊天表单样式
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+
+    button {
+        background-color: #4285f4;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-size: 16px;
+        font-weight: 500;
+        padding: 10px 20px;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(66, 133, 244, 0.3);
+        transition: background-color 0.3s;
+
+        &:hover {
+            background-color: #2a75d9;
+        }
+    }
 `;
 
 interface ChatRoomProps {
@@ -29,39 +80,100 @@ interface ChatRoomProps {
 }
 
 const ChatRoom: React.FC<ChatRoomProps> = ({ teacherId }: ChatRoomProps) => {
+    const firestore = firebase.firestore();
+
+    const { userUid } = useAuth();
     const [messages, setMessages] = useState<any[]>([]);
     const [input, setInput] = useState('');
 
+    console.log('teacherId in chatroom:', teacherId);
+    console.log('userId in chatroom:', userUid);
+
     const user = firebase.auth().currentUser;
+    const chatRoomId = user?.uid && teacherId ? `${user?.uid}_${teacherId}` : '';
+
+    // useEffect(() => {
+    //     const messagesRef = firebase.database().ref('messages').child(teacherId);
+    //     messagesRef.on('child_added', (snapshot) => {
+    //         const message = snapshot.val();
+    //         setMessages((prevMessages) => [...prevMessages, message]);
+    //     });
+
+    //     return () => {
+    //         messagesRef.off();
+    //     };
+    // }, [teacherId]);
+
+    // useEffect(() => {
+    //     if (chatRoomId) {
+    //         const messagesRef = firebase.database().ref('messages').child(chatRoomId);
+    //         messagesRef.on('child_added', (snapshot) => {
+    //             const message = snapshot.val();
+    //             setMessages((prevMessages) => [...prevMessages, message]);
+    //         });
+
+    //         return () => {
+    //             messagesRef.off();
+    //         };
+    //     }
+    // }, [chatRoomId]);
 
     useEffect(() => {
-        const messagesRef = firebase.database().ref('messages').child(teacherId);
-        messagesRef.on('child_added', (snapshot) => {
-            const message = snapshot.val();
-            setMessages((prevMessages) => [...prevMessages, message]);
+        if (!chatRoomId) return;
+
+        const messagesRef = firestore.collection(`users/${user?.uid}/messages`).doc(chatRoomId).collection('messages');
+        const teacherMessagesRef = firestore
+            .collection(`users/${teacherId}/messages`)
+            .doc(chatRoomId)
+            .collection('messages');
+
+        const unsubscribe = messagesRef.orderBy('timestamp').onSnapshot((snapshot) => {
+            setMessages(snapshot.docs.map((doc) => doc.data()));
+        });
+
+        const unsubscribeTeacher = teacherMessagesRef.orderBy('timestamp').onSnapshot((snapshot) => {
+            setMessages(snapshot.docs.map((doc) => doc.data()));
         });
 
         return () => {
-            messagesRef.off();
+            unsubscribe();
+            unsubscribeTeacher();
         };
-    }, [teacherId]);
+    }, [chatRoomId, user?.uid, teacherId, firestore]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInput(e.target.value);
     };
 
+    // const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    //     e.preventDefault();
+
+    //     if (input.trim() === '' || !chatRoomId) return;
+
+    //     const newMessage = {
+    //         text: input,
+    //         userId: user?.uid,
+    //         timestamp: firebase.database.ServerValue.TIMESTAMP,
+    //     };
+
+    //     firebase.database().ref('messages').child(chatRoomId).push(newMessage);
+
+    //     setInput('');
+    // };
+
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if (input.trim() === '') return;
+        if (input.trim() === '' || !chatRoomId) return;
 
         const newMessage = {
             text: input,
             userId: user?.uid,
-            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         };
 
-        firebase.database().ref('messages').child(teacherId).push(newMessage);
+        firestore.collection(`users/${user?.uid}/messages`).doc(chatRoomId).collection('messages').add(newMessage);
+        firestore.collection(`users/${teacherId}/messages`).doc(chatRoomId).collection('messages').add(newMessage);
 
         setInput('');
     };

@@ -3,6 +3,7 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import styled from 'styled-components';
 import Link from 'next/link';
+import { useAuth } from './AuthContext';
 
 const TeacherContainer = styled.div`
     display: grid;
@@ -64,9 +65,13 @@ interface Teacher {
 }
 
 const Teachers = () => {
+    const { user, userInfo, isLoading, userUid } = useAuth();
     const [teachers, setTeachers] = useState<Teacher[]>([]);
     const [search, setSearch] = useState('');
     const [selectedSubject, setSelectedSubject] = useState('');
+
+    console.log('userUid:', userUid);
+    console.log('isLoading:', isLoading);
 
     const handleFilter = () => {
         let query = db.collection('users').where('userType', '==', 'teacher');

@@ -31,8 +31,6 @@ const db = firebase.firestore();
 
 const API_KEY = OPENAI_API_KEY;
 
-console.log(API_KEY);
-
 const StyledApp = styled.div`
     font-family: Arial, Helvetica, sans-serif;
     background-color: #f5f5f5;

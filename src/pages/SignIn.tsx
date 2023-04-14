@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from './AuthContext';
-import { Input, TextField } from '@material-ui/core';
+import { Input, TextField, CircularProgress } from '@material-ui/core';
 import Link from 'next/link';
 import styled from 'styled-components';
 
@@ -82,30 +82,36 @@ const ProfileButton = styled.button`
 `;
 
 const SignIn = () => {
-    const { user, userInfo, handleLoginWithEmail, handleLogout } = useAuth();
+    const { user, userInfo, isLoading, userUid, handleLoginWithEmail, handleLogout } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    console.log('userInfo in sign page:', userInfo);
+    // console.log('userInfo in sign page:', userInfo);
     console.log('use in sign page:', user);
+    console.log('isLoading:', isLoading);
+    // console.log('uid:', userUid);
 
     return (
         <Container>
-            {user ? (
-                <UserInfo>
-                    <p>歡迎, {userInfo?.name}！</p>
-                    {userInfo?.avatar && (
-                        <img
-                            src={userInfo.avatar}
-                            alt={`${userInfo.name} 的大頭照`}
-                            style={{ width: '100px', borderRadius: '50%' }}
-                        />
-                    )}
-                    <LogoutButton onClick={handleLogout}>登出</LogoutButton>
-                    <Link href={`/profile/${user.uid}`} passHref>
-                        <ProfileButton>查看個人資料</ProfileButton>
-                    </Link>
-                </UserInfo>
+            {isLoading ? (
+                user ? (
+                    <UserInfo>
+                        <p>歡迎, {userInfo?.name}！</p>
+                        {userInfo?.avatar && (
+                            <img
+                                src={userInfo.avatar}
+                                alt={`${userInfo.name} 的大頭照`}
+                                style={{ width: '100px', borderRadius: '50%' }}
+                            />
+                        )}
+                        <LogoutButton onClick={handleLogout}>登出</LogoutButton>
+                        <Link href={`/profile/${user.uid}`} passHref>
+                            <ProfileButton>查看個人資料</ProfileButton>
+                        </Link>
+                    </UserInfo>
+                ) : (
+                    <CircularProgress />
+                )
             ) : (
                 <>
                     <Title>會員登入</Title>

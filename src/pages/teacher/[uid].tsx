@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import ChatRoom from '../ChatRoom';
+import { useAuth } from '../AuthContext';
 
 const Container = styled.div`
     max-width: 800px;
@@ -84,6 +85,7 @@ if (!firebase.apps.length) {
 const db = firebase.firestore();
 
 const TeacherDetails = () => {
+    const { user, userInfo, isLoading, userUid } = useAuth();
     const router = useRouter();
     const { uid } = router.query;
 
@@ -120,6 +122,7 @@ const TeacherDetails = () => {
         return <div>Loading...</div>;
     }
 
+    console.log('userUid:', userUid);
     console.log('teacher.uid', uid);
 
     return (
