@@ -1,9 +1,9 @@
-import { Key, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import styled from 'styled-components';
 import Link from 'next/link';
-import { useAuth } from './AuthContext';
+import { useAuth } from '../auth/AuthContext';
 
 const TeacherContainer = styled.div`
     display: grid;
@@ -164,7 +164,6 @@ const Teachers = () => {
                             )}
                             <p>{teacher.description}</p>
                             <p>{teacher.evaluation && <span>&#9733;{teacher.evaluation} </span>}</p>
-
                             <p>科目: {teacher.subject.join(', ')}</p>
                         </TeacherCard>
                     </DirectLink>

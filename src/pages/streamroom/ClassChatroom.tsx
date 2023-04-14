@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
-import { db } from '../../firebase';
+import { db } from '../../../firebase';
 
 interface MessageType {
     id: string;

@@ -11,7 +11,7 @@ import {
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import styled from 'styled-components';
-import { OPENAI_API_KEY } from '../../config';
+import { OPENAI_API_KEY } from '../../../config';
 
 const firebaseConfig = {
     apiKey: process.env.FIRESTORE_API_KEY,

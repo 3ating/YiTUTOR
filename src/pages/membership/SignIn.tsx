@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from './AuthContext';
+import { useAuth } from '../auth/AuthContext';
 import Link from 'next/link';
 import styled, { keyframes } from 'styled-components';
 // import Image from 'next/image';

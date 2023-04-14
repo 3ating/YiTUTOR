@@ -4,8 +4,9 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import styled from 'styled-components';
 import Link from 'next/link';
-import ChatRoom from '../ChatRoom';
-import { useAuth } from '../AuthContext';
+import ChatRoom from '../chat/ChatRoom';
+import { useAuth } from '../auth/AuthContext';
+import ChatIcon from '../chat/ChatIcon';
 
 interface StyledDialogProps {
     open: boolean;
@@ -115,6 +116,7 @@ const TeacherDetails = () => {
 
     const [teacher, setTeacher] = useState<Teacher | null>(null);
     const [openChat, setOpenChat] = useState(false);
+    const [currentUser, setCurrentUser] = useState('');
 
     const handleOpenChat = () => {
         setOpenChat(true);
@@ -202,6 +204,7 @@ const TeacherDetails = () => {
                     <ChatRoom teacherId={uid ? (uid as string) : ''} />
                 </DialogContent>
             </Dialog> */}
+            <ChatIcon onClick={handleOpenChat} />
             <StyledDialog open={openChat} onClick={handleCloseChat}>
                 <StyledDialogContent onClick={(e) => e.stopPropagation()}>
                     <ChatRoom teacherId={uid ? (uid as string) : ''} />

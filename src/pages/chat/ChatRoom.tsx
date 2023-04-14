@@ -5,7 +5,7 @@ import 'firebase/compat/database';
 import 'firebase/compat/firestore';
 import 'firebase/compat/auth';
 import styled from 'styled-components';
-import { useAuth } from './AuthContext';
+import { useAuth } from '../auth/AuthContext';
 
 const ChatContainer = styled.div`
     display: flex;
@@ -90,7 +90,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ teacherId }: ChatRoomProps) => {
     console.log('userId in chatroom:', userUid);
 
     const user = firebase.auth().currentUser;
-    const chatRoomId = user?.uid && teacherId ? `${user?.uid}_${teacherId}` : '';
+    const chatRoomId = user?.uid && teacherId ? `${teacherId}` : '';
 
     // useEffect(() => {
     //     const messagesRef = firebase.database().ref('messages').child(teacherId);
@@ -144,22 +144,6 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ teacherId }: ChatRoomProps) => {
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInput(e.target.value);
     };
-
-    // const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    //     e.preventDefault();
-
-    //     if (input.trim() === '' || !chatRoomId) return;
-
-    //     const newMessage = {
-    //         text: input,
-    //         userId: user?.uid,
-    //         timestamp: firebase.database.ServerValue.TIMESTAMP,
-    //     };
-
-    //     firebase.database().ref('messages').child(chatRoomId).push(newMessage);
-
-    //     setInput('');
-    // };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();

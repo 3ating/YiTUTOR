@@ -2,7 +2,7 @@ import React, { HTMLAttributes, useEffect, useRef, useState, ButtonHTMLAttribute
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import ScreenSharing from './ScreenSharing';
-import ClassChatroom from './ClassChatroom';
+import ClassChatroom from './streamroom/ClassChatroom';
 import Canvas from './Canvas';
 import styled from 'styled-components';
 
