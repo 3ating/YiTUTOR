@@ -65,7 +65,7 @@ interface Teacher {
 }
 
 const Teachers = () => {
-    const { user, userInfo, isLoading, userUid } = useAuth();
+    const { isLoading, userUid } = useAuth();
     const [teachers, setTeachers] = useState<Teacher[]>([]);
     const [search, setSearch] = useState('');
     const [selectedSubject, setSelectedSubject] = useState('');

@@ -3,6 +3,7 @@ import { useAuth } from './AuthContext';
 import { Input, TextField, CircularProgress } from '@material-ui/core';
 import Link from 'next/link';
 import styled from 'styled-components';
+import Image from 'next/image';
 
 const Container = styled.div`
     display: flex;
