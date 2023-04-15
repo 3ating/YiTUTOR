@@ -136,14 +136,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         };
     }, []);
 
-    // const handleMoveCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     setMoveEnabled(e.target.checked);
-    // };
-
-    // const handleScaleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     setScaleEnabled(e.target.checked);
-    // };
-
     const handleMoveCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setMoveEnabled(e.target.checked);
         if (e.target.checked) {
@@ -207,9 +199,28 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         }
     };
 
-    console.log(selectedItem);
+    const deleteSelectedItem = async () => {
+        if (selectedItem) {
+            if (selectedItem.type === 'line') {
+                const newLines = lines.filter((_: any, index: number) => index !== selectedItem.index);
+                setLines(newLines);
+                await db
+                    .collection('rooms')
+                    .doc(roomId ?? '')
+                    .update({ lines: newLines });
+            } else if (selectedItem.type === 'shape') {
+                const newShapes = shapes.filter((_, index) => index !== selectedItem.index);
+                setShapes(newShapes);
+                await db
+                    .collection('rooms')
+                    .doc(roomId ?? '')
+                    .update({ shapes: newShapes });
+            }
+            setSelectedItem(null);
+        }
+    };
 
-    const changeColor = (newColor: string) => {
+    const changeColor = async (newColor: string) => {
         if (selectedItem) {
             if (selectedItem.type === 'line') {
                 const newLines = [...lines];
@@ -218,11 +229,27 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                     color: newColor,
                 }));
                 setLines(newLines);
+
+                // Update the lines in Firebase
+                await db
+                    .collection('rooms')
+                    .doc(roomId ?? '')
+                    .update({ lines: newLines });
             } else if (selectedItem.type === 'shape') {
                 const newShapes = [...shapes];
                 newShapes[selectedItem.index].color = newColor;
                 setShapes(newShapes);
+
+                // Update the shapes in Firebase
+                await db
+                    .collection('rooms')
+                    .doc(roomId ?? '')
+                    .update({ shapes: newShapes });
             }
+
+            // Re-render the shapes and lines to reflect the color change
+            renderShapes();
+            renderLines();
         }
     };
 
@@ -1020,6 +1047,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                 <button onClick={toggleEraser}>{eraserEnabled ? 'Disable Eraser' : 'Enable Eraser'}</button>
                 <button onClick={copySelectedItem}>Copy</button>
                 <button onClick={pasteClipboardItem}>Paste</button>
+                <button onClick={deleteSelectedItem}>Delete</button>
             </div>
         </Container>
     );
