@@ -74,6 +74,47 @@ const StyledDialogContent = styled.div`
     box-sizing: border-box;
 `;
 
+const PriceButton = styled.button`
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    color: #333;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    margin: 0.5rem 0;
+    transition: all 0.2s;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    &:hover {
+        color: #0070f3;
+        border-color: #0070f3;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+`;
+
+const ConfirmationDialog = styled.div<StyledDialogProps>`
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: ${(props) => (props.open ? 'flex' : 'none')};
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 2;
+`;
+
+const ConfirmationDialogContent = styled.div`
+    background-color: #fff;
+    border-radius: 4px;
+    padding: 2rem;
+    max-width: 400px;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+`;
+
 interface Teacher {
     uid: string;
     name: string;
@@ -118,12 +159,30 @@ const TeacherDetails = () => {
     const [openChat, setOpenChat] = useState(false);
     const [currentUser, setCurrentUser] = useState('');
 
+    const [confirmPurchase, setConfirmPurchase] = useState(false);
+    const [selectedPrice, setSelectedPrice] = useState({ qty: 0, price: 0 });
+
     const handleOpenChat = () => {
         setOpenChat(true);
     };
 
     const handleCloseChat = () => {
         setOpenChat(false);
+    };
+
+    const handlePurchaseClick = (priceObj: { qty: number; price: number }) => {
+        setSelectedPrice(priceObj);
+        setConfirmPurchase(true);
+    };
+
+    const handleConfirmPurchase = () => {
+        // 在此處處理購買邏輯
+        console.log(`User confirmed the purchase of ${selectedPrice.qty} classes for ${selectedPrice.price} dollars.`);
+        setConfirmPurchase(false);
+    };
+
+    const handleCancelPurchase = () => {
+        setConfirmPurchase(false);
     };
 
     useEffect(() => {
@@ -174,13 +233,24 @@ const TeacherDetails = () => {
                     {teacher.price &&
                         teacher.price.map((priceObj: { qty: number; price: number }, idx: number) => {
                             return (
-                                <span key={idx}>
+                                <PriceButton key={idx} onClick={() => handlePurchaseClick(priceObj)}>
                                     {priceObj.qty} 堂課: {priceObj.price} 元
-                                </span>
+                                </PriceButton>
                             );
                         })}
                 </Text>
             </Section>
+            <ConfirmationDialog open={confirmPurchase} onClick={handleCancelPurchase}>
+                <ConfirmationDialogContent onClick={(e) => e.stopPropagation()}>
+                    <h3>確認購買</h3>
+                    <p>
+                        您確定要購買 {selectedPrice.qty} 堂課，價格為 {selectedPrice.price} 元嗎？
+                    </p>
+                    <button onClick={handleConfirmPurchase}>確認購買</button>
+                    <button onClick={handleCancelPurchase}>取消</button>
+                </ConfirmationDialogContent>
+            </ConfirmationDialog>
+
             <Section>
                 <SubHeading>評價</SubHeading>
                 <Text>{teacher.evaluation}</Text>
@@ -207,7 +277,7 @@ const TeacherDetails = () => {
             <ChatIcon onClick={handleOpenChat} />
             <StyledDialog open={openChat} onClick={handleCloseChat}>
                 <StyledDialogContent onClick={(e) => e.stopPropagation()}>
-                    <ChatRoom teacherId={uid ? (uid as string) : ''} />
+                    <ChatRoom selectedUserId={uid ? (uid as string) : ''} />
                 </StyledDialogContent>
             </StyledDialog>
         </Container>

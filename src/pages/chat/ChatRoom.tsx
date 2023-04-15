@@ -76,21 +76,22 @@ const ChatForm = styled.form`
 `;
 
 interface ChatRoomProps {
-    teacherId: string;
+    selectedUserId: string;
 }
 
-const ChatRoom: React.FC<ChatRoomProps> = ({ teacherId }: ChatRoomProps) => {
+const ChatRoom: React.FC<ChatRoomProps> = ({ selectedUserId }: ChatRoomProps) => {
     const firestore = firebase.firestore();
 
     const { userUid } = useAuth();
     const [messages, setMessages] = useState<any[]>([]);
     const [input, setInput] = useState('');
 
-    console.log('teacherId in chatroom:', teacherId);
+    console.log('teacherId in chatroom:', selectedUserId);
     console.log('userId in chatroom:', userUid);
 
     const user = firebase.auth().currentUser;
-    const chatRoomId = user?.uid && teacherId ? `${teacherId}` : '';
+
+    const chatRoomId = user?.uid && selectedUserId ? `${selectedUserId}` : '';
 
     // useEffect(() => {
     //     const messagesRef = firebase.database().ref('messages').child(teacherId);
@@ -123,7 +124,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ teacherId }: ChatRoomProps) => {
 
         const messagesRef = firestore.collection(`users/${user?.uid}/messages`).doc(chatRoomId).collection('messages');
         const teacherMessagesRef = firestore
-            .collection(`users/${teacherId}/messages`)
+            .collection(`users/${selectedUserId}/messages`)
             .doc(chatRoomId)
             .collection('messages');
 
@@ -139,7 +140,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ teacherId }: ChatRoomProps) => {
             unsubscribe();
             unsubscribeTeacher();
         };
-    }, [chatRoomId, user?.uid, teacherId, firestore]);
+    }, [chatRoomId, user?.uid, selectedUserId, firestore]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInput(e.target.value);
@@ -157,7 +158,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ teacherId }: ChatRoomProps) => {
         };
 
         firestore.collection(`users/${user?.uid}/messages`).doc(chatRoomId).collection('messages').add(newMessage);
-        firestore.collection(`users/${teacherId}/messages`).doc(chatRoomId).collection('messages').add(newMessage);
+        firestore.collection(`users/${selectedUserId}/messages`).doc(chatRoomId).collection('messages').add(newMessage);
 
         setInput('');
     };

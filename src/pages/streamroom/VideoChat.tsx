@@ -2,8 +2,8 @@ import React, { HTMLAttributes, useEffect, useRef, useState, ButtonHTMLAttribute
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import ScreenSharing from './ScreenSharing';
-import ClassChatroom from './streamroom/ClassChatroom';
-import Canvas from './Canvas';
+import ClassChatroom from './ClassChatroom';
+import Canvas from './canvas/Canvas';
 import styled from 'styled-components';
 
 const firebaseConfig = {
@@ -363,7 +363,7 @@ const VideoChat: React.FC = () => {
     return (
         <div>
             {peerConnection && <Canvas roomId={roomId} />}
-            <div>
+            <div style={{ display: 'flex' }}>
                 <video ref={localVideoRef} autoPlay muted style={{ width: '50%', border: '1px solid black' }}></video>
                 <video ref={remoteVideoRef} autoPlay style={{ width: '50%', border: '1px solid black' }}></video>
             </div>

@@ -63,7 +63,8 @@ interface IStyledCanvasProps {
 }
 
 const Canvas = ({ roomId }: ChatroomProps) => {
-    const minDistance = 5;
+    const MIN_DISTANCE = 5;
+
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [color, setColor] = useState<string>('black');
     const [lineWidth, setLineWidth] = useState<number>(5);
@@ -89,6 +90,9 @@ const Canvas = ({ roomId }: ChatroomProps) => {
     const [cursorStyle, setCursorStyle] = useState('default');
 
     const [eraserEnabled, setEraserEnabled] = useState(false);
+    const [selectedItem, setSelectedItem] = useState<{ type: string; index: number } | null>(null);
+    const [selectedItemColor, setSelectedItemColor] = useState('');
+    const [clipboardItem, setClipboardItem] = useState<{ type: string; data: object } | null>(null);
 
     const updateCursor: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
         const rect = canvasRef.current?.getBoundingClientRect();
@@ -109,12 +113,117 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         }
     };
 
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.shiftKey && event.key === 'S') {
+                setScaleEnabled(true);
+                setMoveEnabled(false);
+            }
+        };
+
+        const handleKeyUp = (event: KeyboardEvent) => {
+            if (event.key === 'Shift' || event.key === 'S') {
+                setScaleEnabled(false);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+        };
+    }, []);
+
+    // const handleMoveCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     setMoveEnabled(e.target.checked);
+    // };
+
+    // const handleScaleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     setScaleEnabled(e.target.checked);
+    // };
+
     const handleMoveCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setMoveEnabled(e.target.checked);
+        if (e.target.checked) {
+            setSelectedItem(null);
+        }
     };
 
     const handleScaleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setScaleEnabled(e.target.checked);
+        if (e.target.checked) {
+            setSelectedItem(null);
+        }
+    };
+
+    const handleCanvasClick = (e: { clientX: number; clientY: number }) => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const foundShapeIndex = findShape(x, y);
+        if (foundShapeIndex !== null) {
+            console.log('click');
+
+            setSelectedItem({ type: 'shape', index: foundShapeIndex });
+            return;
+        }
+
+        const foundLineIndex = findLine(x, y);
+        if (foundLineIndex !== null) {
+            setSelectedItem({ type: 'line', index: foundLineIndex });
+            return;
+        }
+
+        setSelectedItem(null);
+    };
+
+    const copySelectedItem = () => {
+        if (selectedItem) {
+            if (selectedItem.type === 'line') {
+                const copiedLine = { ...lines[selectedItem.index] };
+                setClipboardItem({ type: 'line', data: copiedLine });
+            } else if (selectedItem.type === 'shape') {
+                const copiedShape = { ...shapes[selectedItem.index] };
+                setClipboardItem({ type: 'shape', data: copiedShape });
+            }
+        }
+    };
+
+    const pasteClipboardItem = () => {
+        if (clipboardItem) {
+            if (clipboardItem.type === 'line') {
+                const newLines = [...lines, clipboardItem.data];
+                setLines(newLines);
+            } else if (clipboardItem.type === 'shape') {
+                const newShapes = [...shapes, clipboardItem.data];
+                setShapes(newShapes);
+            }
+        }
+    };
+
+    console.log(selectedItem);
+
+    const changeColor = (newColor: string) => {
+        if (selectedItem) {
+            if (selectedItem.type === 'line') {
+                const newLines = [...lines];
+                newLines[selectedItem.index].points = newLines[selectedItem.index].points.map((point: any) => ({
+                    ...point,
+                    color: newColor,
+                }));
+                setLines(newLines);
+            } else if (selectedItem.type === 'shape') {
+                const newShapes = [...shapes];
+                newShapes[selectedItem.index].color = newColor;
+                setShapes(newShapes);
+            }
+        }
     };
 
     const toggleEraser = () => {
@@ -122,7 +231,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
     };
 
     const findShape = (x: number, y: number) => {
-        // console.log('findShape');
+        console.log('findShape');
         for (let i = shapes.length - 1; i >= 0; i--) {
             const shapeData = shapes[i];
             switch (shapeData.type) {
@@ -175,7 +284,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
     };
 
     const findLine = (x: number, y: number, threshold = 5) => {
-        // console.log('findLine');
+        console.log('findLine');
         for (let i = lines.length - 1; i >= 0; i--) {
             const line = lines[i];
             for (let j = 0; j < line.points.length - 1; j++) {
@@ -207,9 +316,8 @@ const Canvas = ({ roomId }: ChatroomProps) => {
     };
 
     const startMoving: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
-        // console.log('startMoving');
         const canvas = canvasRef.current;
-        if (!canvas) return;
+        if (!canvas || scaleEnabled) return;
 
         const rect = canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
@@ -343,6 +451,33 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
     }, [roomId, lines, shapes]);
 
+    // const startDrawing: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
+    //     const canvas = canvasRef.current;
+    //     if (!canvas) return;
+
+    //     const rect = canvas.getBoundingClientRect();
+    //     setStartX(e.clientX - rect.left);
+    //     setStartY(e.clientY - rect.top);
+
+    //     if (shape) {
+    //         setIsDrawing(true);
+    //     } else {
+    //         const ctx = canvas.getContext('2d');
+    //         if (!ctx) return;
+
+    //         ctx.globalCompositeOperation = eraserEnabled ? 'destination-out' : 'source-over';
+    //         ctx.lineWidth = eraserEnabled ? 50 : lineWidth; // 如果需要，可以調整橡皮擦的大小
+
+    //         console.log('globalCompositeOperation', ctx.globalCompositeOperation);
+
+    //         ctx.strokeStyle = color;
+    //         ctx.beginPath();
+    //         ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+
+    //         setIsDrawing(true);
+    //     }
+    // };
+
     const startDrawing: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -359,9 +494,9 @@ const Canvas = ({ roomId }: ChatroomProps) => {
 
             ctx.globalCompositeOperation = eraserEnabled ? 'destination-out' : 'source-over';
             ctx.lineWidth = eraserEnabled ? 50 : lineWidth; // 如果需要，可以調整橡皮擦的大小
+            console.log('color:', color);
 
             console.log('globalCompositeOperation', ctx.globalCompositeOperation);
-
             ctx.strokeStyle = color;
             ctx.beginPath();
             ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
@@ -369,7 +504,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
             setIsDrawing(true);
         }
     };
-    // console.log('eraserEnabled', eraserEnabled);
 
     const drawShape: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
         if (!isDrawing) return;
@@ -483,7 +617,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         ctx.globalCompositeOperation = eraserEnabled ? 'destination-out' : 'source-over';
         ctx.lineWidth = eraserEnabled ? 50 : lineWidth;
 
-        console.log('draw globalCompositeOperation', ctx.globalCompositeOperation);
+        console.log('draw globalCompositeOperation in draw function', ctx.globalCompositeOperation);
 
         const rect = canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
@@ -514,6 +648,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                 prevY: prevLine.length > 0 ? prevLine[prevLine.length - 1].y : y,
                 color,
                 lineWidth,
+                isErased: eraserEnabled,
             },
         ]);
     };
@@ -527,6 +662,8 @@ const Canvas = ({ roomId }: ChatroomProps) => {
 
         for (const line of lines) {
             for (const point of line.points) {
+                if (point.isErased) continue; // Skip the point if it's erased
+
                 ctx.beginPath();
                 ctx.moveTo(point.prevX, point.prevY);
                 ctx.lineTo(point.x, point.y);
@@ -549,7 +686,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         const endX = lastMouseX - rect.left;
         const endY = lastMouseY - rect.top;
 
-        if (shape && distanceMoved >= minDistance) {
+        if (shape && distanceMoved >= MIN_DISTANCE) {
             const shapeData = {
                 type: shape,
                 startX,
@@ -567,7 +704,18 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                 .update({
                     shapes: firebase.firestore.FieldValue.arrayUnion(shapeData),
                 });
-        } else if (tempLine.length > 0 && distanceMoved >= minDistance) {
+            // } else if (tempLine.length > 0 && distanceMoved >= MIN_DISTANCE) {
+            //     db.collection('rooms')
+            //         .doc(roomId || '')
+            //         .update({
+            //             lines: firebase.firestore.FieldValue.arrayUnion({ points: tempLine }),
+            //         })
+            //         .then(() => {
+            //             setTempLine([]);
+            //         });
+            // }
+            // setDistanceMoved(0);
+        } else if (tempLine.length > 0 && distanceMoved >= MIN_DISTANCE) {
             db.collection('rooms')
                 .doc(roomId || '')
                 .update({
@@ -577,6 +725,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                     setTempLine([]);
                 });
         }
+
         setDistanceMoved(0);
     };
 
@@ -796,6 +945,8 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         setSelectedShape(null);
     };
 
+    // console.log('eraserEnabled', eraserEnabled);
+
     return (
         <Container>
             {/* <StyledCanvas
@@ -823,6 +974,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                 }}
                 onMouseUp={moveEnabled ? endMoving : scaleEnabled ? endScaling : endDrawing}
                 onMouseOut={moveEnabled ? endMoving : scaleEnabled ? endScaling : endDrawing}
+                onClick={handleCanvasClick}
             />
 
             <ControlBar>
@@ -850,6 +1002,15 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                     <option value='rectangle'>Rectangle</option>
                     <option value='triangle'>Triangle</option>
                 </select>
+                <Label>Change Color:</Label>
+                <input
+                    type='color'
+                    value={selectedItemColor}
+                    onChange={(e) => {
+                        setSelectedItemColor(e.target.value);
+                        changeColor(e.target.value);
+                    }}
+                />
             </ShapeSelection>
             <div>
                 <Label>Move:</Label>
@@ -857,6 +1018,8 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                 <Label>Scale:</Label>
                 <input type='checkbox' checked={scaleEnabled} onChange={handleScaleCheckboxChange} />
                 <button onClick={toggleEraser}>{eraserEnabled ? 'Disable Eraser' : 'Enable Eraser'}</button>
+                <button onClick={copySelectedItem}>Copy</button>
+                <button onClick={pasteClipboardItem}>Paste</button>
             </div>
         </Container>
     );
