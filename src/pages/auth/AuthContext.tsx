@@ -106,7 +106,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setIsLoading(true);
         } catch (error) {
             console.log(error);
-            setIsLoading(false); // 登錄出錯時將 isLoading 設置為 false
+            setIsLoading(false);
         }
     };
 

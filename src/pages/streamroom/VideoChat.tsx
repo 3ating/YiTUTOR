@@ -5,6 +5,8 @@ import ScreenSharing from './ScreenSharing';
 import ClassChatroom from './ClassChatroom';
 import Canvas from './canvas/Canvas';
 import styled from 'styled-components';
+import { useAuth } from '../auth/AuthContext';
+import Link from 'next/link';
 
 const firebaseConfig = {
     apiKey: process.env.FIRESTORE_API_KEY,
@@ -123,6 +125,7 @@ const configuration: RTCConfiguration = {
 };
 
 const VideoChat: React.FC = () => {
+    const { userUid, userInfo } = useAuth();
     const localVideoRef = useRef<HTMLVideoElement | null>(null);
     const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
@@ -135,6 +138,7 @@ const VideoChat: React.FC = () => {
     const [isMicMuted, setIsMicMuted] = useState(false);
     const [isAudioMuted, setIsAudioMuted] = useState(false);
     const [isBackgroundBlurred, setIsBackgroundBlurred] = useState(false);
+    const [hostUidInput, setHostUidInput] = useState('');
 
     const toggleBackgroundBlur = () => {
         setIsBackgroundBlurred(!isBackgroundBlurred);
@@ -184,7 +188,10 @@ const VideoChat: React.FC = () => {
 
     const createRoom = async () => {
         const db = firebase.firestore();
-        const roomRef = await db.collection('rooms').doc();
+        const userRef = db.collection('users').doc(userUid!);
+        const roomRef = await userRef.collection('rooms').doc();
+
+        // const roomRef = await db.collection('rooms').doc();
 
         const pc = new RTCPeerConnection(configuration);
 
@@ -251,11 +258,14 @@ const VideoChat: React.FC = () => {
         await createRoom();
         setRoomDialogOpen(false);
     };
+    console.log(userUid);
 
     const joinRoomById = async () => {
         if (roomIdInput === '') return;
         const db = firebase.firestore();
-        const roomRef = db.collection('rooms').doc(`${roomIdInput}`);
+        const hostUid = hostUidInput;
+        const userRef = db.collection('users').doc(hostUid);
+        const roomRef = userRef.collection('rooms').doc(`${roomIdInput}`);
         const roomSnapshot = await roomRef.get();
 
         if (roomSnapshot.exists) {
@@ -405,9 +415,17 @@ const VideoChat: React.FC = () => {
                 <DialogContent>
                     <TextField
                         autoFocus
+                        value={hostUidInput}
+                        onChange={(event) => setHostUidInput(event.target.value)}
+                        placeholder='Host UID'
+                        style={{ width: '95%', marginBottom: '16px' }}
+                    />
+                    <TextField
+                        autoFocus
                         value={roomIdInput}
                         onChange={handleRoomIdInputChange}
-                        style={{ width: '100%', marginBottom: '16px' }}
+                        placeholder='Room ID'
+                        style={{ width: '95%', marginBottom: '16px' }}
                     />
                 </DialogContent>
                 <DialogActions>
@@ -418,9 +436,14 @@ const VideoChat: React.FC = () => {
                 </DialogActions>
             </Dialog>
             {roomId && (
-                <Typography variant='h6' gutterBottom>
-                    房間ID: {roomId}
-                </Typography>
+                <>
+                    <Typography variant='h6' gutterBottom>
+                        User ID: {userUid}
+                    </Typography>
+                    <Typography variant='h6' gutterBottom>
+                        房間ID: {roomId}
+                    </Typography>
+                </>
             )}
             {peerConnection && <ClassChatroom roomId={roomId} />}
         </div>

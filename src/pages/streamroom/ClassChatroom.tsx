@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import { db } from '../../../firebase';
+import { useAuth } from '../auth/AuthContext';
 
 interface MessageType {
     id: string;
@@ -15,9 +16,10 @@ interface ChatroomProps {
 }
 
 export default function ClassChatroom({ roomId }: ChatroomProps) {
+    const { userUid, userInfo } = useAuth();
     const [messages, setMessages] = useState<MessageType[]>([]);
     const [inputValue, setInputValue] = useState('');
-    const [name, setName] = useState('');
+    const [name, setName] = useState(userInfo?.name ?? '');
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
     const scrollToBottom = () => {
@@ -27,10 +29,10 @@ export default function ClassChatroom({ roomId }: ChatroomProps) {
     useEffect(() => {
         if (!roomId) return;
 
-        const unsubscribe = db
-            .collection('rooms')
-            .doc(roomId)
-            .collection('messages') //rooms/{roomId}/messages
+        const roomRef = db.collection('chatrooms').doc(roomId);
+
+        const unsubscribe = roomRef
+            .collection('messages')
             .orderBy('timestamp', 'asc')
             .onSnapshot((snapshot) => {
                 const messagesData: MessageType[] = snapshot.docs.map((doc) => ({
@@ -58,16 +60,10 @@ export default function ClassChatroom({ roomId }: ChatroomProps) {
     const sendMessage = async () => {
         if (!inputValue.trim() || !name.trim() || !roomId) return;
 
-        await db
-            .collection('rooms')
-            .doc(roomId)
-            .collection('messages')
-            .add({
-                // 存到 rooms/{roomId}/messages
-                name,
-                content: inputValue,
-                timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
-            });
+        const timestamp = firebase.firestore.Timestamp.fromDate(new Date());
+        const message = { name, content: inputValue, timestamp };
+
+        await db.collection('chatrooms').doc(roomId).collection('messages').add(message);
 
         setInputValue('');
     };

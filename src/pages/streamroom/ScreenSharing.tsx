@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import styled from 'styled-components';
+import { useAuth } from '../auth/AuthContext';
 // import { db } from '../../firebase';
 
 const firebaseConfig = {
@@ -77,11 +78,14 @@ const ScreenSharing: React.FC<ScreenSharingProps> = ({
     setIsScreenSharing,
     roomId,
 }) => {
+    const { userUid } = useAuth();
     const remoteScreenRef = useRef<HTMLVideoElement | null>(null);
     const [remoteScreen, setRemoteScreen] = useState<MediaStream | null>(null);
 
     const sendSignalData = async (data: any) => {
         await db
+            .collection('users')
+            .doc(userUid || '')
             .collection('rooms')
             .doc(roomId || '')
             .update(data);
@@ -224,6 +228,8 @@ const ScreenSharing: React.FC<ScreenSharingProps> = ({
         };
 
         const unsubscribe = db
+            .collection('users')
+            .doc(userUid || '')
             .collection('rooms')
             .doc(roomId)
             .onSnapshot((doc) => {

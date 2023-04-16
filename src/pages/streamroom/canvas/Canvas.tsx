@@ -976,13 +976,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
 
     return (
         <Container>
-            {/* <StyledCanvas
-                ref={canvasRef}
-                onMouseDown={moveEnabled ? startMoving : scaleEnabled ? startScaling : startDrawing}
-                onMouseMove={moveEnabled ? move : scaleEnabled ? scale : shape ? drawShape : draw}
-                onMouseUp={moveEnabled ? endMoving : scaleEnabled ? endScaling : endDrawing}
-                onMouseOut={moveEnabled ? endMoving : scaleEnabled ? endScaling : endDrawing}
-            /> */}
             <StyledCanvas
                 ref={canvasRef}
                 cursorStyle={cursorStyle}

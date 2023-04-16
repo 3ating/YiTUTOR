@@ -58,6 +58,7 @@ const DirectLink = styled(Link)`
 `;
 
 const AISols = () => {
+    const { userUid } = useAuth();
     const INITIAL_MESSAGE = [
         {
             message: '我是智慧解題機器人🤖，我會盡我所能為你解答任何考題！',
@@ -65,7 +66,6 @@ const AISols = () => {
             sender: 'ChatGPT',
         },
     ];
-    const { userUid } = useAuth();
     const [isTyping, setIsTyping] = useState(false);
     const [messages, setMessages] = useState(INITIAL_MESSAGE);
 
