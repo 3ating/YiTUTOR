@@ -6,7 +6,6 @@ import ClassChatroom from './ClassChatroom';
 import Canvas from './canvas/Canvas';
 import styled from 'styled-components';
 import { useAuth } from '../auth/AuthContext';
-import Link from 'next/link';
 
 const firebaseConfig = {
     apiKey: process.env.FIRESTORE_API_KEY,
@@ -125,7 +124,7 @@ const configuration: RTCConfiguration = {
 };
 
 const VideoChat: React.FC = () => {
-    const { userUid, userInfo } = useAuth();
+    const { userUid } = useAuth();
     const localVideoRef = useRef<HTMLVideoElement | null>(null);
     const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import 'firebase/compat/auth';
+import { useAuth } from '../../auth/AuthContext';
 
 const Container = styled.div`
     display: flex;
@@ -64,6 +65,7 @@ interface IStyledCanvasProps {
 
 const Canvas = ({ roomId }: ChatroomProps) => {
     const MIN_DISTANCE = 5;
+    const { userUid } = useAuth();
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [color, setColor] = useState<string>('black');
@@ -971,8 +973,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         setIsDrawing(false);
         setSelectedShape(null);
     };
-
-    // console.log('eraserEnabled', eraserEnabled);
 
     return (
         <Container>
