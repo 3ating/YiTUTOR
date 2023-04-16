@@ -244,7 +244,7 @@ const RegistrationForm = () => {
                 </button>
                 {message && <p>{message}</p>}
             </form>
-            <Link href='/SignIn'>已經有帳號，前往登入</Link>
+            <Link href='SignIn'>已經有帳號，前往登入</Link>
         </>
     );
 };

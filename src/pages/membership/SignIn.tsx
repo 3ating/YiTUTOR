@@ -157,7 +157,7 @@ const SignIn = () => {
                     />
                     <LoginButton onClick={() => handleLoginWithEmail(email, password)}>登入</LoginButton>
                     {/* <LoginButton onClick={handleLoginGoogle}>使用 Google 登入</LoginButton> */}
-                    <Link href='/SignIn'>還沒有帳號，前往註冊</Link>
+                    <Link href='SignUp'>還沒有帳號，前往註冊</Link>
                 </>
             )}
         </Container>
