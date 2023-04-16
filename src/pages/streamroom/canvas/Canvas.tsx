@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import 'firebase/compat/auth';
-import { useAuth } from '../../auth/AuthContext';
 
 const Container = styled.div`
     display: flex;
@@ -65,7 +64,6 @@ interface IStyledCanvasProps {
 
 const Canvas = ({ roomId }: ChatroomProps) => {
     const MIN_DISTANCE = 5;
-    const { userUid } = useAuth();
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [color, setColor] = useState<string>('black');
@@ -974,6 +972,8 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         setSelectedShape(null);
     };
 
+    // console.log('eraserEnabled', eraserEnabled);
+
     return (
         <Container>
             <StyledCanvas
@@ -1033,10 +1033,10 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                 />
             </ShapeSelection>
             <div>
-                <Label>Move:</Label>
+                {/* <Label>Move:</Label>
                 <input type='checkbox' checked={moveEnabled} onChange={handleMoveCheckboxChange} />
                 <Label>Scale:</Label>
-                <input type='checkbox' checked={scaleEnabled} onChange={handleScaleCheckboxChange} />
+                <input type='checkbox' checked={scaleEnabled} onChange={handleScaleCheckboxChange} /> */}
                 <button onClick={toggleEraser}>{eraserEnabled ? 'Disable Eraser' : 'Enable Eraser'}</button>
                 <button onClick={copySelectedItem}>Copy</button>
                 <button onClick={pasteClipboardItem}>Paste</button>

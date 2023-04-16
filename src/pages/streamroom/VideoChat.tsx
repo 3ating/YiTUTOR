@@ -6,6 +6,7 @@ import ClassChatroom from './ClassChatroom';
 import Canvas from './canvas/Canvas';
 import styled from 'styled-components';
 import { useAuth } from '../auth/AuthContext';
+import Link from 'next/link';
 
 const firebaseConfig = {
     apiKey: process.env.FIRESTORE_API_KEY,
@@ -114,6 +115,11 @@ const StyledIcon = styled.i`
     margin-right: 4px;
 `;
 
+const DirectLink = styled(Link)`
+    text-decoration: none;
+    color: black;
+`;
+
 const configuration: RTCConfiguration = {
     iceServers: [
         {
@@ -124,7 +130,7 @@ const configuration: RTCConfiguration = {
 };
 
 const VideoChat: React.FC = () => {
-    const { userUid } = useAuth();
+    const { userUid, userInfo } = useAuth();
     const localVideoRef = useRef<HTMLVideoElement | null>(null);
     const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
@@ -137,7 +143,6 @@ const VideoChat: React.FC = () => {
     const [isMicMuted, setIsMicMuted] = useState(false);
     const [isAudioMuted, setIsAudioMuted] = useState(false);
     const [isBackgroundBlurred, setIsBackgroundBlurred] = useState(false);
-    const [hostUidInput, setHostUidInput] = useState('');
 
     const toggleBackgroundBlur = () => {
         setIsBackgroundBlurred(!isBackgroundBlurred);
@@ -187,10 +192,7 @@ const VideoChat: React.FC = () => {
 
     const createRoom = async () => {
         const db = firebase.firestore();
-        const userRef = db.collection('users').doc(userUid!);
-        const roomRef = await userRef.collection('rooms').doc();
-
-        // const roomRef = await db.collection('rooms').doc();
+        const roomRef = await db.collection('rooms').doc();
 
         const pc = new RTCPeerConnection(configuration);
 
@@ -257,14 +259,11 @@ const VideoChat: React.FC = () => {
         await createRoom();
         setRoomDialogOpen(false);
     };
-    console.log(userUid);
 
     const joinRoomById = async () => {
         if (roomIdInput === '') return;
         const db = firebase.firestore();
-        const hostUid = hostUidInput;
-        const userRef = db.collection('users').doc(hostUid);
-        const roomRef = userRef.collection('rooms').doc(`${roomIdInput}`);
+        const roomRef = db.collection('rooms').doc(`${roomIdInput}`);
         const roomSnapshot = await roomRef.get();
 
         if (roomSnapshot.exists) {
@@ -368,84 +367,95 @@ const VideoChat: React.FC = () => {
             setIsAudioMuted(!isAudioMuted);
         }
     };
+    console.log(userUid);
 
     return (
-        <div>
-            {peerConnection && <Canvas roomId={roomId} />}
-            <div style={{ display: 'flex' }}>
-                <video ref={localVideoRef} autoPlay muted style={{ width: '50%', border: '1px solid black' }}></video>
-                <video ref={remoteVideoRef} autoPlay style={{ width: '50%', border: '1px solid black' }}></video>
-            </div>
-            <div>
-                <Button primary onClick={openUserMedia} disabled={!!localStream}>
-                    <StyledIcon />
-                    開啟鏡頭
-                </Button>
-                <ScreenSharing
-                    localStream={localStream}
-                    peerConnection={peerConnection}
-                    isScreenSharing={isScreenSharing}
-                    setIsScreenSharing={setIsScreenSharing}
-                    roomId={roomId}
-                />
-                <Button primary onClick={handleCreateRoom} disabled={!localStream || !!roomId}>
-                    <StyledIcon />
-                    建立房間
-                </Button>
-                <Button primary onClick={() => setRoomDialogOpen(true)} disabled={!localStream || !!roomId}>
-                    <StyledIcon />
-                    加入房間
-                </Button>
-                <Button primary onClick={hangUp} disabled={!roomId}>
-                    <StyledIcon />
-                    掛斷
-                </Button>
-                <Button primary={!isMicMuted} onClick={toggleMic} disabled={!localStream || !roomId}>
-                    <StyledIcon />
-                    {isMicMuted ? '開啟麥克風' : '關閉麥克風'}
-                </Button>
-                <Button primary={!isAudioMuted} onClick={toggleAudio} disabled={!remoteStream || !roomId}>
-                    <StyledIcon />
-                    {isAudioMuted ? '開啟音量' : '關閉音量'}
-                </Button>
-            </div>
-            <Dialog open={roomDialogOpen}>
-                <DialogTitle>加入房間</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        autoFocus
-                        value={hostUidInput}
-                        onChange={(event) => setHostUidInput(event.target.value)}
-                        placeholder='Host UID'
-                        style={{ width: '95%', marginBottom: '16px' }}
-                    />
-                    <TextField
-                        autoFocus
-                        value={roomIdInput}
-                        onChange={handleRoomIdInputChange}
-                        placeholder='Room ID'
-                        style={{ width: '95%', marginBottom: '16px' }}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setRoomDialogOpen(false)}>取消</Button>
-                    <Button onClick={joinRoomById} disabled={!localStream || roomIdInput === ''}>
-                        加入
-                    </Button>
-                </DialogActions>
-            </Dialog>
-            {roomId && (
-                <>
-                    <Typography variant='h6' gutterBottom>
-                        User ID: {userUid}
-                    </Typography>
-                    <Typography variant='h6' gutterBottom>
-                        房間ID: {roomId}
-                    </Typography>
-                </>
+        <>
+            {userUid ? (
+                <div>
+                    {peerConnection && <Canvas roomId={roomId} />}
+                    <div style={{ display: 'flex' }}>
+                        <video
+                            ref={localVideoRef}
+                            autoPlay
+                            muted
+                            style={{ width: '50%', border: '1px solid black' }}
+                        ></video>
+                        <video
+                            ref={remoteVideoRef}
+                            autoPlay
+                            style={{ width: '50%', border: '1px solid black' }}
+                        ></video>
+                    </div>
+                    <div>
+                        <Button primary onClick={openUserMedia} disabled={!!localStream}>
+                            <StyledIcon />
+                            開啟鏡頭
+                        </Button>
+                        <ScreenSharing
+                            localStream={localStream}
+                            peerConnection={peerConnection}
+                            isScreenSharing={isScreenSharing}
+                            setIsScreenSharing={setIsScreenSharing}
+                            roomId={roomId}
+                        />
+                        {userInfo?.userType === 'teacher' && (
+                            <Button primary onClick={handleCreateRoom} disabled={!localStream || !!roomId}>
+                                <StyledIcon />
+                                建立房間
+                            </Button>
+                        )}
+                        {userInfo?.userType === 'student' && (
+                            <Button primary onClick={() => setRoomDialogOpen(true)} disabled={!localStream || !!roomId}>
+                                <StyledIcon />
+                                加入房間
+                            </Button>
+                        )}
+                        <Button primary onClick={hangUp} disabled={!roomId}>
+                            <StyledIcon />
+                            掛斷
+                        </Button>
+                        <Button primary={!isMicMuted} onClick={toggleMic} disabled={!localStream || !roomId}>
+                            <StyledIcon />
+                            {isMicMuted ? '開啟麥克風' : '關閉麥克風'}
+                        </Button>
+                        <Button primary={!isAudioMuted} onClick={toggleAudio} disabled={!remoteStream || !roomId}>
+                            <StyledIcon />
+                            {isAudioMuted ? '開啟音量' : '關閉音量'}
+                        </Button>
+                    </div>
+                    <Dialog open={roomDialogOpen}>
+                        <DialogTitle>加入房間</DialogTitle>
+                        <DialogContent>
+                            <TextField
+                                autoFocus
+                                value={roomIdInput}
+                                onChange={handleRoomIdInputChange}
+                                style={{ width: '100%', marginBottom: '16px' }}
+                            />
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={() => setRoomDialogOpen(false)}>取消</Button>
+                            <Button onClick={joinRoomById} disabled={!localStream || roomIdInput === ''}>
+                                加入
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+                    {roomId && (
+                        <Typography variant='h6' gutterBottom>
+                            房間ID: {roomId}
+                        </Typography>
+                    )}
+                    {peerConnection && <ClassChatroom roomId={roomId} />}
+                </div>
+            ) : (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                    <DirectLink href='/membership/SignIn'>
+                        <p>請先登入再使用此功能</p>
+                    </DirectLink>
+                </div>
             )}
-            {peerConnection && <ClassChatroom roomId={roomId} />}
-        </div>
+        </>
     );
 };
 

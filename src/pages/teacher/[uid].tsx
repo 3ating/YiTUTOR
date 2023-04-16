@@ -175,9 +175,31 @@ const TeacherDetails = () => {
         setConfirmPurchase(true);
     };
 
-    const handleConfirmPurchase = () => {
+    const handleConfirmPurchase = async () => {
         // 在此處處理購買邏輯
         console.log(`User confirmed the purchase of ${selectedPrice.qty} classes for ${selectedPrice.price} dollars.`);
+
+        if (userUid) {
+            try {
+                // Get the student's document reference
+                const studentDocRef = db.collection('users').doc(userUid);
+
+                // Update the purchased courses in the student's document
+                await studentDocRef.update({
+                    courses: firebase.firestore.FieldValue.arrayUnion({
+                        teachername: teacher?.name,
+                        subject: teacher?.subject,
+                        quantity: selectedPrice.qty,
+                        price: selectedPrice.price,
+                        purchaseDate: new Date(),
+                    }),
+                });
+
+                console.log('Purchase successfully saved to Firestore');
+            } catch (error) {
+                console.error('Error updating the student document:', error);
+            }
+        }
         setConfirmPurchase(false);
     };
 

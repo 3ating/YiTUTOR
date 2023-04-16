@@ -55,6 +55,31 @@ const StyledButton = styled.button<{ primary?: boolean }>`
     }
 `;
 
+const Table = styled.table`
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    margin-top: 2rem;
+`;
+
+const Th = styled.th`
+    border: 1px solid #ddd;
+    padding: 0.5rem;
+    text-align: left;
+`;
+
+const Tr = styled.tr`
+    &:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+`;
+
+const Td = styled.td`
+    border: 1px solid #ddd;
+    padding: 0.5rem;
+`;
+
 interface UserInfo {
     name: string;
     email: string;
@@ -138,6 +163,7 @@ const UserProfile = () => {
     if (!userInfo) {
         return <div>Loading...</div>;
     }
+    console.log(userInfo);
 
     return (
         <Container>
@@ -182,6 +208,31 @@ const UserProfile = () => {
                     <UserInfoRow>電子郵件: {userInfo.email}</UserInfoRow>
                     <UserInfoRow>電話: {userInfo.phone}</UserInfoRow>
                     <UserInfoRow>使用者類型: {userInfo.userType}</UserInfoRow>
+
+                    {userInfo?.courses && Object.entries(userInfo.courses).length > 0 && (
+                        <Table>
+                            <thead>
+                                <Tr>
+                                    <Th>課程名稱</Th>
+                                    <Th>授課老師</Th>
+                                    <Th>購買日期</Th>
+                                    <Th>數量</Th>
+                                    <Th>價格</Th>
+                                </Tr>
+                            </thead>
+                            <tbody>
+                                {Object.entries(userInfo.courses).map(([courseId, courseData]) => (
+                                    <Tr key={courseId}>
+                                        <Td>{courseData.subject}</Td>
+                                        <Td>{courseData.teachername}</Td>
+                                        <Td>{courseData.purchaseDate?.toDate().toLocaleDateString()}</Td>
+                                        <Td>{courseData.quantity}</Td>
+                                        <Td>{courseData.price}</Td>
+                                    </Tr>
+                                ))}
+                            </tbody>
+                        </Table>
+                    )}
                 </>
             )}
             {/* <ButtonContainer>
