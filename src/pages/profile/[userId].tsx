@@ -215,7 +215,6 @@ const UserProfile = () => {
                                 <Tr>
                                     <Th>課程名稱</Th>
                                     <Th>授課老師</Th>
-                                    <Th>購買日期</Th>
                                     <Th>數量</Th>
                                     <Th>價格</Th>
                                 </Tr>
@@ -225,7 +224,6 @@ const UserProfile = () => {
                                     <Tr key={courseId}>
                                         <Td>{courseData.subject}</Td>
                                         <Td>{courseData.teachername}</Td>
-                                        <Td>{courseData.purchaseDate?.toDate().toLocaleDateString()}</Td>
                                         <Td>{courseData.quantity}</Td>
                                         <Td>{courseData.price}</Td>
                                     </Tr>
@@ -235,13 +233,6 @@ const UserProfile = () => {
                     )}
                 </>
             )}
-            {/* <ButtonContainer>
-                {!isEditing && (
-                    <Button onClick={handleEdit} variant='contained' color='primary'>
-                        編輯個人資料
-                    </Button>
-                )}
-            </ButtonContainer> */}
             <ButtonContainer>
                 {!isEditing && (
                     <StyledButton primary onClick={handleEdit}>
