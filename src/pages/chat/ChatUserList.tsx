@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import styled from 'styled-components';
-import { useAuth } from '../auth/AuthContext';
+import { useAuth } from '../../../public/AuthContext';
 
 const UserListContainer = styled.ul`
     list-style-type: none;

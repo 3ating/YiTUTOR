@@ -5,7 +5,7 @@ import 'firebase/compat/firestore';
 import styled from 'styled-components';
 import Link from 'next/link';
 import ChatRoom from '../chat/ChatRoom';
-import { useAuth } from '../auth/AuthContext';
+import { useAuth } from '../../../public/AuthContext';
 import ChatIcon from '../chat/ChatIcon';
 
 interface StyledDialogProps {

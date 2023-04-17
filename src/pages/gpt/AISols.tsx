@@ -12,7 +12,7 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import styled from 'styled-components';
 import { OPENAI_API_KEY } from '../../../config';
-import { useAuth } from '../auth/AuthContext';
+import { useAuth } from '../../../public/AuthContext';
 import Link from 'next/link';
 
 const firebaseConfig = {

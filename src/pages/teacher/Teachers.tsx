@@ -3,7 +3,7 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import styled from 'styled-components';
 import Link from 'next/link';
-import { useAuth } from '../auth/AuthContext';
+import { useAuth } from '../../../public/AuthContext';
 
 const TeacherContainer = styled.div`
     display: grid;

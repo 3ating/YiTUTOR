@@ -4,7 +4,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import styled from 'styled-components';
-import { useAuth } from '../auth/AuthContext';
+import { useAuth } from '../../../public/AuthContext';
 // import { db } from '../../firebase';
 
 const firebaseConfig = {

@@ -7,7 +7,7 @@
 import React from 'react';
 import { AppProps } from 'next/app';
 import { createGlobalStyle, ThemeProvider, StyleSheetManager } from 'styled-components';
-import { AuthProvider } from './auth/AuthContext';
+import { AuthProvider } from '../../public/AuthContext';
 
 const GlobalStyle = createGlobalStyle`
     body {

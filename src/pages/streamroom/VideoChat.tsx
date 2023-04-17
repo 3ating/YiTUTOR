@@ -5,7 +5,7 @@ import ScreenSharing from './ScreenSharing';
 import ClassChatroom from './ClassChatroom';
 import Canvas from './canvas/Canvas';
 import styled from 'styled-components';
-import { useAuth } from '../auth/AuthContext';
+import { useAuth } from '../../../public/AuthContext';
 import Link from 'next/link';
 
 const firebaseConfig = {
