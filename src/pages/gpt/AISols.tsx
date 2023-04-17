@@ -11,7 +11,7 @@ import {
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import styled from 'styled-components';
-import { OPENAI_API_KEY } from '../../../config';
+// import { OPENAI_API_KEY } from '../../../config';
 import { useAuth } from '../../../public/AuthContext';
 import Link from 'next/link';
 
@@ -31,7 +31,8 @@ if (!firebase.apps.length) {
 
 const db = firebase.firestore();
 
-const API_KEY = OPENAI_API_KEY;
+// const API_KEY = OPENAI_API_KEY;
+const API_KEY = process.env.API_KEY;
 
 const StyledApp = styled.div`
     font-family: Arial, Helvetica, sans-serif;
