@@ -4,6 +4,7 @@ import 'firebase/compat/firestore';
 import 'firebase/compat/auth';
 import 'firebase/compat/storage';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 const styles: { [key: string]: CSSProperties } = {
     form: {
@@ -59,11 +60,29 @@ const RegistrationForm = () => {
     const [documentFile, setDocumentFile] = useState<File | null>(null);
     const [certification, setCertification] = useState(false);
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
+    const [avatarPreview, setAvatarPreview] = useState('');
+    const [intro, setIntro] = useState('');
+    const [selectedTimes, setSelectedTimes] = useState<{ [day: string]: Set<number> }>({
+        Monday: new Set(),
+        Tuesday: new Set(),
+        Wednesday: new Set(),
+        Thursday: new Set(),
+        Friday: new Set(),
+        Saturday: new Set(),
+        Sunday: new Set(),
+    });
+
     const [evaluation, setEvaluation] = useState('');
+
+    const router = useRouter();
 
     const addSubject = () => {
         setSubjects([...subjects, '']);
     };
+
+    const selectedTimesArray = Object.entries(selectedTimes).map(([day, hours]) => {
+        return { day, hours: Array.from(hours) };
+    });
 
     const handleSubjectChange = (index: number, value: string) => {
         const newSubjects = [...subjects];
@@ -74,6 +93,9 @@ const RegistrationForm = () => {
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             setAvatarFile(e.target.files[0]);
+            setAvatarPreview(URL.createObjectURL(e.target.files[0]));
+        } else {
+            setAvatarPreview('');
         }
     };
 
@@ -128,10 +150,13 @@ const RegistrationForm = () => {
                                 price: priceArray,
                                 document: documentUrl,
                                 certification,
+                                intro,
+                                selectedTimes: selectedTimesArray,
                             }),
                         })
                         .then(() => {
                             setMessage('註冊成功！');
+                            router.push('/membership/SignIn');
                             setName('');
                             setEmail('');
                             setPhone('');
@@ -157,6 +182,16 @@ const RegistrationForm = () => {
             });
     };
 
+    const handleTimeChange = (day: string, hour: number, checked: boolean) => {
+        const newSelectedTimes = { ...selectedTimes };
+        if (checked) {
+            newSelectedTimes[day].add(hour);
+        } else {
+            newSelectedTimes[day].delete(hour);
+        }
+        setSelectedTimes(newSelectedTimes);
+    };
+
     return (
         <>
             <form onSubmit={handleSubmit} style={styles.form}>
@@ -164,7 +199,15 @@ const RegistrationForm = () => {
                     大頭貼：
                     <input type='file' accept='image/*' onChange={(e) => handleAvatarChange(e)} />
                 </label>
-
+                {avatarPreview && (
+                    <div>
+                        <img
+                            src={avatarPreview}
+                            alt='Avatar Preview'
+                            style={{ width: '100px', objectFit: 'cover', borderRadius: '50%' }}
+                        />
+                    </div>
+                )}
                 <label>
                     姓名：
                     <input type='text' value={name} onChange={(e) => setName(e.target.value)} />
@@ -192,8 +235,12 @@ const RegistrationForm = () => {
                 {userType === 'teacher' && (
                     <>
                         <label>
-                            自我描述：
+                            簡述：
                             <input type='text' value={description} onChange={(e) => setDescription(e.target.value)} />
+                        </label>
+                        <label>
+                            自我介紹：
+                            <textarea value={intro} onChange={(e) => setIntro(e.target.value)} rows={10} cols={50} />
                         </label>
                         <div>
                             <label>科目：</label>
@@ -233,6 +280,23 @@ const RegistrationForm = () => {
                                 onChange={(e) => handlePriceChange(10, e.target.value)}
                             />
                         </label>
+                        <fieldset>
+                            <legend>Available Time Slots:</legend>
+                            {Object.keys(selectedTimes).map((day) => (
+                                <fieldset key={day}>
+                                    <legend>{day}:</legend>
+                                    {Array.from({ length: 12 }, (_, i) => i + 9).map((hour) => (
+                                        <label key={hour}>
+                                            <input
+                                                type='checkbox'
+                                                onChange={(e) => handleTimeChange(day, hour, e.target.checked)}
+                                            />
+                                            {hour}:00
+                                        </label>
+                                    ))}
+                                </fieldset>
+                            ))}
+                        </fieldset>
                         <label>
                             證明文件：
                             <input type='file' accept='image/*' onChange={handleFileChange} />

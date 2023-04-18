@@ -7,6 +7,8 @@ import Link from 'next/link';
 import ChatRoom from '../chat/ChatRoom';
 import { useAuth } from '../../../public/AuthContext';
 import ChatIcon from '../chat/ChatIcon';
+import Schedule from '../Schedule';
+import Calendar from '../Calendar';
 
 interface StyledDialogProps {
     open: boolean;
@@ -115,7 +117,53 @@ const ConfirmationDialogContent = styled.div`
     text-align: center;
 `;
 
+const CalendarAndSchedule = styled.div`
+    display: flex;
+    flex-wrap: nowrap;
+`;
+
+const ScheduleContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+`;
+
+const ConfirmButton = styled.button`
+    background-color: #4caf50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    &:hover {
+        background-color: #45a049;
+    }
+`;
+
+const RejectButton = styled.button`
+    background-color: #f44336;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    &:hover {
+        background-color: #e42a15;
+    }
+`;
+
 interface Teacher {
+    selectedTimes: { day: string; hours: number[] }[];
     uid: string;
     name: string;
     description?: string;
@@ -129,6 +177,7 @@ interface Teacher {
     price?: { qty: number; price: number }[];
     subject?: string[];
     userType?: string;
+    intro?: string;
 }
 
 interface ChatRoomProps {
@@ -162,13 +211,21 @@ const TeacherDetails = () => {
     const [confirmPurchase, setConfirmPurchase] = useState(false);
     const [selectedPrice, setSelectedPrice] = useState({ qty: 0, price: 0 });
 
-    const handleOpenChat = () => {
-        setOpenChat(true);
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [selectedTime, setSelectedTime] = useState('');
+    const [showBookButtons, setShowBookButtons] = useState(false);
+
+    const handleSelectDate = (date: Date) => {
+        setSelectedDate(date);
     };
 
-    const handleCloseChat = () => {
-        setOpenChat(false);
-    };
+    // const handleOpenChat = () => {
+    //     setOpenChat(true);
+    // };
+
+    // const handleCloseChat = () => {
+    //     setOpenChat(false);
+    // };
 
     const handlePurchaseClick = (priceObj: { qty: number; price: number }) => {
         setSelectedPrice(priceObj);
@@ -176,7 +233,6 @@ const TeacherDetails = () => {
     };
 
     const handleConfirmPurchase = async () => {
-        // 在此處處理購買邏輯
         console.log(`User confirmed the purchase of ${selectedPrice.qty} classes for ${selectedPrice.price} dollars.`);
 
         if (userUid) {
@@ -188,6 +244,7 @@ const TeacherDetails = () => {
                 await studentDocRef.update({
                     courses: firebase.firestore.FieldValue.arrayUnion({
                         teachername: teacher?.name,
+                        teacherid: uid,
                         subject: teacher?.subject,
                         quantity: selectedPrice.qty,
                         price: selectedPrice.price,
@@ -225,12 +282,71 @@ const TeacherDetails = () => {
         }
     }, [uid]);
 
+    const handleTimeSlotClick = () => {
+        // setSelectedTime(time);
+        setShowBookButtons(true);
+    };
+
+    const handleConfirmButtonClick = async () => {
+        if (!userUid) return;
+
+        try {
+            const studentDocRef = db.collection('users').doc(userUid);
+            const studentDoc = await studentDocRef.get();
+
+            const courses = studentDoc.data()?.courses || [];
+            const matchingCourseIndex = courses.findIndex((course: any) => course.teacherid === uid);
+
+            if (matchingCourseIndex === -1) {
+                alert('請先購買課程！');
+                console.error('No matching course found for the given teacherId');
+                return;
+            }
+
+            const matchingCourse = courses[matchingCourseIndex];
+            matchingCourse.quantity = Math.max(matchingCourse.quantity - 1, 0);
+
+            if (matchingCourse.quantity === 0) {
+                courses.splice(matchingCourseIndex, 1);
+            }
+
+            await studentDocRef.update({
+                bookings: firebase.firestore.FieldValue.arrayUnion({
+                    teacherId: uid,
+                    date: selectedDate,
+                    time: selectedTime,
+                }),
+                courses,
+            });
+
+            console.log('Booking and courses updated successfully in Firestore');
+            const formattedDate = `${selectedDate.getFullYear()}/${
+                selectedDate.getMonth() + 1
+            }/${selectedDate.getDate()}`;
+            alert(`預約成功！預約時間：${formattedDate} ${selectedTime}`);
+        } catch (error) {
+            alert('預約失敗，');
+            console.error('Error updating the student document:', error);
+        }
+        setShowBookButtons(false);
+    };
+
+    const handleRejectButtonClick = () => {
+        setShowBookButtons(false);
+    };
+
     if (!teacher) {
         return <div>Loading...</div>;
     }
 
     console.log('userUid:', userUid);
-    console.log('teacher.uid', uid);
+    // console.log('teacherUID', uid);
+    // console.log('userinfo:', userInfo);
+
+    // console.log('teacher:', teacher);
+    console.log('selectedTime:', selectedTime);
+    console.log('selectedDate:', selectedDate);
+    console.log(showBookButtons);
 
     return (
         <Container>
@@ -239,6 +355,10 @@ const TeacherDetails = () => {
             <Section>
                 <SubHeading>關於我</SubHeading>
                 <Text>{teacher.description}</Text>
+            </Section>
+            <Section>
+                <SubHeading>自我介紹</SubHeading>
+                <Text>{teacher.intro}</Text>
             </Section>
             <Section>
                 <SubHeading>聯繫方式</SubHeading>
@@ -262,6 +382,30 @@ const TeacherDetails = () => {
                         })}
                 </Text>
             </Section>
+
+            <Section>
+                <SubHeading>選擇欲預約的日期 & 時間</SubHeading>
+                <CalendarAndSchedule>
+                    {/* <Schedule selectedTimes={teacher.selectedTimes} /> */}
+                    <Calendar handleSelectDate={handleSelectDate} />
+                    <ScheduleContainer>
+                        <Schedule
+                            selectedTimes={teacher.selectedTimes}
+                            selectedDate={selectedDate}
+                            onTimeSlotClick={handleTimeSlotClick}
+                            setSelectedTime={setSelectedTime}
+                            selectedTime={selectedTime}
+                        />
+                        {showBookButtons && (
+                            <div>
+                                <ConfirmButton onClick={handleConfirmButtonClick}>確認</ConfirmButton>
+                                <RejectButton onClick={handleRejectButtonClick}>拒絕</RejectButton>
+                            </div>
+                        )}
+                    </ScheduleContainer>
+                </CalendarAndSchedule>
+            </Section>
+
             <ConfirmationDialog open={confirmPurchase} onClick={handleCancelPurchase}>
                 <ConfirmationDialogContent onClick={(e) => e.stopPropagation()}>
                     <h3>確認購買</h3>
@@ -287,21 +431,22 @@ const TeacherDetails = () => {
                     <a href={teacher.document}>查看證書</a>
                 </Section>
             )}
-            <DirectLink href={'/Teachers'}>
+            <DirectLink href={'/teacher/Teachers'}>
                 <button>尋找其他教師</button>
             </DirectLink>
-            <button onClick={handleOpenChat}>與我聊聊</button>
+            {/* <button onClick={handleOpenChat}>與我聊聊</button> */}
             {/* <Dialog open={openChat} onClose={handleCloseChat} maxWidth='md' fullWidth>
                 <DialogContent>
                     <ChatRoom teacherId={uid ? (uid as string) : ''} />
                 </DialogContent>
             </Dialog> */}
-            <ChatIcon onClick={handleOpenChat} />
+
+            {/* <ChatIcon onClick={handleOpenChat} />
             <StyledDialog open={openChat} onClick={handleCloseChat}>
                 <StyledDialogContent onClick={(e) => e.stopPropagation()}>
                     <ChatRoom selectedUserId={uid ? (uid as string) : ''} />
                 </StyledDialogContent>
-            </StyledDialog>
+            </StyledDialog> */}
         </Container>
     );
 };

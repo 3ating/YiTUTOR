@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import Schedule from './Schedule';
 
 const CalendarContainer = styled.div`
     font-family: Arial, sans-serif;
@@ -72,7 +73,11 @@ const CalendarDaysGrid = styled.div`
     border-radius: 0 0 8px 8px;
 `;
 
-export default function Calendar() {
+interface CalendarProps {
+    handleSelectDate: (date: Date) => void;
+}
+
+export default function Calendar({ handleSelectDate }: CalendarProps) {
     const [selectedDate, setSelectedDate] = useState(new Date());
 
     const prevMonth = () => {
@@ -122,7 +127,8 @@ export default function Calendar() {
                         const date = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), i);
                         const isToday = date.toDateString() === new Date().toDateString();
                         const isSelected = date.toDateString() === selectedDate.toDateString();
-                        const handleClick = () => {
+                        const handleClickDate = () => {
+                            handleSelectDate(date);
                             setSelectedDate(date);
                         };
                         days.push(
@@ -130,7 +136,7 @@ export default function Calendar() {
                                 key={`day-${i}`}
                                 isToday={isToday}
                                 isSelected={isSelected}
-                                onClick={handleClick}
+                                onClick={handleClickDate}
                             >
                                 {i}
                             </CalendarDay>

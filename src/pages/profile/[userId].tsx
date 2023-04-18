@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { getFirestore, doc, getDoc, collection, updateDoc } from 'firebase/firestore';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import styled from 'styled-components';
+import Calendar from '../Calendar';
+import Schedule from '../Schedule';
 
 const Container = styled.div`
     display: flex;
@@ -80,6 +83,30 @@ const Td = styled.td`
     padding: 0.5rem;
 `;
 
+const StyledTextDescription = styled.textarea`
+    display: block;
+    width: 100%;
+    height: 100px;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    resize: none;
+`;
+
+const StyledTextIntro = styled.textarea`
+    display: block;
+    width: 100%;
+    height: 200px;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    resize: none;
+`;
+
 interface UserInfo {
     name: string;
     email: string;
@@ -87,6 +114,12 @@ interface UserInfo {
     userType?: string;
     courses?: object;
     avatar?: string;
+    description?: string;
+    intro?: string;
+    selectedTimes?: {
+        day: string;
+        hours: number[];
+    }[];
 }
 
 const firebaseConfig = {
@@ -112,7 +145,7 @@ const UserProfile = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [editedUserInfo, setEditedUserInfo] = useState<UserInfo | null>(null);
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = event.target;
         if (editedUserInfo) {
             setEditedUserInfo({ ...editedUserInfo, [name]: value });
@@ -194,6 +227,20 @@ const UserProfile = () => {
                         value={editedUserInfo?.phone || ''}
                         onChange={handleChange}
                     />
+                    <label htmlFor='description'>簡述</label>
+                    <StyledTextDescription
+                        id='description'
+                        name='description'
+                        value={editedUserInfo?.description || ''}
+                        onChange={handleChange}
+                    />
+                    <label htmlFor='intro'>自我介紹</label>
+                    <StyledTextIntro
+                        id='intro'
+                        name='intro'
+                        value={editedUserInfo?.intro || ''}
+                        onChange={handleChange}
+                    />
                     <ButtonContainer>
                         <StyledButton primary onClick={handleSave}>
                             保存
@@ -208,13 +255,14 @@ const UserProfile = () => {
                     <UserInfoRow>電子郵件: {userInfo.email}</UserInfoRow>
                     <UserInfoRow>電話: {userInfo.phone}</UserInfoRow>
                     <UserInfoRow>使用者類型: {userInfo.userType}</UserInfoRow>
-
+                    {/* {userInfo?.selectedTimes && <Schedule selectedTimes={userInfo.selectedTimes} userInfo={userInfo} />} */}
                     {userInfo?.courses && Object.entries(userInfo.courses).length > 0 && (
                         <Table>
                             <thead>
                                 <Tr>
                                     <Th>課程名稱</Th>
                                     <Th>授課老師</Th>
+                                    {/* <Th>購買日期</Th> */}
                                     <Th>數量</Th>
                                     <Th>價格</Th>
                                 </Tr>
@@ -223,7 +271,13 @@ const UserProfile = () => {
                                 {Object.entries(userInfo.courses).map(([courseId, courseData]) => (
                                     <Tr key={courseId}>
                                         <Td>{courseData.subject}</Td>
-                                        <Td>{courseData.teachername}</Td>
+
+                                        <Td>
+                                            <Link href={`../teacher/${courseData.teacherid}`}>
+                                                {courseData.teachername}{' '}
+                                            </Link>
+                                        </Td>
+                                        {/* <Td>{courseData.purchaseDate?.toDate().toLocaleDateString()}</Td> */}
                                         <Td>{courseData.quantity}</Td>
                                         <Td>{courseData.price}</Td>
                                     </Tr>
