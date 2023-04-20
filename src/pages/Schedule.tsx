@@ -73,7 +73,7 @@ interface ScheduleProps {
 
 const Schedule: React.FC<ScheduleProps> = ({
     selectedTimes,
-    selectedDate,
+    selectedDate = new Date(),
     onTimeSlotClick,
     setSelectedTime,
     selectedTime,
