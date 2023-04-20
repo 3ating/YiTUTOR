@@ -141,6 +141,8 @@ const VideoChat: React.FC = () => {
     const [isScreenSharing, setIsScreenSharing] = useState(false);
     const [isMicMuted, setIsMicMuted] = useState(false);
     const [isAudioMuted, setIsAudioMuted] = useState(false);
+    const [isVideoEnabled, setIsVideoEnabled] = useState(true);
+
     const [isBackgroundBlurred, setIsBackgroundBlurred] = useState(false);
 
     const toggleBackgroundBlur = () => {
@@ -415,12 +417,19 @@ const VideoChat: React.FC = () => {
             setIsAudioMuted(!isAudioMuted);
         }
     };
+
+    const toggleVideo = () => {
+        if (localStream) {
+            const videoTracks = localStream.current!.getVideoTracks();
+            if (videoTracks.length > 0) {
+                videoTracks[0].enabled = !videoTracks[0].enabled;
+                setIsVideoEnabled(!isVideoEnabled);
+            }
+        }
+    };
+
     // console.log(userUid);
-    // console.log(userInfo);
-
-    // console.log('localVideoRef');
-
-    // console.log('remoteVideoRef', remoteVideoRef);
+    console.log(userInfo);
 
     return (
         <>
@@ -468,6 +477,10 @@ const VideoChat: React.FC = () => {
                         <Button primary onClick={hangUp} disabled={!roomId}>
                             <StyledIcon />
                             掛斷
+                        </Button>
+                        <Button primary={!isVideoEnabled} onClick={toggleVideo} disabled={!localStream || !roomId}>
+                            <StyledIcon />
+                            {isVideoEnabled ? '關閉視訊畫面' : '開啟視訊畫面'}
                         </Button>
                         <Button primary={!isMicMuted} onClick={toggleMic} disabled={!localStream || !roomId}>
                             <StyledIcon />
