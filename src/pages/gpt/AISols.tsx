@@ -11,7 +11,7 @@ import {
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import styled from 'styled-components';
-// import { OPENAI_API_KEY } from '../../../config';
+import { OPENAI_API_KEY } from '../../../config';
 import { useAuth } from '../../../public/AuthContext';
 import Link from 'next/link';
 
@@ -32,7 +32,7 @@ if (!firebase.apps.length) {
 const db = firebase.firestore();
 
 // const API_KEY = OPENAI_API_KEY;
-const API_KEY = process.env.OPENAI_API_KEY;
+// const API_KEY = process.env.OPENAI_API_KEY;
 
 const StyledApp = styled.div`
     font-family: Arial, Helvetica, sans-serif;
@@ -129,12 +129,19 @@ const AISols = () => {
         // console.log('apiMessages:', apiMessages);
         // console.log('apiRequestBody:', apiRequestBody);
 
-        await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
+        // await fetch('https://api.openai.com/v1/chat/completions', {
+        //     method: 'POST',
 
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //         Authorization: `Bearer ${API_KEY}`,
+        //     },
+        //     body: JSON.stringify(apiRequestBody),
+        // })
+        await fetch('/api/gpt/AISols', {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${API_KEY}`,
             },
             body: JSON.stringify(apiRequestBody),
         })
