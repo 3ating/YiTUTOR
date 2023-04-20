@@ -107,6 +107,10 @@ const Schedule: React.FC<ScheduleProps> = ({
     };
 
     const getSelectedTimesForDay = (dayIndex: number) => {
+        if (!selectedTimes) {
+            return []; // 或其他默认值
+        }
+
         const dayName = dayMapping[dayIndex];
         const dayData = selectedTimes.find((item) => item.day === dayName);
         return dayData ? dayData.hours : [];
