@@ -258,7 +258,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
     };
 
     const findShape = (x: number, y: number) => {
-        console.log('findShape');
+        // console.log('findShape');
         for (let i = shapes.length - 1; i >= 0; i--) {
             const shapeData = shapes[i];
             switch (shapeData.type) {
@@ -311,7 +311,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
     };
 
     const findLine = (x: number, y: number, threshold = 5) => {
-        console.log('findLine');
+        // console.log('findLine');
         for (let i = lines.length - 1; i >= 0; i--) {
             const line = lines[i];
             for (let j = 0; j < line.points.length - 1; j++) {

@@ -107,6 +107,29 @@ const StyledTextIntro = styled.textarea`
     resize: none;
 `;
 
+const BookingsContainer = styled.div`
+    display: flex;
+`;
+
+const BookingCard = styled.div`
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+`;
+
+const BookingAvatar = styled.img`
+    width: 50px;
+    border-radius: 50%;
+    margin-right: 1rem;
+`;
+
+const DirectLink = styled(Link)`
+    text-decoration: none;
+    color: black;
+`;
+
 interface UserInfo {
     name: string;
     email: string;
@@ -120,6 +143,24 @@ interface UserInfo {
         day: string;
         hours: number[];
     }[];
+    bookings: Booking[];
+}
+
+interface Booking {
+    date: firebase.firestore.Timestamp;
+    teacherId: string;
+    studentId?: string; // Add this line to include the studentId property
+    time: string;
+}
+
+interface BookingWithTeacherInfo extends Booking {
+    teacherInfo: TeacherInfo;
+}
+
+interface TeacherInfo {
+    avatar: string;
+    name: string;
+    subject: string;
 }
 
 const firebaseConfig = {
@@ -144,6 +185,8 @@ const UserProfile = () => {
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [editedUserInfo, setEditedUserInfo] = useState<UserInfo | null>(null);
+
+    const [bookingsInfo, setBookingsInfo] = useState<BookingWithTeacherInfo[]>([]);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = event.target;
@@ -175,6 +218,22 @@ const UserProfile = () => {
         setEditedUserInfo(null);
     };
 
+    // useEffect(() => {
+    //     if (userId) {
+    //         const fetchUserData = async () => {
+    //             const userDocRef = doc(db, 'users', userId as string);
+    //             const docSnapshot = await getDoc(userDocRef);
+
+    //             if (docSnapshot.exists()) {
+    //                 const userData = docSnapshot.data() as UserInfo;
+    //                 setUserInfo(userData);
+    //             }
+    //         };
+
+    //         fetchUserData();
+    //     }
+    // }, [userId]);
+
     useEffect(() => {
         if (userId) {
             const fetchUserData = async () => {
@@ -184,7 +243,21 @@ const UserProfile = () => {
                 if (docSnapshot.exists()) {
                     const userData = docSnapshot.data() as UserInfo;
                     setUserInfo(userData);
+                    fetchBookingData(userData.bookings);
                 }
+            };
+
+            const fetchBookingData = async (bookings: Booking[]) => {
+                const usersCollectionRef = collection(db, 'users');
+                const bookingsDataPromises = bookings.map(async (booking) => {
+                    const bookingDocRef = doc(usersCollectionRef, booking.teacherId || booking.studentId);
+                    const bookingDocSnapshot = await getDoc(bookingDocRef);
+                    const bookingData = bookingDocSnapshot.data() as TeacherInfo;
+                    return { ...booking, teacherInfo: bookingData };
+                });
+
+                const teachersData = await Promise.all(bookingsDataPromises);
+                setBookingsInfo(teachersData);
             };
 
             fetchUserData();
@@ -192,11 +265,12 @@ const UserProfile = () => {
     }, [userId]);
 
     console.log(userId);
+    console.log(bookingsInfo);
+    console.log(userInfo);
 
     if (!userInfo) {
         return <div>Loading...</div>;
     }
-    console.log(userInfo);
 
     return (
         <Container>
@@ -255,6 +329,33 @@ const UserProfile = () => {
                     <UserInfoRow>電子郵件: {userInfo.email}</UserInfoRow>
                     <UserInfoRow>電話: {userInfo.phone}</UserInfoRow>
                     <UserInfoRow>使用者類型: {userInfo.userType}</UserInfoRow>
+
+                    <h2>預約的課程</h2>
+                    {bookingsInfo.length > 0 && (
+                        <BookingsContainer>
+                            {bookingsInfo.map((booking, index) => (
+                                <DirectLink
+                                    key={index}
+                                    href={`/streamroom/VideoChat?id=${booking.teacherId || booking.studentId}`}
+                                >
+                                    <BookingCard>
+                                        <BookingAvatar
+                                            src={booking.teacherInfo.avatar}
+                                            alt={`${booking.teacherInfo.name} 的大頭照`}
+                                        />
+                                        <div>
+                                            <h3>{booking.teacherInfo.name}</h3>
+                                            <p>科目: {booking.teacherInfo.subject}</p>
+                                            <p>
+                                                時間: {booking.date.toDate().toLocaleDateString()} {booking.time}
+                                            </p>
+                                        </div>
+                                    </BookingCard>
+                                </DirectLink>
+                            ))}
+                        </BookingsContainer>
+                    )}
+
                     {/* {userInfo?.selectedTimes && <Schedule selectedTimes={userInfo.selectedTimes} userInfo={userInfo} />} */}
                     {userInfo?.courses && Object.entries(userInfo.courses).length > 0 && (
                         <Table>

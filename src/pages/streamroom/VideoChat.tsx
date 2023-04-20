@@ -120,21 +120,20 @@ const DirectLink = styled(Link)`
     color: black;
 `;
 
-const configuration: RTCConfiguration = {
+const configuration = {
     iceServers: [
         {
-            urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'],
+            urls: 'stun:stun.l.google.com:19302',
         },
     ],
-    iceCandidatePoolSize: 10,
 };
 
 const VideoChat: React.FC = () => {
     const { userUid, userInfo } = useAuth();
     const localVideoRef = useRef<HTMLVideoElement | null>(null);
     const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
-    const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-    const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
+    const localStream = useRef<MediaStream | null>(null);
+    const remoteStream = useRef<MediaStream | null>(null);
     const [peerConnection, setPeerConnection] = useState<RTCPeerConnection | null>(null);
     const [roomId, setRoomId] = useState<string | null>(null);
     const [roomDialogOpen, setRoomDialogOpen] = useState(false);
@@ -149,29 +148,65 @@ const VideoChat: React.FC = () => {
     };
 
     useEffect(() => {
-        if (localStream && remoteStream && localVideoRef.current && remoteVideoRef.current) {
-            localVideoRef.current.srcObject = localStream;
-            remoteVideoRef.current.srcObject = remoteStream;
+        if (localStream.current && remoteStream.current && localVideoRef.current && remoteVideoRef.current) {
+            localVideoRef.current.srcObject = localStream.current;
+            remoteVideoRef.current.srcObject = remoteStream.current;
         }
     }, [localStream, remoteStream]);
 
+    const findRoomByUserId = async (userId: string | null) => {
+        if (!userId) return null;
+
+        const db = firebase.firestore();
+        const roomsRef = db.collection('rooms');
+        const snapshot = await roomsRef.where('userUid', '==', userId).get();
+
+        if (!snapshot.empty) {
+            // Return the ID of the first room found with the matching userId
+            return snapshot.docs[0].id;
+        } else {
+            return null;
+        }
+    };
     const openUserMedia = async () => {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        setLocalStream(stream);
-        setRemoteStream(new MediaStream());
+        localStream.current = stream;
+        remoteStream.current = new MediaStream();
+
+        if (localVideoRef.current) {
+            localVideoRef.current.srcObject = localStream.current;
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('id');
+
+        const existingRoomId = await findRoomByUserId(userId);
+
+        if (existingRoomId) {
+            setRoomIdInput(existingRoomId);
+            await joinRoomById(existingRoomId);
+            console.log('有人開房間：', existingRoomId);
+        } else {
+            await createRoom();
+            console.log('沒人開房間');
+        }
     };
 
     const hangUp = async () => {
-        localStream?.getTracks().forEach((track) => {
-            track.stop();
-        });
+        if (localStream.current) {
+            localStream.current.getTracks().forEach((track) => {
+                track.stop();
+            });
+        }
 
-        remoteStream?.getTracks().forEach((track) => track.stop());
+        if (remoteStream.current) {
+            remoteStream.current.getTracks().forEach((track) => track.stop());
+        }
 
         peerConnection?.close();
 
-        setLocalStream(null);
-        setRemoteStream(null);
+        localStream.current = null;
+        remoteStream.current = null;
         setPeerConnection(null);
         setRoomId(null);
 
@@ -202,20 +237,28 @@ const VideoChat: React.FC = () => {
         };
 
         setPeerConnection(pc);
+        console.log('localstream in create room:', localStream.current);
 
-        localStream?.getTracks().forEach((track) => {
-            pc.addTrack(track, localStream);
-        });
+        if (localStream.current) {
+            localStream.current.getTracks().forEach((track) => {
+                pc.addTrack(track, localStream.current!);
+            });
+        }
 
         pc.ontrack = (event) => {
             event.streams[0].getTracks().forEach((track) => {
-                remoteStream?.addTrack(track);
+                if (remoteStream.current) {
+                    remoteStream.current.addTrack(track);
+                }
             });
+            if (remoteVideoRef.current) {
+                remoteVideoRef.current.srcObject = remoteStream.current;
+            }
         };
 
         const callerCandidatesCollection = roomRef.collection('callerCandidates');
         pc.onicecandidate = (event) => {
-            // console.log('event.candidate in create room:', event.candidate);
+            console.log('onicecandidate event triggered:', event);
             if (event.candidate) {
                 callerCandidatesCollection.add(event.candidate.toJSON());
             }
@@ -228,11 +271,11 @@ const VideoChat: React.FC = () => {
                 type: offer.type,
                 sdp: offer.sdp,
             },
+            userUid: userUid,
         };
 
         await roomRef.set(roomWithOffer);
         setRoomId(roomRef.id);
-        // console.log('pc in createroom:', pc);
 
         // Listen for remote description
         roomRef.onSnapshot(async (snapshot) => {
@@ -240,14 +283,12 @@ const VideoChat: React.FC = () => {
             if (data?.answer && !pc.currentRemoteDescription) {
                 const rtcSessionDescription = new RTCSessionDescription(data.answer);
                 await pc.setRemoteDescription(rtcSessionDescription);
-                // console.log('Remote description set:', rtcSessionDescription);
             }
         });
 
         roomRef.collection('calleeCandidates').onSnapshot((snapshot: { docChanges: () => any[] }) => {
             snapshot.docChanges().forEach(async (change) => {
                 if (change.type === 'added') {
-                    // console.log('pc in createroom(onSnapshot):', pc);
                     const data = change.doc.data();
                     await pc.addIceCandidate(new RTCIceCandidate(data));
                 }
@@ -260,10 +301,10 @@ const VideoChat: React.FC = () => {
         setRoomDialogOpen(false);
     };
 
-    const joinRoomById = async () => {
-        if (roomIdInput === '') return;
+    const joinRoomById = async (roomId: string) => {
+        if (!roomId) return;
         const db = firebase.firestore();
-        const roomRef = db.collection('rooms').doc(`${roomIdInput}`);
+        const roomRef = db.collection('rooms').doc(`${roomId}`);
         const roomSnapshot = await roomRef.get();
 
         if (roomSnapshot.exists) {
@@ -271,8 +312,11 @@ const VideoChat: React.FC = () => {
 
             pc.ontrack = (event) => {
                 event.streams[0].getTracks().forEach((track) => {
-                    remoteStream?.addTrack(track);
+                    remoteStream.current?.addTrack(track);
                 });
+                if (remoteVideoRef.current) {
+                    remoteVideoRef.current.srcObject = remoteStream.current;
+                }
             };
 
             pc.oniceconnectionstatechange = (event) => {
@@ -280,10 +324,13 @@ const VideoChat: React.FC = () => {
             };
 
             setPeerConnection(pc);
+            console.log('localstream in joinroom:', localStream);
 
-            localStream?.getTracks().forEach((track) => {
-                pc.addTrack(track, localStream);
-            });
+            if (localStream.current) {
+                localStream.current.getTracks().forEach((track) => {
+                    pc.addTrack(track, localStream.current!);
+                });
+            }
 
             const offer = roomSnapshot.data()?.offer;
             await pc.setRemoteDescription(new RTCSessionDescription(offer));
@@ -291,7 +338,6 @@ const VideoChat: React.FC = () => {
             pc.onicecandidate = (event) => {
                 // console.log('event.candidate in joinRoomById:', event.candidate);
                 if (event.candidate) {
-                    // console.log('add calleeCandidates in joinroom()');
                     roomRef.collection('calleeCandidates').add(event.candidate.toJSON());
                 }
             };
@@ -335,9 +381,11 @@ const VideoChat: React.FC = () => {
     useEffect(() => {
         if (peerConnection) {
             const handleIceCandidate = async (event: RTCPeerConnectionIceEvent) => {
+                console.log('handleIceCandidate');
+
                 if (event.candidate && roomId) {
                     const roomRef = db.collection('rooms').doc(roomId);
-                    const role = localStream && !remoteStream?.getTracks().length ? 'caller' : 'callee';
+                    const role = localStream.current && !remoteStream.current?.getTracks().length ? 'caller' : 'callee';
                     const candidatesCollection = roomRef.collection(`${role}Candidates`);
                     await candidatesCollection.add(event.candidate.toJSON());
                 }
@@ -353,7 +401,7 @@ const VideoChat: React.FC = () => {
 
     const toggleMic = () => {
         if (localStream) {
-            const audioTracks = localStream.getAudioTracks();
+            const audioTracks = localStream.current!.getAudioTracks();
             if (audioTracks.length > 0) {
                 audioTracks[0].enabled = !audioTracks[0].enabled;
                 setIsMicMuted(!isMicMuted);
@@ -367,7 +415,12 @@ const VideoChat: React.FC = () => {
             setIsAudioMuted(!isAudioMuted);
         }
     };
-    console.log(userUid);
+    // console.log(userUid);
+    // console.log(userInfo);
+
+    // console.log('localVideoRef');
+
+    // console.log('remoteVideoRef', remoteVideoRef);
 
     return (
         <>
@@ -388,29 +441,30 @@ const VideoChat: React.FC = () => {
                         ></video>
                     </div>
                     <div>
-                        <Button primary onClick={openUserMedia} disabled={!!localStream}>
+                        <Button primary onClick={openUserMedia} disabled={!!localStream.current}>
                             <StyledIcon />
                             開啟鏡頭
                         </Button>
+
                         <ScreenSharing
-                            localStream={localStream}
+                            localStream={localStream.current}
                             peerConnection={peerConnection}
                             isScreenSharing={isScreenSharing}
                             setIsScreenSharing={setIsScreenSharing}
                             roomId={roomId}
                         />
-                        {userInfo?.userType === 'teacher' && (
-                            <Button primary onClick={handleCreateRoom} disabled={!localStream || !!roomId}>
-                                <StyledIcon />
-                                建立房間
-                            </Button>
-                        )}
-                        {userInfo?.userType === 'student' && (
-                            <Button primary onClick={() => setRoomDialogOpen(true)} disabled={!localStream || !!roomId}>
-                                <StyledIcon />
-                                加入房間
-                            </Button>
-                        )}
+                        {/* {userInfo?.userType === 'teacher' && ( */}
+                        {/* <Button primary onClick={handleCreateRoom} disabled={!localStream || !!roomId}>
+                            <StyledIcon />
+                            建立房間
+                        </Button> */}
+                        {/* )} */}
+                        {/* {userInfo?.userType === 'student' && ( */}
+                        {/* <Button primary onClick={() => setRoomDialogOpen(true)} disabled={!localStream || !!roomId}>
+                            <StyledIcon />
+                            加入房間
+                        </Button> */}
+                        {/* )} */}
                         <Button primary onClick={hangUp} disabled={!roomId}>
                             <StyledIcon />
                             掛斷
@@ -434,12 +488,12 @@ const VideoChat: React.FC = () => {
                                 style={{ width: '100%', marginBottom: '16px' }}
                             />
                         </DialogContent>
-                        <DialogActions>
+                        {/* <DialogActions>
                             <Button onClick={() => setRoomDialogOpen(false)}>取消</Button>
                             <Button onClick={joinRoomById} disabled={!localStream || roomIdInput === ''}>
                                 加入
                             </Button>
-                        </DialogActions>
+                        </DialogActions> */}
                     </Dialog>
                     {roomId && (
                         <Typography variant='h6' gutterBottom>

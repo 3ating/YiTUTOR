@@ -3,6 +3,8 @@ import Image from 'next/image';
 import styled from 'styled-components';
 import styles from '@/styles/Home.module.css';
 import Link from 'next/link';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 const Container = styled.div`
     display: flex;
@@ -46,6 +48,7 @@ const DirectLink = styled(Link)`
 export default function Home() {
     return (
         <>
+            <Header />
             <Head>
                 <title>YiTUTOR</title>
             </Head>
@@ -69,6 +72,7 @@ export default function Home() {
                     </DirectLink>
                 </ButtonContainer>
             </Container>
+            <Footer />
         </>
     );
 }

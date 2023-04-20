@@ -11,7 +11,7 @@ const ScheduleContainer = styled.div`
 
 const DayRow = styled.div`
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     width: 100%;
     margin-bottom: 1rem;

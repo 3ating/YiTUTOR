@@ -237,10 +237,7 @@ const TeacherDetails = () => {
 
         if (userUid) {
             try {
-                // Get the student's document reference
                 const studentDocRef = db.collection('users').doc(userUid);
-
-                // Update the purchased courses in the student's document
                 await studentDocRef.update({
                     courses: firebase.firestore.FieldValue.arrayUnion({
                         teachername: teacher?.name,
@@ -287,11 +284,11 @@ const TeacherDetails = () => {
         setShowBookButtons(true);
     };
 
-    const handleConfirmButtonClick = async () => {
+    const handleConfirmBook = async () => {
         if (!userUid) return;
 
         try {
-            const studentDocRef = db.collection('users').doc(userUid);
+            const studentDocRef = db.collection('users').doc(userUid as string);
             const studentDoc = await studentDocRef.get();
 
             const courses = studentDoc.data()?.courses || [];
@@ -319,19 +316,29 @@ const TeacherDetails = () => {
                 courses,
             });
 
+            // Update the teacher's document with the student's booking information
+            const teacherDocRef = db.collection('users').doc(uid as string);
+            await teacherDocRef.update({
+                bookings: firebase.firestore.FieldValue.arrayUnion({
+                    studentId: userUid,
+                    date: selectedDate,
+                    time: selectedTime,
+                }),
+            });
+
             console.log('Booking and courses updated successfully in Firestore');
             const formattedDate = `${selectedDate.getFullYear()}/${
                 selectedDate.getMonth() + 1
             }/${selectedDate.getDate()}`;
             alert(`預約成功！預約時間：${formattedDate} ${selectedTime}`);
         } catch (error) {
-            alert('預約失敗，');
+            alert('預約失敗');
             console.error('Error updating the student document:', error);
         }
         setShowBookButtons(false);
     };
 
-    const handleRejectButtonClick = () => {
+    const handleRejectBook = () => {
         setShowBookButtons(false);
     };
 
@@ -340,7 +347,7 @@ const TeacherDetails = () => {
     }
 
     console.log('userUid:', userUid);
-    // console.log('teacherUID', uid);
+    console.log('teacherUID', uid);
     // console.log('userinfo:', userInfo);
 
     // console.log('teacher:', teacher);
@@ -398,8 +405,8 @@ const TeacherDetails = () => {
                         />
                         {showBookButtons && (
                             <div>
-                                <ConfirmButton onClick={handleConfirmButtonClick}>確認</ConfirmButton>
-                                <RejectButton onClick={handleRejectButtonClick}>拒絕</RejectButton>
+                                <ConfirmButton onClick={handleConfirmBook}>確認</ConfirmButton>
+                                <RejectButton onClick={handleRejectBook}>拒絕</RejectButton>
                             </div>
                         )}
                     </ScheduleContainer>
