@@ -7,6 +7,8 @@ import Canvas from './canvas/Canvas';
 import styled from 'styled-components';
 import { useAuth } from '../../../public/AuthContext';
 import Link from 'next/link';
+import Header from '@/components/Header/Header';
+import Footer from '@/components/Footer/Footer';
 
 const firebaseConfig = {
     apiKey: process.env.FIRESTORE_API_KEY,
@@ -433,20 +435,24 @@ const VideoChat: React.FC = () => {
 
     return (
         <>
+            <Header />
             {userUid ? (
                 <div>
-                    {peerConnection && <Canvas roomId={roomId} />}
+                    {/* {peerConnection && <Canvas roomId={roomId} />} */}
+                    <Canvas roomId={roomId} />
                     <div style={{ display: 'flex' }}>
                         <video
                             ref={localVideoRef}
                             autoPlay
                             muted
                             style={{ width: '50%', border: '1px solid black' }}
+                            playsInline
                         ></video>
                         <video
                             ref={remoteVideoRef}
                             autoPlay
                             style={{ width: '50%', border: '1px solid black' }}
+                            playsInline
                         ></video>
                     </div>
                     <div>
@@ -462,18 +468,6 @@ const VideoChat: React.FC = () => {
                             setIsScreenSharing={setIsScreenSharing}
                             roomId={roomId}
                         />
-                        {/* {userInfo?.userType === 'teacher' && ( */}
-                        {/* <Button primary onClick={handleCreateRoom} disabled={!localStream || !!roomId}>
-                            <StyledIcon />
-                            建立房間
-                        </Button> */}
-                        {/* )} */}
-                        {/* {userInfo?.userType === 'student' && ( */}
-                        {/* <Button primary onClick={() => setRoomDialogOpen(true)} disabled={!localStream || !!roomId}>
-                            <StyledIcon />
-                            加入房間
-                        </Button> */}
-                        {/* )} */}
                         <Button primary onClick={hangUp} disabled={!roomId}>
                             <StyledIcon />
                             掛斷
@@ -501,19 +495,14 @@ const VideoChat: React.FC = () => {
                                 style={{ width: '100%', marginBottom: '16px' }}
                             />
                         </DialogContent>
-                        {/* <DialogActions>
-                            <Button onClick={() => setRoomDialogOpen(false)}>取消</Button>
-                            <Button onClick={joinRoomById} disabled={!localStream || roomIdInput === ''}>
-                                加入
-                            </Button>
-                        </DialogActions> */}
                     </Dialog>
                     {roomId && (
                         <Typography variant='h6' gutterBottom>
                             房間ID: {roomId}
                         </Typography>
                     )}
-                    {peerConnection && <ClassChatroom roomId={roomId} />}
+                    {/* {peerConnection && <ClassChatroom roomId={roomId} />} */}
+                    <ClassChatroom roomId={roomId} />
                 </div>
             ) : (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -522,6 +511,7 @@ const VideoChat: React.FC = () => {
                     </DirectLink>
                 </div>
             )}
+            <Footer />
         </>
     );
 };

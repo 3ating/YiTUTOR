@@ -16,7 +16,7 @@ const BannerContainer = styled.div`
     flex-direction: row;
     align-items: center;
     padding: 0px;
-    gap: 44px;
+    /* gap: 44px; */
     padding: 0 20px;
 `;
 

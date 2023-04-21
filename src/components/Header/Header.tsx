@@ -30,7 +30,7 @@ const SignBtnContainer = styled.div`
     flex-direction: row;
     align-items: flex-start;
     padding: 0px;
-    gap: 27px;
+    gap: 18px;
     margin-left: 40px;
 `;
 
@@ -44,7 +44,7 @@ const MenuContainer = styled.div`
 
 const Menu = styled(Link)`
     font-weight: 400;
-    font-size: 20px;
+    font-size: 18px;
     line-height: 23px;
     letter-spacing: 0.15em;
     text-align: center;
@@ -52,26 +52,46 @@ const Menu = styled(Link)`
     color: #000000;
 `;
 
-const SignBtn = styled(Link)`
+const SignInBtn = styled(Link)`
     width: 114px;
     height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 500;
-    font-size: 16px;
-    line-height: 19px;
-    letter-spacing: 0.42em;
+    /* line-height: 19px; */
+    /* letter-spacing: 0.42em; */
+    text-align: center;
+    color: #f5f5f5;
+    background: #000000;
+    opacity: 0.7;
+    text-decoration: none;
+
+    /* &:hover {
+        color: #f5f5f5;
+        background: #000000;
+    } */
+`;
+
+const SignUpBtn = styled(Link)`
+    width: 114px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    /* line-height: 19px; */
+    /* letter-spacing: 0.42em; */
     text-align: center;
     color: #000000;
     background: #f5f5f5;
     opacity: 0.7;
     text-decoration: none;
 
-    &:hover {
+    /* &:hover {
         color: #f5f5f5;
         background: #000000;
-    }
+    } */
 `;
 
 const Header: React.FC = () => {
@@ -85,8 +105,8 @@ const Header: React.FC = () => {
                     <Menu href='/streamroom/VideoChat'>線上教室</Menu>
                 </MenuContainer>
                 <SignBtnContainer>
-                    <SignBtn href='/membership/SignIn'>登入</SignBtn>
-                    <SignBtn href='/membership/SignUp'>註冊</SignBtn>
+                    <SignUpBtn href='/membership/SignUp'>註 冊</SignUpBtn>
+                    <SignInBtn href='/membership/SignIn'>登 入</SignInBtn>
                 </SignBtnContainer>
             </NavContainer>
         </HeaderWrapper>

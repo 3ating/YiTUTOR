@@ -9,6 +9,7 @@ const FooterWrapper = styled.footer`
     background-color: #ffd335;
     height: 65px;
     padding: 0 40px;
+    margin-top: auto;
 `;
 
 const Logo = styled.h1`
