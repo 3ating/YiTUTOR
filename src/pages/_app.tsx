@@ -5,6 +5,7 @@
 //     return <Component {...pageProps} />;
 // }
 import React from 'react';
+import '@/styles/globals.css';
 import { AppProps } from 'next/app';
 import { createGlobalStyle, ThemeProvider, StyleSheetManager } from 'styled-components';
 import { AuthProvider } from '../../public/AuthContext';

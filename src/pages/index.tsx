@@ -3,8 +3,9 @@ import Image from 'next/image';
 import styled from 'styled-components';
 import styles from '@/styles/Home.module.css';
 import Link from 'next/link';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import Header from '@/components/Header/Header';
+import Main from '@/components/Main/Main';
+import Footer from '@/components/Footer/Footer';
 
 const Container = styled.div`
     display: flex;
@@ -49,10 +50,7 @@ export default function Home() {
     return (
         <>
             <Header />
-            <Head>
-                <title>YiTUTOR</title>
-            </Head>
-            <Container>
+            {/* <Container>
                 <Title>YiTUTOR</Title>
                 <ButtonContainer>
                     <DirectLink href='/teacher/Teachers'>
@@ -71,7 +69,8 @@ export default function Home() {
                         <Button>註冊帳號</Button>
                     </DirectLink>
                 </ButtonContainer>
-            </Container>
+            </Container> */}
+            <Main />
             <Footer />
         </>
     );
