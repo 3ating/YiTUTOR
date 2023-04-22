@@ -9,6 +9,12 @@ import { useAuth } from '../../../public/AuthContext';
 import Link from 'next/link';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
+import { AiTwotoneSwitcher } from 'react-icons/ai';
+import { BsFillCameraVideoFill, BsFillCameraVideoOffFill, BsMicFill, BsMicMuteFill } from 'react-icons/bs';
+import { ImPhoneHangUp } from 'react-icons/im';
+import { MdOutlineVideoCall } from 'react-icons/md';
+import { FaVolumeDown, FaVolumeMute } from 'react-icons/fa';
+import { RiVideoAddFill } from 'react-icons/ri';
 
 const firebaseConfig = {
     apiKey: process.env.FIRESTORE_API_KEY,
@@ -36,10 +42,17 @@ interface TypographyProps extends HTMLAttributes<HTMLParagraphElement> {
 }
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     primary?: boolean;
+    active?: boolean;
 }
 
-const Button = styled.button<ButtonProps>`
-    background-color: ${({ primary }) => (primary ? 'blue' : 'gray')};
+const ButtonsContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+`;
+
+const CreateButton = styled.button<ButtonProps>`
+    background-color: ${({ primary }) => (primary ? 'gold' : 'gray')};
     color: white;
     border: none;
     border-radius: 4px;
@@ -47,11 +60,77 @@ const Button = styled.button<ButtonProps>`
     display: inline-block;
     font-size: 14px;
     margin: 4px 2px;
-    padding: 8px 16px;
+    padding: 8px 16px 6px 16px;
     text-align: center;
     text-decoration: none;
     &:hover {
-        background-color: ${({ primary }) => (primary ? 'darkblue' : 'darkgray')};
+        background-color: ${({ primary }) => (primary ? 'darkgoldenrod' : 'darkgray')};
+    }
+    &:disabled {
+        background-color: lightgray;
+        color: gray;
+        cursor: not-allowed;
+    }
+`;
+
+const ControlButton = styled.button<ButtonProps>`
+    background-color: ${({ active }) => (active ? 'gray' : 'red')};
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    padding: 8px 16px 6px 16px;
+    text-align: center;
+    text-decoration: none;
+    &:hover {
+        background-color: ${({ active }) => (active ? 'darkgray' : 'darkred')};
+    }
+    &:disabled {
+        background-color: lightgray;
+        color: gray;
+        cursor: not-allowed;
+    }
+`;
+
+const VideoScreenButton = styled.button<ButtonProps>`
+    background-color: ${({ active }) => (active ? 'gray' : 'cornflowerblue')};
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    padding: 8px 16px 6px 16px;
+    text-align: center;
+    text-decoration: none;
+    &:hover {
+        background-color: ${({ active }) => (active ? 'darkgray' : 'lightskyblue')};
+    }
+    &:disabled {
+        background-color: lightgray;
+        color: gray;
+        cursor: not-allowed;
+    }
+`;
+
+const HangUpButton = styled.button<ButtonProps>`
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    padding: 8px 25px 6px 25px;
+    text-align: center;
+    text-decoration: none;
+    &:hover {
+        background-color: darkred;
     }
     &:disabled {
         background-color: lightgray;
@@ -112,14 +191,29 @@ const Typography = styled.p<TypographyProps>`
     margin-bottom: ${({ gutterBottom }) => (gutterBottom ? '0.35em' : '0')};
 `;
 
-const StyledIcon = styled.i`
-    font-size: 1.2rem;
-    margin-right: 4px;
-`;
-
 const DirectLink = styled(Link)`
     text-decoration: none;
     color: black;
+`;
+
+const VideoScreen = styled.video`
+    position: absolute;
+    bottom: 4%;
+    right: 3.5%;
+    /* width: 25%; */
+    height: 40%;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+    z-index: 1;
+    background-color: black;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: all 0.3s ease-in-out;
+
+    &.visible {
+        opacity: 1;
+        transform: scale(1);
+    }
 `;
 
 const configuration = {
@@ -131,7 +225,9 @@ const configuration = {
 };
 
 const VideoChat: React.FC = () => {
+    const ICON_SIZE = 18;
     const { userUid, userInfo } = useAuth();
+    const [showLocalVideo, setShowLocalVideo] = useState(true);
     const localVideoRef = useRef<HTMLVideoElement | null>(null);
     const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
     const localStream = useRef<MediaStream | null>(null);
@@ -140,6 +236,8 @@ const VideoChat: React.FC = () => {
     const [roomId, setRoomId] = useState<string | null>(null);
     const [roomDialogOpen, setRoomDialogOpen] = useState(false);
     const [roomIdInput, setRoomIdInput] = useState('');
+    const [cameraEnabled, setCameraEnabled] = useState(false);
+
     const [isScreenSharing, setIsScreenSharing] = useState(false);
     const [isMicMuted, setIsMicMuted] = useState(false);
     const [isAudioMuted, setIsAudioMuted] = useState(false);
@@ -149,6 +247,10 @@ const VideoChat: React.FC = () => {
 
     const toggleBackgroundBlur = () => {
         setIsBackgroundBlurred(!isBackgroundBlurred);
+    };
+
+    const toggleVideoScreen = () => {
+        setShowLocalVideo(!showLocalVideo);
     };
 
     useEffect(() => {
@@ -194,6 +296,7 @@ const VideoChat: React.FC = () => {
             await createRoom();
             console.log('沒人開房間');
         }
+        setCameraEnabled(true);
     };
 
     const hangUp = async () => {
@@ -439,27 +542,52 @@ const VideoChat: React.FC = () => {
             {userUid ? (
                 <div>
                     {/* {peerConnection && <Canvas roomId={roomId} />} */}
-                    <Canvas roomId={roomId} />
+                    <div style={{ position: 'relative' }}>
+                        <Canvas roomId={roomId} />
+                        <VideoScreen
+                            ref={localVideoRef}
+                            autoPlay
+                            muted
+                            playsInline
+                            className={showLocalVideo ? 'visible' : ''}
+                        ></VideoScreen>
+                        <VideoScreen
+                            ref={remoteVideoRef}
+                            autoPlay
+                            muted
+                            playsInline
+                            className={!showLocalVideo ? 'visible' : ''}
+                            style={{ backgroundColor: 'white' }}
+                        ></VideoScreen>
+                    </div>
+
                     <div style={{ display: 'flex' }}>
-                        <video
+                        {/* <video
                             ref={localVideoRef}
                             autoPlay
                             muted
                             style={{ width: '50%', border: '1px solid black' }}
                             playsInline
-                        ></video>
-                        <video
+                        ></video> */}
+                        {/* <video
                             ref={remoteVideoRef}
                             autoPlay
                             style={{ width: '50%', border: '1px solid black' }}
                             playsInline
-                        ></video>
+                        ></video> */}
                     </div>
-                    <div>
-                        <Button primary onClick={openUserMedia} disabled={!!localStream.current}>
-                            <StyledIcon />
-                            開啟鏡頭
-                        </Button>
+                    <ButtonsContainer>
+                        <CreateButton onClick={openUserMedia} primary={roomId == null} disabled={roomId !== null}>
+                            <RiVideoAddFill size={ICON_SIZE} />
+                        </CreateButton>
+
+                        <VideoScreenButton
+                            active={showLocalVideo}
+                            onClick={toggleVideoScreen}
+                            disabled={!localStream || !roomId}
+                        >
+                            <AiTwotoneSwitcher size={ICON_SIZE} />
+                        </VideoScreenButton>
 
                         <ScreenSharing
                             localStream={localStream.current}
@@ -468,24 +596,25 @@ const VideoChat: React.FC = () => {
                             setIsScreenSharing={setIsScreenSharing}
                             roomId={roomId}
                         />
-                        <Button primary onClick={hangUp} disabled={!roomId}>
-                            <StyledIcon />
-                            掛斷
-                        </Button>
-                        <Button primary={!isVideoEnabled} onClick={toggleVideo} disabled={!localStream || !roomId}>
-                            <StyledIcon />
-                            {isVideoEnabled ? '關閉視訊畫面' : '開啟視訊畫面'}
-                        </Button>
-                        <Button primary={!isMicMuted} onClick={toggleMic} disabled={!localStream || !roomId}>
-                            <StyledIcon />
-                            {isMicMuted ? '開啟麥克風' : '關閉麥克風'}
-                        </Button>
-                        <Button primary={!isAudioMuted} onClick={toggleAudio} disabled={!remoteStream || !roomId}>
-                            <StyledIcon />
-                            {isAudioMuted ? '開啟音量' : '關閉音量'}
-                        </Button>
-                    </div>
-                    <Dialog open={roomDialogOpen}>
+
+                        <ControlButton active={isVideoEnabled} onClick={toggleVideo} disabled={!localStream || !roomId}>
+                            {isVideoEnabled ? (
+                                <BsFillCameraVideoFill size={ICON_SIZE} />
+                            ) : (
+                                <BsFillCameraVideoOffFill size={ICON_SIZE} />
+                            )}
+                        </ControlButton>
+                        <ControlButton active={!isMicMuted} onClick={toggleMic} disabled={!localStream || !roomId}>
+                            {isMicMuted ? <BsMicMuteFill size={ICON_SIZE} /> : <BsMicFill size={ICON_SIZE} />}
+                        </ControlButton>
+                        <ControlButton active={isAudioMuted} onClick={toggleAudio} disabled={!remoteStream || !roomId}>
+                            {isAudioMuted ? <FaVolumeDown size={ICON_SIZE} /> : <FaVolumeMute size={ICON_SIZE} />}
+                        </ControlButton>
+                        <HangUpButton onClick={hangUp} disabled={!localStream || !roomId}>
+                            <ImPhoneHangUp size={ICON_SIZE} />
+                        </HangUpButton>
+                    </ButtonsContainer>
+                    {/* <Dialog open={roomDialogOpen}>
                         <DialogTitle>加入房間</DialogTitle>
                         <DialogContent>
                             <TextField
@@ -495,7 +624,7 @@ const VideoChat: React.FC = () => {
                                 style={{ width: '100%', marginBottom: '16px' }}
                             />
                         </DialogContent>
-                    </Dialog>
+                    </Dialog> */}
                     {roomId && (
                         <Typography variant='h6' gutterBottom>
                             房間ID: {roomId}

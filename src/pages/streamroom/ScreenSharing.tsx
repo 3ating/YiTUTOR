@@ -1,10 +1,12 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, ButtonHTMLAttributes } from 'react';
 // import { Button } from '@material-ui/core';
 // import { ScreenShare } from '@material-ui/icons';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import styled from 'styled-components';
 import { useAuth } from '../../../public/AuthContext';
+import { TbScreenShare } from 'react-icons/tb';
+
 // import { db } from '../../firebase';
 
 const firebaseConfig = {
@@ -29,6 +31,11 @@ interface ScreenSharingProps {
     isScreenSharing: boolean;
     setIsScreenSharing: React.Dispatch<React.SetStateAction<boolean>>;
     roomId: string | null;
+}
+
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+    primary?: boolean;
+    active?: boolean;
 }
 
 const ShareButton = styled.button`
@@ -71,6 +78,28 @@ const RemoteScreen = styled.video`
     margin-top: 8px;
 `;
 
+const ShareScreenButton = styled.button<ButtonProps>`
+    background-color: ${({ active }) => (active ? 'blue' : 'gray')};
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    padding: 8px 16px 6px 16px;
+    text-align: center;
+    text-decoration: none;
+    &:hover {
+        background-color: ${({ active }) => (active ? 'darkblue' : 'darkgray')};
+    }
+    &:disabled {
+        background-color: lightgray;
+        color: gray;
+        cursor: not-allowed;
+    }
+`;
+
 const ScreenSharing: React.FC<ScreenSharingProps> = ({
     localStream,
     peerConnection,
@@ -78,6 +107,7 @@ const ScreenSharing: React.FC<ScreenSharingProps> = ({
     setIsScreenSharing,
     roomId,
 }) => {
+    const ICON_SIZE = 18;
     const { userUid } = useAuth();
     const remoteScreenRef = useRef<HTMLVideoElement | null>(null);
     const [remoteScreen, setRemoteScreen] = useState<MediaStream | null>(null);
@@ -249,22 +279,28 @@ const ScreenSharing: React.FC<ScreenSharingProps> = ({
     return (
         <>
             {!isScreenSharing ? (
-                <ShareButton onClick={openScreenShare} disabled={!localStream}>
-                    <ScreenShareIcon viewBox='0 0 24 24'>
-                        <path d='M4 17h16v2H4zm13-6.2l2.2-2.2 1.4 1.4-3.6 3.6-3.6-3.6 1.4-1.4 2.2 2.2V3h2zm3 2.2h2v6c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2v-6h2v6h16z' />
-                    </ScreenShareIcon>
-                    開啟螢幕共享
-                </ShareButton>
+                <ShareScreenButton
+                    active={isScreenSharing}
+                    onClick={openScreenShare}
+                    disabled={!localStream || !roomId}
+                >
+                    <TbScreenShare size={ICON_SIZE} />
+                </ShareScreenButton>
             ) : (
-                <StopSharingButton onClick={stopScreenShare} disabled={!remoteScreen}>
-                    <ScreenShareIcon viewBox='0 0 24 24'>
-                        <path d='M4 17h16v2H4zm13-6.2l2.2-2.2 1.4 1.4-3.6 3.6-3.6-3.6 1.4-1.4 2.2 2.2V3h2zm3 2.2h2v6c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2v-6h2v6h16z' />
-                    </ScreenShareIcon>
-                    停止螢幕分享
-                </StopSharingButton>
+                <ShareScreenButton active={isScreenSharing} onClick={stopScreenShare}>
+                    <TbScreenShare size={ICON_SIZE} />
+                </ShareScreenButton>
             )}
             <RemoteScreen ref={remoteScreenRef} show={!!remoteScreen} autoPlay muted />
         </>
+
+        //                         <VideoScreenButton
+        //                             active={showLocalVideo}
+        //                             onClick={toggleVideoScreen}
+        //                             disabled={!localStream || !roomId}
+        //                         >
+        //                             <AiTwotoneSwitcher size={ICON_SIZE} />
+        //                         </VideoScreenButton>
     );
 };
 
