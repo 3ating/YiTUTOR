@@ -37,6 +37,7 @@ const StyledCanvas = styled.canvas<IStyledCanvasProps>`
     box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
     width: 98%;
     height: 500px;
+    border-radius: 9px;
     cursor: ${(props) => props.cursorStyle};
 `;
 
@@ -45,11 +46,12 @@ const StyledToolbar = styled.div`
     flex-direction: column;
     align-items: flex-start;
     background: #dfdfdf;
-    padding: 10px 5px;
-    border-radius: 6px;
+    padding: 12px 8px;
+    border-radius: 7px;
     position: absolute;
-    left: 3%;
-    top: 26%;
+    left: 2%;
+    top: 19%;
+    gap: 5px;
 `;
 
 const RelativeDiv = styled.div`
@@ -59,6 +61,10 @@ const RelativeDiv = styled.div`
 const ToolIcon = styled.div`
     cursor: pointer;
     font-size: 24px;
+    color: gray;
+    &:hover {
+        color: #000000;
+    }
 `;
 
 const StyledInput = styled.input<{ isVisible?: boolean }>`
@@ -1073,6 +1079,14 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                             <RxBorderWidth />
                         </ToolIcon>
                         {showLineWidthPicker && (
+                            // <StyledInput
+                            //     type='range'
+                            //     min='1'
+                            //     max='20'
+                            //     value={lineWidth}
+                            //     onChange={(e) => setLineWidth(Number(e.target.value))}
+                            //     style={{ top: '10px', left: '30px' }}
+                            // />
                             <StyledInput
                                 type='range'
                                 min='1'
@@ -1080,6 +1094,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                                 value={lineWidth}
                                 onChange={(e) => setLineWidth(Number(e.target.value))}
                                 style={{ top: '10px', left: '30px' }}
+                                isVisible={showLineWidthPicker}
                             />
                         )}
                     </RelativeDiv>
@@ -1120,59 +1135,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                     <ToolIconAno as={AiOutlineClear} onClick={handleClearCanvas} />
                 </StyledToolbar>
             </StyledCanvasContainer>
-
-            {/* <ControlBar> */}
-            {/* <div>
-                    <MdOutlineColorLens style={{ fontSize: '24px' }}>
-                        <input type='color' value={color} onChange={(e) => setColor(e.target.value)} />
-                    </MdOutlineColorLens>
-                </div> */}
-
-            {/* <div>
-                    <RxBorderWidth style={{ fontSize: '24px' }} />
-                    <input
-                        type='range'
-                        min='1'
-                        max='20'
-                        value={lineWidth}
-                        onChange={(e) => setLineWidth(Number(e.target.value))}
-                    />
-                </div> */}
-
-            {/* <button onClick={handleClearCanvas}> */}
-            {/* </button> */}
-            {/* </ControlBar> */}
-            <ShapeSelection>
-                {/* <IoShapesOutline style={{ cursor: 'pointer', fontSize: '24px' }} />
-                <select value={shape || ''} onChange={(e) => setShape(e.target.value)}>
-                    <option value=''>Line</option>
-                    <option value='circle'>Circle</option>
-                    <option value='rectangle'>Rectangle</option>
-                    <option value='triangle'>Triangle</option>
-                </select>
-                <IoColorWand style={{ cursor: 'pointer', fontSize: '24px' }} />
-                <input
-                    type='color'
-                    value={selectedItemColor}
-                    onChange={(e) => {
-                        setSelectedItemColor(e.target.value);
-                        changeColor(e.target.value);
-                    }}
-                /> */}
-            </ShapeSelection>
-            <div>
-                {/* <Label>Move:</Label>
-                <input type='checkbox' checked={moveEnabled} onChange={handleMoveCheckboxChange} />
-                <Label>Scale:</Label>
-                <input type='checkbox' checked={scaleEnabled} onChange={handleScaleCheckboxChange} /> */}
-                {/* <button onClick={toggleEraser}>{eraserEnabled ? 'Disable Eraser' : 'Enable Eraser'}</button> */}
-                {/* <MdContentCopy onClick={copySelectedItem} style={{ cursor: 'pointer', fontSize: '24px' }} />
-                <MdContentPaste onClick={pasteClipboardItem} style={{ cursor: 'pointer', fontSize: '24px' }} />
-                <MdOutlineDelete onClick={deleteSelectedItem} style={{ cursor: 'pointer', fontSize: '27px' }} /> */}
-                {/* <button onClick={copySelectedItem}>Copy</button>
-                <button onClick={pasteClipboardItem}>Paste</button> */}
-                {/* <button onClick={deleteSelectedItem}>Delete</button> */}
-            </div>
         </BoardContainer>
     );
 };

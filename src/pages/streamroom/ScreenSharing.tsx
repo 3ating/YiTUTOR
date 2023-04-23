@@ -45,27 +45,48 @@ const ScreenShareIcon = styled.svg`
 `;
 
 const RemoteScreen = styled.video`
-    width: 100%;
+    width: 50%;
     display: ${({ show }: { show: boolean }) => (show ? 'block' : 'none')};
     border-radius: 4px;
     border: 1px solid #ddd;
     margin-top: 8px;
 `;
 
+// const ShareScreenButton = styled.button<ButtonProps>`
+//     background-color: ${({ active }) => (active ? 'cornflowerblue' : 'gray')};
+//     color: white;
+//     border: none;
+//     border-radius: 4px;
+//     cursor: pointer;
+//     display: inline-block;
+//     font-size: 14px;
+//     margin: 4px 2px;
+//     padding: 8px 16px 6px 16px;
+//     text-align: center;
+//     text-decoration: none;
+//     &:hover {
+//         background-color: ${({ active }) => (active ? 'lightskyblue' : 'darkgray')};
+//     }
+//     &:disabled {
+//         background-color: lightgray;
+//         color: gray;
+//         cursor: not-allowed;
+//     }
+// `;
 const ShareScreenButton = styled.button<ButtonProps>`
-    background-color: ${({ active }) => (active ? 'cornflowerblue' : 'gray')};
+    background-color: ${({ active }) => (active ? '#ffd335' : 'gray')};
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 9px;
     cursor: pointer;
     display: inline-block;
     font-size: 14px;
     margin: 4px 2px;
-    padding: 8px 16px 6px 16px;
+    padding: 10px 13px 8px 13px;
     text-align: center;
     text-decoration: none;
     &:hover {
-        background-color: ${({ active }) => (active ? 'lightskyblue' : 'darkgray')};
+        background-color: ${({ active }) => (active ? 'darkgoldenrod' : 'darkgray')};
     }
     &:disabled {
         background-color: lightgray;
@@ -81,7 +102,7 @@ const ScreenSharing: React.FC<ScreenSharingProps> = ({
     setIsScreenSharing,
     roomId,
 }) => {
-    const ICON_SIZE = 18;
+    const ICON_SIZE = 22;
     const { userUid } = useAuth();
     const remoteScreenRef = useRef<HTMLVideoElement | null>(null);
     const [remoteScreen, setRemoteScreen] = useState<MediaStream | null>(null);
@@ -268,13 +289,12 @@ const ScreenSharing: React.FC<ScreenSharingProps> = ({
             <RemoteScreen ref={remoteScreenRef} show={!!remoteScreen} autoPlay muted />
         </>
 
-        //                         <VideoScreenButton
-        //                             active={showLocalVideo}
-        //                             onClick={toggleVideoScreen}
-        //                             disabled={!localStream || !roomId}
-        //                         >
-        //                             <AiTwotoneSwitcher size={ICON_SIZE} />
-        //                         </VideoScreenButton>
+        // <>
+        //     <ShareScreenButton active={isScreenSharing} onClick={openScreenShare} disabled={!localStream || !roomId}>
+        //         <TbScreenShare size={ICON_SIZE} />
+        //     </ShareScreenButton>
+        //     <RemoteScreen ref={remoteScreenRef} show={!!remoteScreen} autoPlay muted />
+        // </>
     );
 };
 

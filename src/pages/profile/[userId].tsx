@@ -5,17 +5,17 @@ import { getFirestore, doc, getDoc, collection, updateDoc } from 'firebase/fires
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import styled from 'styled-components';
+import Header from '@/components/Header/Header';
+import Footer from '@/components/Footer/Footer';
 import Calendar from '../Calendar';
 import Schedule from '../Schedule';
 
-const Container = styled.div`
+const InfoContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 2rem;
+    background-color: antiquewhite;
 `;
 
 const Avatar = styled.img`
@@ -52,35 +52,53 @@ const StyledButton = styled.button<{ primary?: boolean }>`
     padding: 8px 16px;
     cursor: pointer;
     transition: background-color 0.3s;
-    margin-right: ${(props) => (props.primary ? '1rem' : '0')};
+    /* margin-right: ${(props) => (props.primary ? '1rem' : '0')}; */
     &:hover {
         background-color: ${(props) => (props.primary ? '#303f9f' : '#d32f2f')};
     }
 `;
 
-const Table = styled.table`
-    border-collapse: collapse;
-    width: 100%;
-    max-width: 800px;
-    margin: 0 auto;
+const CourseCardContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     margin-top: 2rem;
 `;
 
-const Th = styled.th`
-    border: 1px solid #ddd;
-    padding: 0.5rem;
-    text-align: left;
+const CourseCard = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    background-color: #ffffff;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+
+    /* &:hover {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        transform: translateY(-4px);
+    } */
 `;
 
-const Tr = styled.tr`
-    &:nth-child(even) {
-        background-color: #f2f2f2;
-    }
+const CourseInfo = styled.div`
+    display: flex;
+    align-items: center;
+    /* margin-right: 1.5rem; */
 `;
 
-const Td = styled.td`
-    border: 1px solid #ddd;
-    padding: 0.5rem;
+const CourseLabel = styled.span`
+    font-weight: 600;
+    margin-right: 5px;
+    color: #444;
+`;
+
+const CourseValue = styled.span`
+    font-weight: 400;
+    color: #777;
 `;
 
 const StyledTextDescription = styled.textarea`
@@ -112,22 +130,61 @@ const BookingsContainer = styled.div`
 `;
 
 const BookingCard = styled.div`
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    /* border: 1px solid #ccc; */
+    border-radius: 9px;
     padding: 1rem;
     margin-bottom: 1rem;
     cursor: pointer;
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s, transform 0.3s;
+    &:hover {
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
 `;
 
 const BookingAvatar = styled.img`
-    width: 50px;
+    width: 60px;
     border-radius: 50%;
     margin-right: 1rem;
+`;
+
+const BookingInfo = styled.div`
+    display: flex;
+    flex-direction: column;
+`;
+
+const BookingInfoTitle = styled.h3`
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 0;
+`;
+
+const BookingInfoSubject = styled.p`
+    font-size: 16px;
+    margin-bottom: 0;
+`;
+
+const BookingInfoTime = styled.p`
+    font-size: 16px;
 `;
 
 const DirectLink = styled(Link)`
     text-decoration: none;
     color: black;
+`;
+
+const TeacherLink = styled(Link)`
+    color: #3498db;
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    &:hover {
+        color: #1e7ab2;
+    }
 `;
 
 interface UserInfo {
@@ -273,129 +330,142 @@ const UserProfile = () => {
     }
 
     return (
-        <Container>
-            <h1>{userInfo.name} 的個人資料</h1>
-            {isEditing ? (
-                <>
-                    <label htmlFor='name'>姓名</label>
-                    <StyledInput
-                        type='text'
-                        id='name'
-                        name='name'
-                        value={editedUserInfo?.name || ''}
-                        onChange={handleChange}
-                    />
-                    <label htmlFor='email'>電子郵件</label>
-                    <StyledInput
-                        type='email'
-                        id='email'
-                        name='email'
-                        value={editedUserInfo?.email || ''}
-                        onChange={handleChange}
-                    />
-                    <label htmlFor='phone'>電話</label>
-                    <StyledInput
-                        type='tel'
-                        id='phone'
-                        name='phone'
-                        value={editedUserInfo?.phone || ''}
-                        onChange={handleChange}
-                    />
-                    <label htmlFor='description'>簡述</label>
-                    <StyledTextDescription
-                        id='description'
-                        name='description'
-                        value={editedUserInfo?.description || ''}
-                        onChange={handleChange}
-                    />
-                    <label htmlFor='intro'>自我介紹</label>
-                    <StyledTextIntro
-                        id='intro'
-                        name='intro'
-                        value={editedUserInfo?.intro || ''}
-                        onChange={handleChange}
-                    />
-                    <ButtonContainer>
-                        <StyledButton primary onClick={handleSave}>
-                            保存
-                        </StyledButton>
-                        <StyledButton onClick={handleCancel}>取消</StyledButton>
-                    </ButtonContainer>
-                </>
-            ) : (
-                <>
-                    {userInfo.avatar && <Avatar src={userInfo.avatar} alt={`${name} 的大頭照`} />}
-                    <UserInfoRow>姓名: {userInfo.name}</UserInfoRow>
-                    <UserInfoRow>電子郵件: {userInfo.email}</UserInfoRow>
-                    <UserInfoRow>電話: {userInfo.phone}</UserInfoRow>
-                    <UserInfoRow>使用者類型: {userInfo.userType}</UserInfoRow>
+        <>
+            <Header />
+            <InfoContainer>
+                <h1>{userInfo.name} 的個人資料</h1>
+                {isEditing ? (
+                    <>
+                        <label htmlFor='name'>姓名</label>
+                        <StyledInput
+                            type='text'
+                            id='name'
+                            name='name'
+                            value={editedUserInfo?.name || ''}
+                            onChange={handleChange}
+                        />
+                        <label htmlFor='email'>電子郵件</label>
+                        <StyledInput
+                            type='email'
+                            id='email'
+                            name='email'
+                            value={editedUserInfo?.email || ''}
+                            onChange={handleChange}
+                        />
+                        <label htmlFor='phone'>電話</label>
+                        <StyledInput
+                            type='tel'
+                            id='phone'
+                            name='phone'
+                            value={editedUserInfo?.phone || ''}
+                            onChange={handleChange}
+                        />
+                        <label htmlFor='description'>簡述</label>
+                        <StyledTextDescription
+                            id='description'
+                            name='description'
+                            value={editedUserInfo?.description || ''}
+                            onChange={handleChange}
+                        />
+                        <label htmlFor='intro'>自我介紹</label>
+                        <StyledTextIntro
+                            id='intro'
+                            name='intro'
+                            value={editedUserInfo?.intro || ''}
+                            onChange={handleChange}
+                        />
+                        <ButtonContainer>
+                            <StyledButton primary onClick={handleSave}>
+                                保存
+                            </StyledButton>
+                            <StyledButton onClick={handleCancel}>取消</StyledButton>
+                        </ButtonContainer>
+                    </>
+                ) : (
+                    <>
+                        {userInfo.avatar && <Avatar src={userInfo.avatar} alt={`${name} 的大頭照`} />}
+                        <UserInfoRow>姓名: {userInfo.name}</UserInfoRow>
+                        <UserInfoRow>電子郵件: {userInfo.email}</UserInfoRow>
+                        <UserInfoRow>電話: {userInfo.phone}</UserInfoRow>
+                        <UserInfoRow>使用者類型: {userInfo.userType}</UserInfoRow>
 
-                    <h2>預約的課程</h2>
-                    {bookingsInfo.length > 0 && (
-                        <BookingsContainer>
-                            {bookingsInfo.map((booking, index) => (
-                                <DirectLink
-                                    key={index}
-                                    href={`/streamroom/VideoChat?id=${booking.teacherId || booking.studentId}`}
-                                >
-                                    <BookingCard>
-                                        <BookingAvatar
-                                            src={booking.teacherInfo.avatar}
-                                            alt={`${booking.teacherInfo.name} 的大頭照`}
-                                        />
-                                        <div>
-                                            <h3>{booking.teacherInfo.name}</h3>
-                                            <p>科目: {booking.teacherInfo.subject}</p>
-                                            <p>
-                                                時間: {booking.date.toDate().toLocaleDateString()} {booking.time}
-                                            </p>
-                                        </div>
-                                    </BookingCard>
-                                </DirectLink>
-                            ))}
-                        </BookingsContainer>
-                    )}
+                        <ButtonContainer>
+                            {!isEditing && (
+                                <StyledButton primary onClick={handleEdit}>
+                                    編輯個人資料
+                                </StyledButton>
+                            )}
+                        </ButtonContainer>
 
-                    {/* {userInfo?.selectedTimes && <Schedule selectedTimes={userInfo.selectedTimes} userInfo={userInfo} />} */}
-                    {userInfo?.courses && Object.entries(userInfo.courses).length > 0 && (
-                        <Table>
-                            <thead>
-                                <Tr>
-                                    <Th>課程名稱</Th>
-                                    <Th>授課老師</Th>
-                                    {/* <Th>購買日期</Th> */}
-                                    <Th>數量</Th>
-                                    <Th>價格</Th>
-                                </Tr>
-                            </thead>
-                            <tbody>
-                                {Object.entries(userInfo.courses).map(([courseId, courseData]) => (
-                                    <Tr key={courseId}>
-                                        <Td>{courseData.subject}</Td>
-
-                                        <Td>
-                                            <Link href={`../teacher/${courseData.teacherid}`}>
-                                                {courseData.teachername}{' '}
-                                            </Link>
-                                        </Td>
-                                        {/* <Td>{courseData.purchaseDate?.toDate().toLocaleDateString()}</Td> */}
-                                        <Td>{courseData.quantity}</Td>
-                                        <Td>{courseData.price}</Td>
-                                    </Tr>
+                        <h2>預約的課程</h2>
+                        {bookingsInfo.length > 0 && (
+                            <BookingsContainer>
+                                {bookingsInfo.map((booking, index) => (
+                                    <DirectLink
+                                        key={index}
+                                        href={`/streamroom/VideoChat?id=${booking.teacherId || booking.studentId}`}
+                                    >
+                                        <BookingCard>
+                                            <BookingAvatar
+                                                src={booking.teacherInfo.avatar}
+                                                alt={`${booking.teacherInfo.name} 的大頭照`}
+                                            />
+                                            <BookingInfo>
+                                                <BookingInfoTitle>{booking.teacherInfo.name}</BookingInfoTitle>
+                                                <BookingInfoSubject>
+                                                    科目: {booking.teacherInfo.subject}
+                                                </BookingInfoSubject>
+                                                <BookingInfoTime>
+                                                    時間: {booking.date.toDate().toLocaleDateString()} {booking.time}
+                                                </BookingInfoTime>
+                                            </BookingInfo>
+                                        </BookingCard>
+                                    </DirectLink>
                                 ))}
-                            </tbody>
-                        </Table>
-                    )}
-                </>
-            )}
-            <ButtonContainer>
-                {!isEditing && (
-                    <StyledButton primary onClick={handleEdit}>
-                        編輯個人資料
-                    </StyledButton>
+                            </BookingsContainer>
+                        )}
+
+                        {/* {userInfo?.selectedTimes && <Schedule selectedTimes={userInfo.selectedTimes} userInfo={userInfo} />} */}
+                        <h2 style={{ marginBottom: '0' }}>購買的課程</h2>
+                        {userInfo?.courses && Object.entries(userInfo.courses).length > 0 && (
+                            <CourseCardContainer>
+                                {Object.entries(userInfo.courses).map(([courseId, courseData]) => (
+                                    <CourseCard key={courseId}>
+                                        <CourseInfo>
+                                            <CourseLabel>課程名稱:</CourseLabel>
+                                            <CourseValue>{courseData.subject}</CourseValue>
+                                        </CourseInfo>
+                                        <CourseInfo>
+                                            <CourseLabel>授課老師:</CourseLabel>
+                                            <CourseValue>
+                                                <TeacherLink href={`../teacher/${courseData.teacherid}`}>
+                                                    {courseData.teachername}{' '}
+                                                </TeacherLink>
+                                            </CourseValue>
+                                        </CourseInfo>
+                                        {/* <CourseInfo>
+                                        <CourseLabel>購買日期:</CourseLabel>
+                                        <CourseValue>
+                                            {courseData.purchaseDate?.toDate().toLocaleDateString()}
+                                        </CourseValue>
+                                   </CourseInfo> */}
+                                        <CourseInfo>
+                                            <CourseLabel>數量:</CourseLabel>
+                                            <CourseValue>{courseData.quantity}</CourseValue>
+                                        </CourseInfo>
+                                        <CourseInfo>
+                                            <CourseLabel>價格:</CourseLabel>
+                                            <CourseValue>{courseData.price}</CourseValue>
+                                        </CourseInfo>
+                                    </CourseCard>
+                                ))}
+                            </CourseCardContainer>
+                        )}
+                    </>
                 )}
-            </ButtonContainer>
-        </Container>
+            </InfoContainer>
+            <Footer />
+        </>
     );
 };
 

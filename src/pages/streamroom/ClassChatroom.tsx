@@ -15,17 +15,26 @@ const ChatroomContainer = styled.div`
     height: 495px;
     background-color: #f5f5f5;
     padding: 5px 15px;
-    border-radius: 8px 8px 0 0;
-    box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+    /* border-radius: 8px 8px 0 0; */
+    box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.1);
     z-index: 2;
     position: relative;
+    border-radius: 9px;
 `;
 
 const ChatHeader = styled.p`
-    /* text-align: center; */
-    font-size: 20px;
-    /* margin-bottom: 32px; */
+    font-size: 16px;
     color: #333;
+    margin: 4px 0 0;
+    letter-spacing: 1.5px;
+`;
+
+const HeaderContainer = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    justify-content: center;
+    align-items: center;
 `;
 
 const InputContainer = styled.div`
@@ -34,9 +43,8 @@ const InputContainer = styled.div`
     background-color: #e8e8e8;
     margin-top: 20px;
     padding: 3px 10px 0 5px;
-    /* border: 1px solid #ccc; */
     border-radius: 4px;
-    margin-bottom: 16px;
+    margin-bottom: 5px;
 `;
 
 const ChatInput = styled.input`
@@ -57,61 +65,52 @@ const ChatInput = styled.input`
 const SendButton = styled.button<{ hasInput: boolean }>`
     padding: 8px 12px;
     background-color: transparent;
-    color: ${({ hasInput }) => (hasInput ? '#1d7bdf' : 'gray')};
+    color: ${({ hasInput }) => (hasInput ? '#282525f' : 'gray')};
     font-size: 16px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     margin-left: 8px;
     transition: background-color 0.2s;
-
-    /* &:hover {
-        background-color: #0056b3;
-    } */
 `;
 
 const MessagesContainer = styled.div`
     flex-grow: 1;
     overflow-y: auto;
     max-height: 400px;
-    padding: 16px;
-    /* border: 1px solid #ccc; */
+    padding: 20px 0px 16px;
     border-radius: 4px;
-    background-color: white;
+    background-color: #f5f5f5;
 `;
 
 const MessageBubble = styled.div`
-    margin-bottom: 16px;
-    padding: 12px;
-    background-color: ${({ ownMessage }: { ownMessage: boolean }) => (ownMessage ? '#007bff' : '#f1f1f1')};
-    color: ${({ ownMessage }: { ownMessage: boolean }) => (ownMessage ? 'white' : '#333')};
-    border-radius: 12px;
+    margin-bottom: 6px;
+    padding: 5px 15px;
+    background-color: ${({ ownMessage }: { ownMessage: boolean }) => (ownMessage ? 'white' : '#e9e8e8')};
+    color: ${({ ownMessage }: { ownMessage: boolean }) => (ownMessage ? '#333' : '#333')};
+    border-radius: 8px;
     max-width: 70%;
     display: inline-block;
     word-wrap: break-word;
 `;
 
 const MessageSender = styled.strong`
-    font-size: 14px;
-    color: ${({ ownMessage }: { ownMessage: boolean }) => (ownMessage ? 'white' : '#555')};
+    font-size: 13px;
+    color: ${({ ownMessage }: { ownMessage: boolean }) => (ownMessage ? '#333' : '#555')};
     margin-right: 8px;
 `;
 
 const MessageRow = styled.div`
     display: flex;
+    font-size: 14px;
     justify-content: ${({ ownMessage }: { ownMessage: boolean }) => (ownMessage ? 'flex-end' : 'flex-start')};
-    margin-bottom: 8px;
-`;
-
-const MessageContent = styled.span`
-    font-size: 16px;
-    color: #333;
+    margin-bottom: 3px;
 `;
 
 const CloseButton = styled.button`
     position: absolute;
     top: 10px;
-    right: 10px;
+    right: 4px;
     background-color: transparent;
     border: none;
     cursor: pointer;
@@ -128,9 +127,10 @@ interface MessageType {
 
 interface ChatroomProps {
     roomId: string | null;
+    toggleChat: () => void;
 }
 
-export default function ClassChatroom({ roomId }: ChatroomProps) {
+export default function ClassChatroom({ roomId, toggleChat }: ChatroomProps) {
     const { userInfo } = useAuth();
     const [messages, setMessages] = useState<MessageType[]>([]);
     const [inputValue, setInputValue] = useState('');
@@ -168,10 +168,6 @@ export default function ClassChatroom({ roomId }: ChatroomProps) {
         setInputValue(e.target.value);
     };
 
-    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setName(e.target.value);
-    };
-
     const sendMessage = async () => {
         if (!inputValue.trim() || !name?.trim() || !roomId) return;
 
@@ -180,7 +176,6 @@ export default function ClassChatroom({ roomId }: ChatroomProps) {
             .doc(roomId)
             .collection('messages')
             .add({
-                // 存到 rooms/{roomId}/messages
                 name,
                 content: inputValue,
                 timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
@@ -195,16 +190,14 @@ export default function ClassChatroom({ roomId }: ChatroomProps) {
         }
     };
 
-    const handleClose = () => {
-        // 在這裡執行關閉操作
-    };
-
     return (
         <ChatroomContainer>
-            <ChatHeader>通話中的訊息</ChatHeader>
-            <CloseButton onClick={handleClose}>
-                <AiOutlineClose />
-            </CloseButton>
+            <HeaderContainer>
+                <ChatHeader>課堂中的訊息</ChatHeader>
+                <CloseButton onClick={toggleChat}>
+                    <AiOutlineClose />
+                </CloseButton>
+            </HeaderContainer>
 
             <MessagesContainer>
                 {messages.map((message) => {
@@ -222,7 +215,6 @@ export default function ClassChatroom({ roomId }: ChatroomProps) {
             </MessagesContainer>
 
             <InputContainer>
-                {/* <NameInput type='text' placeholder='Your name' value={name} onChange={handleNameChange} /> */}
                 <ChatInput
                     type='text'
                     placeholder='傳送訊息'

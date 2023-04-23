@@ -2,15 +2,30 @@ import React, { useState } from 'react';
 import { useAuth } from '../../../public/AuthContext';
 import Link from 'next/link';
 import styled, { keyframes } from 'styled-components';
+import Header from '@/components/Header/Header';
+import Footer from '@/components/Footer/Footer';
+import Button from '../../components/Button';
 // import Image from 'next/image';
 
-const Container = styled.div`
+const LoginContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
-    background-color: #f0f2f5;
+    height: calc(100vh - 130px);
+    background-color: antiquewhite;
+`;
+
+const LoginFormWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white;
+    padding: 40px;
+    border-radius: 9px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    max-width: 90%;
 `;
 
 const Title = styled.h2`
@@ -22,46 +37,46 @@ const Title = styled.h2`
 
 const InputField = styled.input`
     border: 1px solid #ccc;
-    border-radius: 4px;
     font-size: 16px;
     padding: 8px 12px;
     margin: 5px 0;
-    width: 60%;
+    width: 100%;
+    height: 40px;
+    box-sizing: border-box;
+    border-radius: 9px;
 `;
 
-const LoginButton = styled.button`
-    background-color: #4285f4;
-    color: white;
-    border: none;
-    border-radius: 50px;
-    font-size: 18px;
-    font-weight: 500;
-    padding: 12px 40px;
-    cursor: pointer;
-    box-shadow: 0 2px 6px rgba(66, 133, 244, 0.3);
-    transition: background-color 0.3s;
-    margin-top: 10px;
-
+const LoginButton = styled(Button)`
+    margin: 20px 0 20px;
+    width: 100%;
+    border-radius: 9px;
+    letter-spacing: 2px;
     &:hover {
-        background-color: #2a75d9;
+        background-color: #333333;
+        color: #ffffff;
     }
 `;
 
-const LogoutButton = styled.button`
-    background-color: #f44336;
-    color: white;
-    border: none;
-    border-radius: 50px;
-    font-size: 18px;
-    font-weight: 500;
-    padding: 12px 40px;
-    cursor: pointer;
-    box-shadow: 0 2px 6px rgba(244, 67, 54, 0.3);
-    transition: background-color 0.3s;
-    margin-top: 20px;
-
+const LogoutButton = styled(Button)`
+    margin: 20px 0 0;
+    width: 100%;
+    border-radius: 9px;
+    letter-spacing: 2px;
+    background-color: red;
     &:hover {
-        background-color: #d32f2f;
+        background-color: darkred;
+        color: #ffffff;
+    }
+`;
+
+const ProfileButton = styled(Button)`
+    margin: 10px 0;
+    width: 100%;
+    border-radius: 9px;
+    letter-spacing: 2px;
+    &:hover {
+        background-color: #333333;
+        color: #ffffff;
     }
 `;
 
@@ -71,24 +86,21 @@ const UserInfo = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 10px;
+    width: 100%;
 `;
 
-const ProfileButton = styled.button`
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    border-radius: 50px;
+const UserContent = styled.p`
+    margin: 0;
     font-size: 18px;
-    font-weight: 500;
-    padding: 12px 40px;
-    cursor: pointer;
-    box-shadow: 0 2px 6px rgba(76, 175, 80, 0.3);
-    transition: background-color 0.3s;
-    margin-top: 20px;
+    color: #333;
+`;
 
-    &:hover {
-        background-color: #388e3c;
-    }
+const Avatar = styled.img`
+    width: 100px;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
 `;
 
 const spin = keyframes`
@@ -109,6 +121,17 @@ const LoadingSpinner = styled.div`
     animation: ${spin} 1s linear infinite;
 `;
 
+const DirectLink = styled(Link)`
+    text-decoration: none;
+    color: gray;
+    width: 100%;
+    display: inline-block;
+    text-align: center;
+    &:hover {
+        color: #333333;
+    }
+`;
+
 const SignIn = () => {
     const { user, userInfo, isLoading, userUid, handleLoginWithEmail, handleLogout } = useAuth();
     const [email, setEmail] = useState('');
@@ -120,47 +143,56 @@ const SignIn = () => {
     // console.log('uid:', userUid);
 
     return (
-        <Container>
-            {isLoading ? (
-                user ? (
-                    <UserInfo>
-                        <p>歡迎, {userInfo?.name}！</p>
-                        {userInfo?.avatar && (
-                            <img
-                                src={userInfo.avatar}
-                                alt={`${userInfo.name} 的大頭照`}
-                                style={{ width: '100px', borderRadius: '50%' }}
-                            />
-                        )}
-                        <LogoutButton onClick={handleLogout}>登出</LogoutButton>
-                        <Link href={`/profile/${user.uid}`} passHref>
-                            <ProfileButton>查看個人資料</ProfileButton>
-                        </Link>
-                    </UserInfo>
+        <>
+            <Header />
+            <LoginContainer>
+                {isLoading ? (
+                    user ? (
+                        <LoginFormWrapper>
+                            <UserInfo>
+                                {userInfo?.avatar && (
+                                    <Avatar
+                                        src={userInfo.avatar}
+                                        alt={`${userInfo.name} 的大頭照`}
+                                        style={{ width: '100px', borderRadius: '50%' }}
+                                    />
+                                )}
+                                <UserContent>{userInfo?.name}</UserContent>
+                                <UserContent>{userInfo?.email}</UserContent>
+
+                                <LogoutButton onClick={handleLogout}>登出</LogoutButton>
+                                <DirectLink href={`/profile/${user.uid}`} passHref>
+                                    <ProfileButton>查看個人資料</ProfileButton>
+                                </DirectLink>
+                            </UserInfo>
+                        </LoginFormWrapper>
+                    ) : (
+                        <LoadingSpinner />
+                    )
                 ) : (
-                    <LoadingSpinner />
-                )
-            ) : (
-                <>
-                    <Title>會員登入</Title>
-                    <InputField
-                        type='email'
-                        placeholder='輸入帳號'
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                    <InputField
-                        type='password'
-                        placeholder='輸入密碼'
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                    <LoginButton onClick={() => handleLoginWithEmail(email, password)}>登入</LoginButton>
-                    {/* <LoginButton onClick={handleLoginGoogle}>使用 Google 登入</LoginButton> */}
-                    <Link href='SignUp'>還沒有帳號，前往註冊</Link>
-                </>
-            )}
-        </Container>
+                    <>
+                        <LoginFormWrapper>
+                            <Title>會員登入</Title>
+                            <InputField
+                                type='email'
+                                placeholder='輸入信箱'
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
+                            <InputField
+                                type='password'
+                                placeholder='輸入密碼'
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
+                            <LoginButton onClick={() => handleLoginWithEmail(email, password)}>登入</LoginButton>
+                            <DirectLink href='SignUp'>還沒有帳號，前往註冊</DirectLink>
+                        </LoginFormWrapper>
+                    </>
+                )}
+            </LoginContainer>
+            <Footer />
+        </>
     );
 };
 

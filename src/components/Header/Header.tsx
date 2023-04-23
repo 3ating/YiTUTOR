@@ -59,6 +59,8 @@ const SignInBtn = styled(Link)`
     align-items: center;
     justify-content: center;
     font-weight: 500;
+    border-radius: 9px;
+
     /* line-height: 19px; */
     /* letter-spacing: 0.42em; */
     text-align: center;
@@ -80,8 +82,7 @@ const SignUpBtn = styled(Link)`
     align-items: center;
     justify-content: center;
     font-weight: 500;
-    /* line-height: 19px; */
-    /* letter-spacing: 0.42em; */
+    border-radius: 9px;
     text-align: center;
     color: #000000;
     background: #f5f5f5;

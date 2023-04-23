@@ -9,10 +9,10 @@ import { useAuth } from '../../../public/AuthContext';
 import Link from 'next/link';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
-import { AiTwotoneSwitcher } from 'react-icons/ai';
+import { AiFillSwitcher } from 'react-icons/ai';
 import { BsFillCameraVideoFill, BsFillCameraVideoOffFill, BsMicFill, BsMicMuteFill } from 'react-icons/bs';
 import { ImPhoneHangUp } from 'react-icons/im';
-import { TbMessageCircle2Filled } from 'react-icons/tb';
+import { TbMessageCircle2Filled, TbScreenShare } from 'react-icons/tb';
 import { FaVolumeDown, FaVolumeMute } from 'react-icons/fa';
 import { RiVideoAddFill } from 'react-icons/ri';
 
@@ -45,11 +45,26 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     active?: boolean;
 }
 
-const TotalContainer = styled.div`
+const MainWrapper = styled.div`
     display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: antiquewhite;
+`;
+
+const OnlineClassContainer = styled.div`
+    position: relative;
+    margin: auto 0;
+    /* margin-top: 30px; */
+    /* height: calc(100vh - 160px); */
 `;
 
 const ClassContainer = styled.div`
+    display: flex;
+    margin-top: 30px;
+`;
+
+const VideoContainer = styled.div`
     width: 100%;
     /* display: flex; */
 `;
@@ -58,22 +73,23 @@ const ButtonsContainer = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+    margin: 15px 0 0;
 `;
 
 const CreateButton = styled.button<ButtonProps>`
-    background-color: ${({ primary }) => (primary ? 'gold' : 'gray')};
+    background-color: ${({ primary }) => (primary ? '#ffd335' : 'gray')};
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 9px;
     cursor: pointer;
     display: inline-block;
     font-size: 14px;
     margin: 4px 2px;
-    padding: 8px 25px 6px 25px;
+    padding: 10px 19px 8px 19px;
     text-align: center;
     text-decoration: none;
     &:hover {
-        background-color: ${({ primary }) => (primary ? 'darkgoldenrod' : 'darkgray')};
+        background-color: ${({ primary }) => (primary ? '#ffab34' : 'darkgray')};
     }
     &:disabled {
         background-color: lightgray;
@@ -86,12 +102,12 @@ const ControlButton = styled.button<ButtonProps>`
     background-color: ${({ active }) => (active ? 'gray' : 'red')};
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 9px;
     cursor: pointer;
     display: inline-block;
     font-size: 14px;
     margin: 4px 2px;
-    padding: 8px 16px 6px 16px;
+    padding: 10px 13px 8px 13px;
     text-align: center;
     text-decoration: none;
     &:hover {
@@ -104,8 +120,8 @@ const ControlButton = styled.button<ButtonProps>`
     }
 `;
 
-const VideoScreenButton = styled.button<ButtonProps>`
-    background-color: ${({ active }) => (active ? 'gray' : 'cornflowerblue')};
+const ShareScreenButton = styled.button<ButtonProps>`
+    background-color: ${({ active }) => (active ? '#ffd335' : 'gray')};
     color: white;
     border: none;
     border-radius: 4px;
@@ -113,11 +129,33 @@ const VideoScreenButton = styled.button<ButtonProps>`
     display: inline-block;
     font-size: 14px;
     margin: 4px 2px;
-    padding: 8px 16px 6px 16px;
+    padding: 10px 13px 8px 13px;
     text-align: center;
     text-decoration: none;
     &:hover {
-        background-color: ${({ active }) => (active ? 'darkgray' : 'lightskyblue')};
+        background-color: ${({ active }) => (active ? '#ffab34' : 'darkgray')};
+    }
+    &:disabled {
+        background-color: lightgray;
+        color: gray;
+        cursor: not-allowed;
+    }
+`;
+
+const VideoScreenButton = styled.button<ButtonProps>`
+    background-color: ${({ active }) => (active ? 'gray' : '#ffd335')};
+    color: white;
+    border: none;
+    border-radius: 9px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    padding: 10px 13px 8px 13px;
+    text-align: center;
+    text-decoration: none;
+    &:hover {
+        background-color: ${({ active }) => (active ? 'darkgray' : '#ffab34')};
     }
     &:disabled {
         background-color: lightgray;
@@ -130,12 +168,12 @@ const HangUpButton = styled.button<ButtonProps>`
     background-color: red;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 9px;
     cursor: pointer;
     display: inline-block;
     font-size: 14px;
     margin: 4px 2px;
-    padding: 8px 25px 6px 25px;
+    padding: 10px 19px 8px 19px;
     text-align: center;
     text-decoration: none;
     &:hover {
@@ -217,9 +255,20 @@ const TextField = styled.input`
     margin-bottom: 10px;
 `;
 
-const RoonTitle = styled.p<TypographyProps>`
+const RoomTitle = styled.p<TypographyProps>`
+    position: absolute;
     font-size: 16px;
-    margin: 20px 0 5px 16px;
+    margin: 0;
+    top: 8px;
+    left: 16px;
+    z-index: 1;
+`;
+
+const CenteredContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 `;
 
 const DirectLink = styled(Link)`
@@ -229,11 +278,11 @@ const DirectLink = styled(Link)`
 
 const VideoScreen = styled.video`
     position: absolute;
-    bottom: 4%;
+    bottom: 3.5%;
     right: 2%;
     /* width: 25%; */
     height: 40%;
-    border-radius: 10px;
+    border-radius: 7px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
     z-index: 1;
     background-color: black;
@@ -248,7 +297,7 @@ const VideoScreen = styled.video`
 `;
 
 const ChatRoomContainer = styled.div`
-    /* margin: 20px 0; */
+    /* margin: 20px 0 5px 0; */
 `;
 
 const configuration = {
@@ -260,7 +309,7 @@ const configuration = {
 };
 
 const VideoChat: React.FC = () => {
-    const ICON_SIZE = 18;
+    const ICON_SIZE = 22;
     const { userUid, userInfo } = useAuth();
     const [showLocalVideo, setShowLocalVideo] = useState(true);
     const localVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -587,123 +636,101 @@ const VideoChat: React.FC = () => {
 
     const minutes = Math.floor(timeRemaining / 60);
     const seconds = timeRemaining % 60;
+    const formattedSeconds = seconds.toString().padStart(2, '0');
 
     // console.log(userUid);
     console.log(userInfo);
 
     return (
-        <>
+        <MainWrapper>
             <Header />
-            {roomId && (
-                <RoonTitle>
-                    {roomId} - ⏰ {minutes}:{seconds}
-                </RoonTitle>
-            )}
+
             {userUid ? (
-                <TotalContainer>
-                    <ClassContainer>
-                        {/* {peerConnection && <Canvas roomId={roomId} />} */}
-                        <div style={{ position: 'relative' }}>
-                            <Canvas roomId={roomId} />
-                            <VideoScreen
-                                ref={localVideoRef}
-                                autoPlay
-                                muted
-                                playsInline
-                                className={showLocalVideo ? 'visible' : ''}
-                            ></VideoScreen>
-                            <VideoScreen
-                                ref={remoteVideoRef}
-                                autoPlay
-                                muted
-                                playsInline
-                                className={!showLocalVideo ? 'visible' : ''}
-                                style={{ backgroundColor: 'white' }}
-                            ></VideoScreen>
-                        </div>
-
-                        <div style={{ display: 'flex' }}>
-                            {/* <video
-                            ref={localVideoRef}
-                            autoPlay
-                            muted
-                            style={{ width: '50%', border: '1px solid black' }}
-                            playsInline
-                        ></video> */}
-                            {/* <video
-                            ref={remoteVideoRef}
-                            autoPlay
-                            style={{ width: '50%', border: '1px solid black' }}
-                            playsInline
-                        ></video> */}
-                        </div>
-                        <ButtonsContainer>
-                            <CreateButton onClick={openUserMedia} primary={roomId == null} disabled={roomId !== null}>
-                                <RiVideoAddFill size={ICON_SIZE} />
-                            </CreateButton>
-
-                            <VideoScreenButton
-                                active={showLocalVideo}
-                                onClick={toggleVideoScreen}
-                                disabled={!localStream || !roomId}
-                            >
-                                <AiTwotoneSwitcher size={ICON_SIZE} />
-                            </VideoScreenButton>
-
-                            <ScreenSharing
-                                localStream={localStream.current}
-                                peerConnection={peerConnection}
-                                isScreenSharing={isScreenSharing}
-                                setIsScreenSharing={setIsScreenSharing}
-                                roomId={roomId}
-                            />
-
-                            <ControlButton
-                                active={isVideoEnabled}
-                                onClick={toggleVideo}
-                                disabled={!localStream || !roomId}
-                            >
-                                {isVideoEnabled ? (
-                                    <BsFillCameraVideoFill size={ICON_SIZE} />
-                                ) : (
-                                    <BsFillCameraVideoOffFill size={ICON_SIZE} />
-                                )}
-                            </ControlButton>
-                            <ControlButton active={!isMicMuted} onClick={toggleMic} disabled={!localStream || !roomId}>
-                                {isMicMuted ? <BsMicMuteFill size={ICON_SIZE} /> : <BsMicFill size={ICON_SIZE} />}
-                            </ControlButton>
-                            <ControlButton
-                                active={isAudioMuted}
-                                onClick={toggleAudio}
-                                disabled={!remoteStream || !roomId}
-                            >
-                                {isAudioMuted ? <FaVolumeDown size={ICON_SIZE} /> : <FaVolumeMute size={ICON_SIZE} />}
-                            </ControlButton>
-
-                            <ChatButton active={!showChatroom} onClick={toggleChat} disabled={!remoteStream || !roomId}>
-                                <TbMessageCircle2Filled size={ICON_SIZE} />
-                            </ChatButton>
-
-                            <HangUpButton onClick={hangUp} disabled={!localStream || !roomId}>
-                                <ImPhoneHangUp size={ICON_SIZE} />
-                            </HangUpButton>
-                        </ButtonsContainer>
-                    </ClassContainer>
-                    {showChatroom && (
-                        <ChatRoomContainer>
-                            <ClassChatroom roomId={roomId} />
-                        </ChatRoomContainer>
+                <OnlineClassContainer>
+                    {roomId && (
+                        <RoomTitle>
+                            {roomId} - ⏰ {minutes}:{formattedSeconds}
+                        </RoomTitle>
                     )}
-                </TotalContainer>
+                    <ClassContainer>
+                        <VideoContainer>
+                            <div style={{ position: 'relative' }}>
+                                <Canvas roomId={roomId} />
+                                <VideoScreen
+                                    ref={localVideoRef}
+                                    autoPlay
+                                    muted
+                                    playsInline
+                                    className={showLocalVideo ? 'visible' : ''}
+                                ></VideoScreen>
+                                <VideoScreen
+                                    ref={remoteVideoRef}
+                                    autoPlay
+                                    muted
+                                    playsInline
+                                    className={!showLocalVideo ? 'visible' : ''}
+                                    style={{ backgroundColor: 'white' }}
+                                ></VideoScreen>
+                            </div>
+                        </VideoContainer>
+                        {showChatroom && (
+                            <ChatRoomContainer>
+                                <ClassChatroom roomId={roomId} toggleChat={toggleChat} />
+                            </ChatRoomContainer>
+                        )}
+                    </ClassContainer>
+
+                    <ButtonsContainer>
+                        <CreateButton onClick={openUserMedia} primary={roomId == null} disabled={roomId !== null}>
+                            <RiVideoAddFill size={ICON_SIZE} />
+                        </CreateButton>
+
+                        <VideoScreenButton
+                            active={showLocalVideo}
+                            onClick={toggleVideoScreen}
+                            disabled={!localStream || !roomId}
+                        >
+                            <AiFillSwitcher size={ICON_SIZE} />
+                        </VideoScreenButton>
+
+                        <ScreenSharing
+                            localStream={localStream.current}
+                            peerConnection={peerConnection}
+                            isScreenSharing={isScreenSharing}
+                            setIsScreenSharing={setIsScreenSharing}
+                            roomId={roomId}
+                        />
+
+                        <ChatButton active={!showChatroom} onClick={toggleChat} disabled={!remoteStream || !roomId}>
+                            <TbMessageCircle2Filled size={ICON_SIZE} />
+                        </ChatButton>
+
+                        <ControlButton active={isVideoEnabled} onClick={toggleVideo} disabled={!localStream || !roomId}>
+                            {isVideoEnabled ? (
+                                <BsFillCameraVideoFill size={ICON_SIZE} />
+                            ) : (
+                                <BsFillCameraVideoOffFill size={ICON_SIZE} />
+                            )}
+                        </ControlButton>
+                        <ControlButton active={!isMicMuted} onClick={toggleMic} disabled={!localStream || !roomId}>
+                            {isMicMuted ? <BsMicMuteFill size={ICON_SIZE} /> : <BsMicFill size={ICON_SIZE} />}
+                        </ControlButton>
+                        <ControlButton active={isAudioMuted} onClick={toggleAudio} disabled={!remoteStream || !roomId}>
+                            {isAudioMuted ? <FaVolumeDown size={ICON_SIZE} /> : <FaVolumeMute size={ICON_SIZE} />}
+                        </ControlButton>
+
+                        <HangUpButton onClick={hangUp} disabled={!localStream || !roomId}>
+                            <ImPhoneHangUp size={ICON_SIZE} />
+                        </HangUpButton>
+                    </ButtonsContainer>
+                </OnlineClassContainer>
             ) : (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                    <DirectLink href='/membership/SignIn'>
-                        <p>請先登入再使用此功能</p>
-                    </DirectLink>
-                </div>
+                <CenteredContainer>
+                    <DirectLink href='/membership/SignIn'>請先登入再使用此功能</DirectLink>
+                </CenteredContainer>
             )}
             <Footer />
-        </>
+        </MainWrapper>
     );
 };
 

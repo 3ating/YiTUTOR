@@ -14,6 +14,7 @@ const PrimaryButton = styled.button`
     border: none;
     font-size: 18px;
     font-weight: bold;
+    border-radius: 9px;
     cursor: pointer;
 `;
 
