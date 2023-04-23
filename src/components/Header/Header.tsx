@@ -95,10 +95,17 @@ const SignUpBtn = styled(Link)`
     } */
 `;
 
+const LogoLink = styled(Link)`
+    text-decoration: none;
+    color: black;
+`;
+
 const Header: React.FC = () => {
     return (
         <HeaderWrapper>
-            <Logo>YiTUTOR</Logo>
+            <LogoLink href={'/'}>
+                <Logo>YiTUTOR</Logo>
+            </LogoLink>
             <NavContainer>
                 <MenuContainer>
                     <Menu href='/teacher/Teachers'>尋找老師</Menu>

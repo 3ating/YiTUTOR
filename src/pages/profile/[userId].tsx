@@ -10,6 +10,13 @@ import Footer from '@/components/Footer/Footer';
 import Calendar from '../Calendar';
 import Schedule from '../Schedule';
 
+const MainWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: antiquewhite;
+`;
+
 const InfoContainer = styled.div`
     display: flex;
     flex-direction: column;
@@ -330,7 +337,7 @@ const UserProfile = () => {
     }
 
     return (
-        <>
+        <MainWrapper>
             <Header />
             <InfoContainer>
                 <h1>{userInfo.name} 的個人資料</h1>
@@ -465,7 +472,7 @@ const UserProfile = () => {
                 )}
             </InfoContainer>
             <Footer />
-        </>
+        </MainWrapper>
     );
 };
 
