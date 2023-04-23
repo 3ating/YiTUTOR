@@ -12,7 +12,7 @@ import Footer from '@/components/Footer/Footer';
 import { AiTwotoneSwitcher } from 'react-icons/ai';
 import { BsFillCameraVideoFill, BsFillCameraVideoOffFill, BsMicFill, BsMicMuteFill } from 'react-icons/bs';
 import { ImPhoneHangUp } from 'react-icons/im';
-import { MdOutlineVideoCall } from 'react-icons/md';
+import { TbMessageCircle2Filled } from 'react-icons/tb';
 import { FaVolumeDown, FaVolumeMute } from 'react-icons/fa';
 import { RiVideoAddFill } from 'react-icons/ri';
 
@@ -45,6 +45,15 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     active?: boolean;
 }
 
+const TotalContainer = styled.div`
+    display: flex;
+`;
+
+const ClassContainer = styled.div`
+    width: 100%;
+    /* display: flex; */
+`;
+
 const ButtonsContainer = styled.div`
     display: flex;
     justify-content: center;
@@ -60,7 +69,7 @@ const CreateButton = styled.button<ButtonProps>`
     display: inline-block;
     font-size: 14px;
     margin: 4px 2px;
-    padding: 8px 16px 6px 16px;
+    padding: 8px 25px 6px 25px;
     text-align: center;
     text-decoration: none;
     &:hover {
@@ -139,6 +148,28 @@ const HangUpButton = styled.button<ButtonProps>`
     }
 `;
 
+const ChatButton = styled(VideoScreenButton)`
+    /* background-color: ${({ active }) => (active ? 'gray' : 'red')};
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    padding: 8px 16px 6px 16px;
+    text-align: center;
+    text-decoration: none;
+    &:hover {
+        background-color: ${({ active }) => (active ? 'darkgray' : 'darkred')};
+    }
+    &:disabled {
+        background-color: lightgray;
+        color: gray;
+        cursor: not-allowed;
+    } */
+`;
+
 const Dialog = styled.div<DialogProps>`
     display: ${({ open }) => (open ? 'block' : 'none')};
     position: fixed;
@@ -186,9 +217,9 @@ const TextField = styled.input`
     margin-bottom: 10px;
 `;
 
-const Typography = styled.p<TypographyProps>`
-    font-size: ${({ variant }) => (variant === 'h6' ? '1.25rem' : '1rem')};
-    margin-bottom: ${({ gutterBottom }) => (gutterBottom ? '0.35em' : '0')};
+const RoonTitle = styled.p<TypographyProps>`
+    font-size: 16px;
+    margin: 20px 0 5px 16px;
 `;
 
 const DirectLink = styled(Link)`
@@ -199,7 +230,7 @@ const DirectLink = styled(Link)`
 const VideoScreen = styled.video`
     position: absolute;
     bottom: 4%;
-    right: 3.5%;
+    right: 2%;
     /* width: 25%; */
     height: 40%;
     border-radius: 10px;
@@ -214,6 +245,10 @@ const VideoScreen = styled.video`
         opacity: 1;
         transform: scale(1);
     }
+`;
+
+const ChatRoomContainer = styled.div`
+    /* margin: 20px 0; */
 `;
 
 const configuration = {
@@ -242,6 +277,9 @@ const VideoChat: React.FC = () => {
     const [isMicMuted, setIsMicMuted] = useState(false);
     const [isAudioMuted, setIsAudioMuted] = useState(false);
     const [isVideoEnabled, setIsVideoEnabled] = useState(true);
+    const [showChatroom, setShowChatroom] = useState(false);
+
+    const [timeRemaining, setTimeRemaining] = useState(50 * 60);
 
     const [isBackgroundBlurred, setIsBackgroundBlurred] = useState(false);
 
@@ -533,106 +571,130 @@ const VideoChat: React.FC = () => {
         }
     };
 
+    const toggleChat = () => {
+        setShowChatroom(!showChatroom);
+    };
+
+    useEffect(() => {
+        if (!roomId) return;
+
+        const timer = setInterval(() => {
+            setTimeRemaining((prevTime) => prevTime - 1);
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [roomId]);
+
+    const minutes = Math.floor(timeRemaining / 60);
+    const seconds = timeRemaining % 60;
+
     // console.log(userUid);
     console.log(userInfo);
 
     return (
         <>
             <Header />
+            {roomId && (
+                <RoonTitle>
+                    {roomId} - ⏰ {minutes}:{seconds}
+                </RoonTitle>
+            )}
             {userUid ? (
-                <div>
-                    {/* {peerConnection && <Canvas roomId={roomId} />} */}
-                    <div style={{ position: 'relative' }}>
-                        <Canvas roomId={roomId} />
-                        <VideoScreen
-                            ref={localVideoRef}
-                            autoPlay
-                            muted
-                            playsInline
-                            className={showLocalVideo ? 'visible' : ''}
-                        ></VideoScreen>
-                        <VideoScreen
-                            ref={remoteVideoRef}
-                            autoPlay
-                            muted
-                            playsInline
-                            className={!showLocalVideo ? 'visible' : ''}
-                            style={{ backgroundColor: 'white' }}
-                        ></VideoScreen>
-                    </div>
+                <TotalContainer>
+                    <ClassContainer>
+                        {/* {peerConnection && <Canvas roomId={roomId} />} */}
+                        <div style={{ position: 'relative' }}>
+                            <Canvas roomId={roomId} />
+                            <VideoScreen
+                                ref={localVideoRef}
+                                autoPlay
+                                muted
+                                playsInline
+                                className={showLocalVideo ? 'visible' : ''}
+                            ></VideoScreen>
+                            <VideoScreen
+                                ref={remoteVideoRef}
+                                autoPlay
+                                muted
+                                playsInline
+                                className={!showLocalVideo ? 'visible' : ''}
+                                style={{ backgroundColor: 'white' }}
+                            ></VideoScreen>
+                        </div>
 
-                    <div style={{ display: 'flex' }}>
-                        {/* <video
+                        <div style={{ display: 'flex' }}>
+                            {/* <video
                             ref={localVideoRef}
                             autoPlay
                             muted
                             style={{ width: '50%', border: '1px solid black' }}
                             playsInline
                         ></video> */}
-                        {/* <video
+                            {/* <video
                             ref={remoteVideoRef}
                             autoPlay
                             style={{ width: '50%', border: '1px solid black' }}
                             playsInline
                         ></video> */}
-                    </div>
-                    <ButtonsContainer>
-                        <CreateButton onClick={openUserMedia} primary={roomId == null} disabled={roomId !== null}>
-                            <RiVideoAddFill size={ICON_SIZE} />
-                        </CreateButton>
+                        </div>
+                        <ButtonsContainer>
+                            <CreateButton onClick={openUserMedia} primary={roomId == null} disabled={roomId !== null}>
+                                <RiVideoAddFill size={ICON_SIZE} />
+                            </CreateButton>
 
-                        <VideoScreenButton
-                            active={showLocalVideo}
-                            onClick={toggleVideoScreen}
-                            disabled={!localStream || !roomId}
-                        >
-                            <AiTwotoneSwitcher size={ICON_SIZE} />
-                        </VideoScreenButton>
+                            <VideoScreenButton
+                                active={showLocalVideo}
+                                onClick={toggleVideoScreen}
+                                disabled={!localStream || !roomId}
+                            >
+                                <AiTwotoneSwitcher size={ICON_SIZE} />
+                            </VideoScreenButton>
 
-                        <ScreenSharing
-                            localStream={localStream.current}
-                            peerConnection={peerConnection}
-                            isScreenSharing={isScreenSharing}
-                            setIsScreenSharing={setIsScreenSharing}
-                            roomId={roomId}
-                        />
-
-                        <ControlButton active={isVideoEnabled} onClick={toggleVideo} disabled={!localStream || !roomId}>
-                            {isVideoEnabled ? (
-                                <BsFillCameraVideoFill size={ICON_SIZE} />
-                            ) : (
-                                <BsFillCameraVideoOffFill size={ICON_SIZE} />
-                            )}
-                        </ControlButton>
-                        <ControlButton active={!isMicMuted} onClick={toggleMic} disabled={!localStream || !roomId}>
-                            {isMicMuted ? <BsMicMuteFill size={ICON_SIZE} /> : <BsMicFill size={ICON_SIZE} />}
-                        </ControlButton>
-                        <ControlButton active={isAudioMuted} onClick={toggleAudio} disabled={!remoteStream || !roomId}>
-                            {isAudioMuted ? <FaVolumeDown size={ICON_SIZE} /> : <FaVolumeMute size={ICON_SIZE} />}
-                        </ControlButton>
-                        <HangUpButton onClick={hangUp} disabled={!localStream || !roomId}>
-                            <ImPhoneHangUp size={ICON_SIZE} />
-                        </HangUpButton>
-                    </ButtonsContainer>
-                    {/* <Dialog open={roomDialogOpen}>
-                        <DialogTitle>加入房間</DialogTitle>
-                        <DialogContent>
-                            <TextField
-                                autoFocus
-                                value={roomIdInput}
-                                onChange={handleRoomIdInputChange}
-                                style={{ width: '100%', marginBottom: '16px' }}
+                            <ScreenSharing
+                                localStream={localStream.current}
+                                peerConnection={peerConnection}
+                                isScreenSharing={isScreenSharing}
+                                setIsScreenSharing={setIsScreenSharing}
+                                roomId={roomId}
                             />
-                        </DialogContent>
-                    </Dialog> */}
-                    {roomId && (
-                        <Typography variant='h6' gutterBottom>
-                            房間ID: {roomId}
-                        </Typography>
+
+                            <ControlButton
+                                active={isVideoEnabled}
+                                onClick={toggleVideo}
+                                disabled={!localStream || !roomId}
+                            >
+                                {isVideoEnabled ? (
+                                    <BsFillCameraVideoFill size={ICON_SIZE} />
+                                ) : (
+                                    <BsFillCameraVideoOffFill size={ICON_SIZE} />
+                                )}
+                            </ControlButton>
+                            <ControlButton active={!isMicMuted} onClick={toggleMic} disabled={!localStream || !roomId}>
+                                {isMicMuted ? <BsMicMuteFill size={ICON_SIZE} /> : <BsMicFill size={ICON_SIZE} />}
+                            </ControlButton>
+                            <ControlButton
+                                active={isAudioMuted}
+                                onClick={toggleAudio}
+                                disabled={!remoteStream || !roomId}
+                            >
+                                {isAudioMuted ? <FaVolumeDown size={ICON_SIZE} /> : <FaVolumeMute size={ICON_SIZE} />}
+                            </ControlButton>
+
+                            <ChatButton active={!showChatroom} onClick={toggleChat} disabled={!remoteStream || !roomId}>
+                                <TbMessageCircle2Filled size={ICON_SIZE} />
+                            </ChatButton>
+
+                            <HangUpButton onClick={hangUp} disabled={!localStream || !roomId}>
+                                <ImPhoneHangUp size={ICON_SIZE} />
+                            </HangUpButton>
+                        </ButtonsContainer>
+                    </ClassContainer>
+                    {showChatroom && (
+                        <ChatRoomContainer>
+                            <ClassChatroom roomId={roomId} />
+                        </ChatRoomContainer>
                     )}
-                    {/* {peerConnection && <ClassChatroom roomId={roomId} />} */}
-                    <ClassChatroom roomId={roomId} />
-                </div>
+                </TotalContainer>
             ) : (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
                     <DirectLink href='/membership/SignIn'>

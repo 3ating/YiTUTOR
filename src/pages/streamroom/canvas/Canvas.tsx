@@ -27,7 +27,7 @@ const StyledCanvasContainer = styled.div`
     flex-direction: column;
     align-items: center;
     width: 100%;
-    margin-top: 20px;
+    /* margin-top: 20px; */
     position: relative;
 `;
 
@@ -35,7 +35,7 @@ const StyledCanvas = styled.canvas<IStyledCanvasProps>`
     border: 2px solid #e8e8e8;
     background-color: #f8f8f8;
     box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
-    width: 95%;
+    width: 98%;
     height: 500px;
     cursor: ${(props) => props.cursorStyle};
 `;

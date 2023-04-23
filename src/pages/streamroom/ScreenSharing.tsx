@@ -38,32 +38,6 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     active?: boolean;
 }
 
-const ShareButton = styled.button`
-    display: flex;
-    align-items: center;
-    padding: 6px 12px;
-    background-color: #3f51b5;
-    color: #ffffff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    &:hover {
-        background-color: #303f9f;
-    }
-    &:disabled {
-        background-color: #c5cae9;
-        cursor: not-allowed;
-    }
-`;
-
-const StopSharingButton = styled(ShareButton)`
-    background-color: #f44336;
-    &:hover {
-        background-color: #d32f2f;
-    }
-`;
-
 const ScreenShareIcon = styled.svg`
     width: 24px;
     height: 24px;
@@ -79,7 +53,7 @@ const RemoteScreen = styled.video`
 `;
 
 const ShareScreenButton = styled.button<ButtonProps>`
-    background-color: ${({ active }) => (active ? 'blue' : 'gray')};
+    background-color: ${({ active }) => (active ? 'cornflowerblue' : 'gray')};
     color: white;
     border: none;
     border-radius: 4px;
@@ -91,7 +65,7 @@ const ShareScreenButton = styled.button<ButtonProps>`
     text-align: center;
     text-decoration: none;
     &:hover {
-        background-color: ${({ active }) => (active ? 'darkblue' : 'darkgray')};
+        background-color: ${({ active }) => (active ? 'lightskyblue' : 'darkgray')};
     }
     &:disabled {
         background-color: lightgray;

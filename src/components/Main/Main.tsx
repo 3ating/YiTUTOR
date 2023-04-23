@@ -28,7 +28,7 @@ const BannerTextContainer = styled.div`
     padding: 15px 25px;
     gap: 10px;
     width: 441px;
-    margin-left: auto;
+    margin: 0 auto;
 `;
 
 const BannerText = styled.p`
@@ -211,7 +211,7 @@ export default function Main() {
                     <BannerText>Easy to Learn, Easy to Achieve with YiTUTOR</BannerText>
                     <PrimaryButton>立即加入</PrimaryButton>
                 </BannerTextContainer>
-                <Image src={mainImg} width={700} alt='Banner image' />
+                <Image src={mainImg} width={700} alt='Banner image' style={{ margin: '0 auto' }} />
             </BannerContainer>
             <FeaturesContainer>
                 <MainMainDescriptionContainer>
