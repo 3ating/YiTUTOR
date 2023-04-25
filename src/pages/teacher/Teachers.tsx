@@ -35,7 +35,7 @@ const TeacherContainer = styled.div`
         'search search search search'
         'subject subject subject subject'
         'teacher teacher teacher teacher';
-    padding: 20px;
+    padding: 60px 20px 80px;
     background-color: antiquewhite;
     flex: 1;
     justify-content: center;
@@ -75,21 +75,6 @@ const SearchInput = styled.input`
     margin: 10px;
 `;
 
-const SearchButton = styled.button`
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #4a9df8;
-    color: white;
-    cursor: pointer;
-    margin: 10px;
-
-    &:hover {
-        background-color: #3b8de1;
-    }
-`;
-
 const SubjectSelect = styled.select`
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -103,6 +88,21 @@ const SubjectSelect = styled.select`
     grid-area: subject;
     margin-left: 0;
     height: 45px;
+`;
+
+const SearchButton = styled.button`
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #4a9df8;
+    color: white;
+    cursor: pointer;
+    margin: 10px;
+
+    &:hover {
+        background-color: #3b8de1;
+    }
 `;
 
 const firebaseConfig = {
