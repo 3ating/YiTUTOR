@@ -49,7 +49,12 @@ const Menu = styled(Link)`
     letter-spacing: 0.15em;
     text-align: center;
     text-decoration: none;
-    color: #000000;
+    color: #383333;
+    transition: color 0.3s ease;
+
+    &:hover {
+        color: #000000;
+    }
 `;
 
 const SignInBtn = styled(Link)`

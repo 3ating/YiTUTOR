@@ -5,27 +5,40 @@ import styled, { keyframes } from 'styled-components';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
 import Button from '../../components/Button';
-// import Image from 'next/image';
+import SignInImg from './signin.png';
+import Image from 'next/image';
+import { ToastContainer } from 'react-toastify';
 
 const LoginContainer = styled.div`
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
+
     justify-content: center;
+    gap: 50px;
+    /* justify-content: space-between; */
     height: calc(100vh - 130px);
     background-color: antiquewhite;
+    /* padding: 0 10%; */
+`;
+
+const SignInImage = styled(Image)`
+    width: 450px;
+    height: auto;
 `;
 
 const LoginFormWrapper = styled.div`
     display: flex;
+    justify-content: center;
     flex-direction: column;
     align-items: center;
     background-color: white;
-    padding: 40px;
+    padding: 100px 35px 90px;
     border-radius: 9px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     width: 400px;
     max-width: 90%;
+    height: 300px;
 `;
 
 const Title = styled.h2`
@@ -33,6 +46,7 @@ const Title = styled.h2`
     font-weight: 600;
     color: #444;
     margin-bottom: 30px;
+    text-align: center;
 `;
 
 const InputField = styled.input`
@@ -58,14 +72,15 @@ const LoginButton = styled(Button)`
 `;
 
 const LogoutButton = styled(Button)`
-    margin: 20px 0 0;
+    margin: 35px 0 0;
     width: 100%;
     border-radius: 9px;
     letter-spacing: 2px;
-    background-color: red;
+    background-color: #ffab34;
+    /* color: black; */
     &:hover {
-        background-color: darkred;
-        color: #ffffff;
+        background-color: #f9b352;
+        /* color: #ffffff; */
     }
 `;
 
@@ -97,7 +112,7 @@ const UserContent = styled.p`
 `;
 
 const Avatar = styled.img`
-    width: 100px;
+    width: 130px;
     border-radius: 50%;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     margin-bottom: 10px;
@@ -137,6 +152,11 @@ const SignIn = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
+    const handleFormSubmit = async (e: { preventDefault: () => void }) => {
+        e.preventDefault();
+        handleLoginWithEmail(email, password);
+    };
+
     // console.log('userInfo in sign page:', userInfo);
     console.log('use in sign page:', user);
     console.log('isLoading:', isLoading);
@@ -146,48 +166,55 @@ const SignIn = () => {
         <>
             <Header />
             <LoginContainer>
+                <ToastContainer />
                 {isLoading ? (
                     user ? (
-                        <LoginFormWrapper>
-                            <UserInfo>
-                                {userInfo?.avatar && (
-                                    <Avatar
-                                        src={userInfo.avatar}
-                                        alt={`${userInfo.name} 的大頭照`}
-                                        style={{ width: '100px', borderRadius: '50%' }}
-                                    />
-                                )}
-                                <UserContent>{userInfo?.name}</UserContent>
-                                <UserContent>{userInfo?.email}</UserContent>
+                        <>
+                            <LoginFormWrapper>
+                                <UserInfo>
+                                    {userInfo?.avatar && (
+                                        <Avatar
+                                            src={userInfo.avatar}
+                                            // alt={`${userInfo.name} 的大頭照`}
+                                            // style={{ width: '100px', borderRadius: '50%' }}
+                                        />
+                                    )}
+                                    <UserContent>{userInfo?.name}</UserContent>
+                                    <UserContent>{userInfo?.email}</UserContent>
 
-                                <LogoutButton onClick={handleLogout}>登出</LogoutButton>
-                                <DirectLink href={`/profile/${user.uid}`} passHref>
-                                    <ProfileButton>查看個人資料</ProfileButton>
-                                </DirectLink>
-                            </UserInfo>
-                        </LoginFormWrapper>
+                                    <LogoutButton onClick={handleLogout}>登出</LogoutButton>
+                                    <DirectLink href={`/profile/${user.uid}`} passHref>
+                                        <ProfileButton>查看個人資料</ProfileButton>
+                                    </DirectLink>
+                                </UserInfo>
+                            </LoginFormWrapper>
+                            <SignInImage src={SignInImg} alt='Sign In' />
+                        </>
                     ) : (
                         <LoadingSpinner />
                     )
                 ) : (
                     <>
                         <LoginFormWrapper>
-                            <Title>會員登入</Title>
-                            <InputField
-                                type='email'
-                                placeholder='輸入信箱'
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
-                            <InputField
-                                type='password'
-                                placeholder='輸入密碼'
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                            <LoginButton onClick={() => handleLoginWithEmail(email, password)}>登入</LoginButton>
+                            <form onSubmit={handleFormSubmit}>
+                                <Title>會員登入</Title>
+                                <InputField
+                                    type='email'
+                                    placeholder='輸入信箱'
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
+                                <InputField
+                                    type='password'
+                                    placeholder='輸入密碼'
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                />
+                                <LoginButton type='submit'>登入</LoginButton>
+                            </form>
                             <DirectLink href='SignUp'>還沒有帳號，前往註冊</DirectLink>
                         </LoginFormWrapper>
+                        <SignInImage src={SignInImg} alt='Sign In' />
                     </>
                 )}
             </LoginContainer>

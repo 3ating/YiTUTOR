@@ -9,12 +9,34 @@ import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
 import Calendar from '../Calendar';
 import Schedule from '../Schedule';
+import Button from '@/components/Button';
 
 const MainWrapper = styled.div`
     display: flex;
     flex-direction: column;
     height: 100vh;
     background-color: antiquewhite;
+`;
+
+const ProfileContainer = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 2rem;
+    padding: 0 50px;
+`;
+
+const UserInfoBox = styled.div`
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    /* background-color: #ffffff; */
+    /* padding: 1.5rem; */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    width: 100%;
 `;
 
 const InfoContainer = styled.div`
@@ -26,9 +48,53 @@ const InfoContainer = styled.div`
 `;
 
 const Avatar = styled.img`
-    width: 100px;
+    width: 150px;
     border-radius: 50%;
+    margin: 53px auto 20px;
+`;
+
+const UserInfoContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    /* margin-left: 24px; */
+`;
+
+const UserName = styled.p`
+    /* font-weight: 400; */
+    font-size: 25px;
+    color: #777;
+    margin: 0 0 10px 0;
+`;
+
+const UserInfo = styled.div`
+    font-size: 20px;
+    color: #777;
+    margin: 0 0 5px 0;
+`;
+
+const UserMail = styled.p`
+    /* font-weight: 400; */
+    font-size: 20px;
+    color: #777;
+    margin: 0 0 15px 0;
+`;
+
+const InputLabel = styled.label`
+    display: block;
+    margin-bottom: 0.5rem;
+`;
+
+const TextArea = styled.textarea`
+    display: block;
+    width: 100%;
+    padding: 0.5rem;
     margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    resize: none;
 `;
 
 const UserInfoRow = styled.p`
@@ -62,6 +128,25 @@ const StyledButton = styled.button<{ primary?: boolean }>`
     /* margin-right: ${(props) => (props.primary ? '1rem' : '0')}; */
     &:hover {
         background-color: ${(props) => (props.primary ? '#303f9f' : '#d32f2f')};
+    }
+`;
+
+const ModifyButton = styled(Button)`
+    /* margin: 20px 0 0;
+    width: 100%;
+    border-radius: 9px;
+    letter-spacing: 2px;
+    background-color: #ffab34;
+    &:hover {
+        background-color: #f9b352;
+    } */
+    margin: 10px 0;
+    width: 100%;
+    border-radius: 9px;
+    letter-spacing: 2px;
+    &:hover {
+        background-color: #333333;
+        color: #ffffff;
     }
 `;
 
@@ -134,8 +219,11 @@ const StyledTextIntro = styled.textarea`
 
 const BookingsContainer = styled.div`
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    min-width: 300px;
 `;
-
 const BookingCard = styled.div`
     display: flex;
     align-items: center;
@@ -192,6 +280,76 @@ const TeacherLink = styled(Link)`
     &:hover {
         color: #1e7ab2;
     }
+`;
+
+const ProfileWrapper = styled.div`
+    display: flex;
+    height: 100%;
+    /* border: 1px solid red; */
+`;
+
+const ProfileLeftContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    width: 75%;
+    height: 100%;
+`;
+
+const CoursesContainer = styled.div`
+    display: flex;
+    width: 100%;
+    height: 60%;
+    border: 1px solid black;
+    align-items: center;
+`;
+
+const CalendarContainer = styled.div`
+    width: 40%;
+    margin: auto;
+`;
+
+const CourseTeacherContainer = styled.div`
+    width: 60%;
+
+    /* margin-right: ; */
+`;
+
+const TeachersContainer = styled.div`
+    width: 90%;
+    height: 370px;
+    background: #e2e1e1;
+    border-radius: 9px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    padding: 30px;
+`;
+
+const TeacherSubject = styled.p`
+    font-size: 30px;
+    margin: 0;
+`;
+
+const TeacherName = styled.p`
+    font-size: 30px;
+    margin: 0;
+`;
+
+const CourseTime = styled.p`
+    font-size: 30px;
+    margin: 0;
+`;
+
+const PurchasedContainer = styled.div`
+    display: flex;
+    width: 100%;
+    height: 40%;
+    border: 1px solid green;
+`;
+
+const ProfileRightContainer = styled.div`
+    display: flex;
+    border: 1px solid red;
+    width: 25%;
 `;
 
 interface UserInfo {
@@ -339,138 +497,76 @@ const UserProfile = () => {
     return (
         <MainWrapper>
             <Header />
-            <InfoContainer>
-                <h1>{userInfo.name} 的個人資料</h1>
-                {isEditing ? (
-                    <>
-                        <label htmlFor='name'>姓名</label>
-                        <StyledInput
-                            type='text'
-                            id='name'
-                            name='name'
-                            value={editedUserInfo?.name || ''}
-                            onChange={handleChange}
-                        />
-                        <label htmlFor='email'>電子郵件</label>
-                        <StyledInput
-                            type='email'
-                            id='email'
-                            name='email'
-                            value={editedUserInfo?.email || ''}
-                            onChange={handleChange}
-                        />
-                        <label htmlFor='phone'>電話</label>
-                        <StyledInput
-                            type='tel'
-                            id='phone'
-                            name='phone'
-                            value={editedUserInfo?.phone || ''}
-                            onChange={handleChange}
-                        />
-                        <label htmlFor='description'>簡述</label>
-                        <StyledTextDescription
-                            id='description'
-                            name='description'
-                            value={editedUserInfo?.description || ''}
-                            onChange={handleChange}
-                        />
-                        <label htmlFor='intro'>自我介紹</label>
-                        <StyledTextIntro
-                            id='intro'
-                            name='intro'
-                            value={editedUserInfo?.intro || ''}
-                            onChange={handleChange}
-                        />
-                        <ButtonContainer>
-                            <StyledButton primary onClick={handleSave}>
-                                保存
-                            </StyledButton>
-                            <StyledButton onClick={handleCancel}>取消</StyledButton>
-                        </ButtonContainer>
-                    </>
-                ) : (
-                    <>
+            <ProfileWrapper>
+                <ProfileRightContainer>
+                    <UserInfoBox>
                         {userInfo.avatar && <Avatar src={userInfo.avatar} alt={`${name} 的大頭照`} />}
-                        <UserInfoRow>姓名: {userInfo.name}</UserInfoRow>
-                        <UserInfoRow>電子郵件: {userInfo.email}</UserInfoRow>
-                        <UserInfoRow>電話: {userInfo.phone}</UserInfoRow>
-                        <UserInfoRow>使用者類型: {userInfo.userType}</UserInfoRow>
-
-                        <ButtonContainer>
-                            {!isEditing && (
-                                <StyledButton primary onClick={handleEdit}>
-                                    編輯個人資料
-                                </StyledButton>
-                            )}
-                        </ButtonContainer>
-
-                        <h2>預約的課程</h2>
-                        {bookingsInfo.length > 0 && (
-                            <BookingsContainer>
-                                {bookingsInfo.map((booking, index) => (
-                                    <DirectLink
-                                        key={index}
-                                        href={`/streamroom/VideoChat?id=${booking.teacherId || booking.studentId}`}
-                                    >
-                                        <BookingCard>
-                                            <BookingAvatar
-                                                src={booking.teacherInfo.avatar}
-                                                alt={`${booking.teacherInfo.name} 的大頭照`}
-                                            />
-                                            <BookingInfo>
-                                                <BookingInfoTitle>{booking.teacherInfo.name}</BookingInfoTitle>
-                                                <BookingInfoSubject>
-                                                    科目: {booking.teacherInfo.subject}
-                                                </BookingInfoSubject>
-                                                <BookingInfoTime>
-                                                    時間: {booking.date.toDate().toLocaleDateString()} {booking.time}
-                                                </BookingInfoTime>
-                                            </BookingInfo>
-                                        </BookingCard>
-                                    </DirectLink>
-                                ))}
-                            </BookingsContainer>
-                        )}
-
-                        {/* {userInfo?.selectedTimes && <Schedule selectedTimes={userInfo.selectedTimes} userInfo={userInfo} />} */}
-                        <h2 style={{ marginBottom: '0' }}>購買的課程</h2>
-                        {userInfo?.courses && Object.entries(userInfo.courses).length > 0 && (
-                            <CourseCardContainer>
-                                {Object.entries(userInfo.courses).map(([courseId, courseData]) => (
-                                    <CourseCard key={courseId}>
-                                        <CourseInfo>
-                                            <CourseLabel>課程名稱:</CourseLabel>
-                                            <CourseValue>{courseData.subject}</CourseValue>
-                                        </CourseInfo>
-                                        <CourseInfo>
-                                            <CourseLabel>授課老師:</CourseLabel>
-                                            <CourseValue>
-                                                <TeacherLink href={`../teacher/${courseData.teacherid}`}>
-                                                    {courseData.teachername}{' '}
-                                                </TeacherLink>
-                                            </CourseValue>
-                                        </CourseInfo>
-                                        {/* <CourseInfo>
-                                        <CourseLabel>購買日期:</CourseLabel>
-                                        <CourseValue>
-                                            {courseData.purchaseDate?.toDate().toLocaleDateString()}
-                                        </CourseValue>
-                                   </CourseInfo> */}
-                                        <CourseInfo>
-                                            <CourseLabel>數量:</CourseLabel>
-                                            <CourseValue>{courseData.quantity}</CourseValue>
-                                        </CourseInfo>
-                                        <CourseInfo>
-                                            <CourseLabel>價格:</CourseLabel>
-                                            <CourseValue>{courseData.price}</CourseValue>
-                                        </CourseInfo>
-                                    </CourseCard>
-                                ))}
-                            </CourseCardContainer>
-                        )}
-                    </>
-                )}
-            </InfoContainer>
+                        <UserInfoContainer>
+                            <UserName>{userInfo.name}</UserName>
+                            <UserInfo>{userInfo.email}</UserInfo>
+                            <UserInfo>{userInfo.phone}</UserInfo>
+                            <UserInfo>
+                                {userInfo.userType === 'student'
+                                    ? '學生'
+                                    : userInfo.userType === 'teacher'
+                                    ? '老師'
+                                    : ''}
+                            </UserInfo>
+                            <ButtonContainer>
+                                {!isEditing && <ModifyButton onClick={handleEdit}>編輯個人資料</ModifyButton>}
+                            </ButtonContainer>
+                        </UserInfoContainer>
+                    </UserInfoBox>
+                </ProfileRightContainer>
+                <ProfileLeftContainer>
+                    <CoursesContainer>
+                        <CalendarContainer>
+                            <Calendar
+                                handleSelectDate={function (date: Date): void {
+                                    throw new Error('Function not implemented.');
+                                }}
+                            />
+                        </CalendarContainer>
+                        <CourseTeacherContainer>
+                            <TeachersContainer>
+                                <TeacherSubject>科目：數學</TeacherSubject>
+                                <TeacherName>老師：曾濟彬</TeacherName>
+                                <CourseTime>時間：2023/4/25 11:00</CourseTime>
+                                {/* {bookingsInfo.length > 0 && (
+                                    <BookingsContainer>
+                                        {bookingsInfo.map((booking, index) => (
+                                            <DirectLink
+                                                key={index}
+                                                href={`/streamroom/VideoChat?id=${
+                                                    booking.teacherId || booking.studentId
+                                                }`}
+                                            >
+                                                <BookingCard>
+                                                    <BookingAvatar
+                                                        src={booking.teacherInfo.avatar}
+                                                        alt={`${booking.teacherInfo.name} 的大頭照`}
+                                                    />
+                                                    <BookingInfo>
+                                                        <BookingInfoTitle>{booking.teacherInfo.name}</BookingInfoTitle>
+                                                        <BookingInfoSubject>
+                                                            科目: {booking.teacherInfo.subject}
+                                                        </BookingInfoSubject>
+                                                        <BookingInfoTime>
+                                                            時間: {booking.date.toDate().toLocaleDateString()}{' '}
+                                                            {booking.time}
+                                                        </BookingInfoTime>
+                                                    </BookingInfo>
+                                                </BookingCard>
+                                            </DirectLink>
+                                        ))}
+                                    </BookingsContainer>
+                                )} */}
+                            </TeachersContainer>
+                        </CourseTeacherContainer>
+                    </CoursesContainer>
+                    <PurchasedContainer></PurchasedContainer>
+                </ProfileLeftContainer>
+            </ProfileWrapper>
             <Footer />
         </MainWrapper>
     );

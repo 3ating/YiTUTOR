@@ -2,6 +2,9 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
+import { useRouter } from 'next/router';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface UserInfo {
     name: string;
@@ -59,6 +62,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [userUid, setUserUid] = useState<string | null>(null);
+    const router = useRouter();
 
     useEffect(() => {
         const auth = getAuth();
@@ -98,12 +102,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         };
     }, [user]);
 
+    // const handleLoginWithEmail = async (email: string, password: string) => {
+    //     const auth = getAuth();
+    //     try {
+    //         const result = await signInWithEmailAndPassword(auth, email, password);
+    //         setUser(result.user);
+    //         setIsLoading(true);
+    //         router.push('/');
+    //     } catch (error) {
+    //         console.log(error);
+    //         setIsLoading(false);
+    //     }
+    // };
+
     const handleLoginWithEmail = async (email: string, password: string) => {
         const auth = getAuth();
         try {
             const result = await signInWithEmailAndPassword(auth, email, password);
             setUser(result.user);
             setIsLoading(true);
+            toast.success('登入成功！', {
+                position: toast.POSITION.TOP_CENTER,
+                autoClose: 2000,
+            });
+            setTimeout(() => {
+                router.push('/');
+            }, 2000);
         } catch (error) {
             console.log(error);
             setIsLoading(false);
