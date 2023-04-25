@@ -23,6 +23,7 @@ const TeacherCard = styled.div`
     height: 538px;
     border: 1px black solid;
     background: white;
+    padding: 20px 0 10px;
 `;
 
 const CoursePrice = styled.p`
@@ -30,7 +31,7 @@ const CoursePrice = styled.p`
     font-size: 24px;
     line-height: 32px;
     letter-spacing: 0.05em;
-    margin: 24px 0 18px;
+    margin: 24px 0 12px;
 `;
 
 const Hightline = styled.div`
@@ -51,15 +52,15 @@ const TeacherName = styled.p`
     font-size: 32px;
     line-height: 42px;
     letter-spacing: 0.05em;
-    margin: 10px 0 0 0;
+    margin: 28px 0 0 0;
 `;
 
 const Subject = styled.p`
     font-weight: 400;
-    font-size: 20px;
+    font-size: 18px;
     letter-spacing: 0.05em;
     line-height: 27px;
-    margin: 5px 0 0 0;
+    margin: 5px 0 0 1px;
 `;
 
 const TeacherDescription = styled.p`

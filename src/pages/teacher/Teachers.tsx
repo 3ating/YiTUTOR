@@ -21,46 +21,16 @@ const {
     TeacherBtn,
 } = TeacherCardComponents;
 
-// const TeacherContainer = styled.div`
-//     display: grid;
-//     grid-gap: 20px;
-//     grid-template-columns: repeat(3, 1fr);
-// `;
-
-// const TeacherCard = styled.div`
-//     border: 1px solid #ccc;
-//     border-radius: 5px;
-//     padding: 20px;
-//     margin-bottom: 20px;
-//     width: 300px;
-//     height: 400px;
-//     max-width: 100%;
-//     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-//     display: flex;
-//     flex-direction: column;
-//     justify-content: space-between;
-
-//     &:hover {
-//         cursor: pointer;
-//     }
-// `;
-
-// const DirectLink = styled(Link)`
-//     text-decoration: none;
-//     color: black;
-// `;
-
 const PageContainer = styled.div`
     display: flex;
     flex-direction: column;
     min-height: 100vh;
 `;
 
-// 在現有的 TeacherContainer 樣式中添加 flex: 1
 const TeacherContainer = styled.div`
     display: grid;
-    grid-gap: 10px;
-    grid-template-columns: repeat(4, 1fr);
+    /* grid-gap: 6px; */
+    grid-template-columns: repeat(4, 345px);
     grid-template-areas:
         'search search search search'
         'subject subject subject subject'
@@ -68,35 +38,18 @@ const TeacherContainer = styled.div`
     padding: 20px;
     background-color: antiquewhite;
     flex: 1;
+    justify-content: center;
 `;
 
 const TeacherCardWrapper = styled.div`
-    width: 25%;
+    width: 100%;
     padding: 0 10px;
     box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
 `;
-
-// const TeacherCard = styled.div`
-//     border: 1px solid #ccc;
-//     border-radius: 10px;
-//     padding: 20px;
-//     margin-bottom: 20px;
-//     width: 300px;
-//     height: 400px;
-//     max-width: 100%;
-//     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-//     display: flex;
-//     flex-direction: column;
-//     justify-content: space-between;
-//     background-color: #ffffff;
-//     transition: transform 0.3s, box-shadow 0.3s;
-
-//     &:hover {
-//         cursor: pointer;
-//         transform: translateY(-5px);
-//         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-//     }
-// `;
 
 const DirectLink = styled(Link)`
     text-decoration: none;
