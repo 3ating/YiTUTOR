@@ -10,6 +10,7 @@ import Footer from '@/components/Footer/Footer';
 import Calendar from '../Calendar';
 import Schedule from '../Schedule';
 import Button from '@/components/Button';
+import { AiFillEdit } from 'react-icons/ai';
 
 const MainWrapper = styled.div`
     display: flex;
@@ -50,14 +51,14 @@ const InfoContainer = styled.div`
 const Avatar = styled.img`
     width: 182px;
     border-radius: 50%;
-    margin: 53px auto 20px;
+    margin: 20px auto;
 `;
 
 const UserInfoContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-
+    /* margin-bottom: 30px; */
     /* margin-left: 24px; */
 `;
 
@@ -66,7 +67,7 @@ const UserNameContainer = styled.div`
     justify-content: space-between;
     align-items: center;
     width: 240px;
-    margin: 20px 0 50px;
+    margin: 20px 0 30px;
 `;
 
 const UserName = styled.p`
@@ -91,18 +92,20 @@ const UserType = styled.p`
     text-align: center;
     letter-spacing: 0.09em;
     margin: 0;
+    border-radius: 9px;
 `;
 
 const UserInformationContainer = styled.div`
     display: flex;
     flex-direction: column;
-    /* margin-top: 26px; */
+    margin-bottom: 15px;
 `;
 
 const UserInformation = styled.p`
     font-weight: 600;
     font-size: 16px;
     line-height: 19px;
+    letter-spacing: 1.5px;
 `;
 
 const UserInforContent = styled.p`
@@ -165,39 +168,25 @@ const StyledInput = styled.input`
     font-size: 16px;
 `;
 
-const StyledButton = styled.button<{ primary?: boolean }>`
-    background-color: ${(props) => (props.primary ? '#3f51b5' : '#f44336')};
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 18px;
-    font-weight: 500;
-    padding: 8px 16px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    /* margin-right: ${(props) => (props.primary ? '1rem' : '0')}; */
-    &:hover {
-        background-color: ${(props) => (props.primary ? '#303f9f' : '#d32f2f')};
-    }
-`;
-
-const ModifyButton = styled(Button)`
-    /* margin: 20px 0 0;
+const ConfirmButton = styled(Button)`
+    margin: 0;
     width: 100%;
     border-radius: 9px;
     letter-spacing: 2px;
+    height: 45px;
     background-color: #ffab34;
     &:hover {
         background-color: #f9b352;
-    } */
-    margin: 10px 0;
+    }
+`;
+
+const CancelButton = styled(Button)`
+    margin: 0;
     width: 100%;
     border-radius: 9px;
     letter-spacing: 2px;
-    &:hover {
-        background-color: #333333;
-        color: #ffffff;
-    }
+    margin-top: 8px;
+    height: 45px;
 `;
 
 const CourseCardContainer = styled.div`
@@ -242,6 +231,7 @@ const CourseLabel = styled.span`
 const CourseValue = styled.span`
     font-weight: 400;
     font-size: 18px;
+    /* width: 35.5px; */
 `;
 
 const StyledTextDescription = styled.textarea`
@@ -387,7 +377,7 @@ const BookedCoursesContainer = styled.div`
     grid-template-columns: 1fr 1fr;
     justify-items: center;
     grid-gap: 1rem;
-    width: 90%;
+    width: 518.4px;
     /* height: 100%; */
     padding: 30px 0;
     box-sizing: border-box;
@@ -413,48 +403,17 @@ const PurchasedContainer = styled.div`
     /* border: 1px solid red; */
 `;
 
-const CoursesContainer = styled.div`
-    display: flex;
+const ModifiedInput = styled.input`
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease-in-out;
     width: 100%;
-    height: 60%;
-    border: 1px solid black;
-    align-items: center;
-`;
-
-const CalendarContainer = styled.div`
-    width: 40%;
-    margin: auto;
-`;
-
-const CourseTeacherContainer = styled.div`
-    width: 60%;
-
-    /* margin-right: ; */
-`;
-
-const TeachersContainer = styled.div`
-    width: 90%;
-    height: 370px;
-    background: #e2e1e1;
-    border-radius: 9px;
-    margin: 0 auto;
-    box-sizing: border-box;
-    padding: 30px;
-`;
-
-const TeacherSubject = styled.p`
-    font-size: 30px;
-    margin: 0;
-`;
-
-const TeacherName = styled.p`
-    font-size: 30px;
-    margin: 0;
-`;
-
-const CourseTime = styled.p`
-    font-size: 30px;
-    margin: 0;
+    &:focus {
+        border-color: #ffab34;
+    }
 `;
 
 const ProfileLeftContainer = styled.div`
@@ -462,6 +421,15 @@ const ProfileLeftContainer = styled.div`
     /* border: 1px solid red; */
     width: 25%;
     background: white;
+`;
+
+const EditContainer = styled.div`
+    display: flex;
+    justify-content: space-between;
+`;
+
+const IconWrapper = styled.div`
+    cursor: pointer;
 `;
 
 interface UserInfo {
@@ -497,6 +465,8 @@ interface TeacherInfo {
     subject: string;
 }
 
+type UserInfoKeys = 'email' | 'phone';
+
 const firebaseConfig = {
     apiKey: process.env.FIRESTORE_API_KEY,
     authDomain: 'board-12c3c.firebaseapp.com',
@@ -519,31 +489,56 @@ const UserProfile = () => {
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [editedUserInfo, setEditedUserInfo] = useState<UserInfo | null>(null);
-
+    const [isEditingEmail, setIsEditingEmail] = useState(false);
+    const [isEditingPhone, setIsEditingPhone] = useState(false);
     const [bookingsInfo, setBookingsInfo] = useState<BookingWithTeacherInfo[]>([]);
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = event.target;
+    // const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    //     const { name, value } = event.target;
+    //     if (editedUserInfo) {
+    //         setEditedUserInfo({ ...editedUserInfo, [name]: value });
+    //     }
+    // };
+    const isUserInfoKey = (key: string): key is keyof UserInfo => {
+        return key in UserInfo;
+    };
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, fieldName: string) => {
+        const { value } = event.target;
         if (editedUserInfo) {
-            setEditedUserInfo({ ...editedUserInfo, [name]: value });
+            setEditedUserInfo({ ...editedUserInfo, [fieldName]: value });
         }
     };
 
-    const handleEdit = () => {
-        setIsEditing(true);
+    // const handleEdit = () => {
+    //     setIsEditing(true);
+    //     setEditedUserInfo(userInfo);
+    // };
+
+    const handleEdit = (fieldName: string) => {
+        if (fieldName === 'email') {
+            setIsEditingEmail(true);
+        } else if (fieldName === 'phone') {
+            setIsEditingPhone(true);
+        }
         setEditedUserInfo(userInfo);
     };
 
-    const handleSave = async () => {
+    const handleSave = async (fieldName: UserInfoKeys) => {
         if (userId && editedUserInfo) {
             const usersCollectionRef = collection(
                 db,
                 'users'
             ) as unknown as firebase.firestore.CollectionReference<UserInfo>;
             const userDocRef = doc(usersCollectionRef, userId as string);
-            await updateDoc(userDocRef, editedUserInfo);
+            await updateDoc(userDocRef, { [fieldName]: editedUserInfo[fieldName] });
             setUserInfo(editedUserInfo);
-            setIsEditing(false);
+
+            if (fieldName === 'email') {
+                setIsEditingEmail(false);
+            } else if (fieldName === 'phone') {
+                setIsEditingPhone(false);
+            }
         }
     };
 
@@ -551,22 +546,6 @@ const UserProfile = () => {
         setIsEditing(false);
         setEditedUserInfo(null);
     };
-
-    // useEffect(() => {
-    //     if (userId) {
-    //         const fetchUserData = async () => {
-    //             const userDocRef = doc(db, 'users', userId as string);
-    //             const docSnapshot = await getDoc(userDocRef);
-
-    //             if (docSnapshot.exists()) {
-    //                 const userData = docSnapshot.data() as UserInfo;
-    //                 setUserInfo(userData);
-    //             }
-    //         };
-
-    //         fetchUserData();
-    //     }
-    // }, [userId]);
 
     useEffect(() => {
         if (userId) {
@@ -627,16 +606,67 @@ const UserProfile = () => {
                             <UserInformationContainer>
                                 <UserInformation>信箱</UserInformation>
                                 <UserInformationLine />
-                                <UserInforContent>{userInfo.email}</UserInforContent>
+                                <UserInforContent>
+                                    <EditContainer>
+                                        {isEditingEmail ? (
+                                            <>
+                                                <ModifiedInput
+                                                    type='email'
+                                                    name='email'
+                                                    value={editedUserInfo?.email || ''}
+                                                    onChange={(e) => handleChange(e, 'email')}
+                                                />
+                                            </>
+                                        ) : (
+                                            <>
+                                                {userInfo.email}
+                                                <IconWrapper>
+                                                    <AiFillEdit onClick={() => handleEdit('email')} />
+                                                </IconWrapper>
+                                            </>
+                                        )}
+                                    </EditContainer>
+                                </UserInforContent>
                             </UserInformationContainer>
+
                             <UserInformationContainer>
                                 <UserInformation>電話</UserInformation>
                                 <UserInformationLine />
-                                <UserInforContent>{userInfo.phone}</UserInforContent>
+                                <UserInforContent>
+                                    <EditContainer>
+                                        {isEditingPhone ? (
+                                            <>
+                                                <ModifiedInput
+                                                    type='tel'
+                                                    name='phone'
+                                                    value={editedUserInfo?.phone || ''}
+                                                    onChange={(e) => handleChange(e, 'phone')}
+                                                />
+                                            </>
+                                        ) : (
+                                            <>
+                                                {userInfo.phone}
+                                                <IconWrapper>
+                                                    <AiFillEdit onClick={() => handleEdit('phone')} />
+                                                </IconWrapper>
+                                            </>
+                                        )}
+                                    </EditContainer>
+                                </UserInforContent>
                             </UserInformationContainer>
-                            <ButtonContainer>
-                                {!isEditing && <ModifyButton onClick={handleEdit}>編輯個人資料</ModifyButton>}
-                            </ButtonContainer>
+                            {(isEditingEmail || isEditingPhone) && (
+                                <>
+                                    <ConfirmButton onClick={() => handleSave('email' || 'phone')}>確認</ConfirmButton>
+                                    <CancelButton
+                                        onClick={() => {
+                                            setIsEditingEmail(false);
+                                            setIsEditingPhone(false);
+                                        }}
+                                    >
+                                        取消
+                                    </CancelButton>
+                                </>
+                            )}
                         </UserInfoContainer>
                     </UserInfoBox>
                 </ProfileLeftContainer>
