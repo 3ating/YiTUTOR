@@ -1,19 +1,21 @@
-import { useEffect, useState } from 'react';
+import { SetStateAction, useEffect, useRef, useState } from 'react';
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
-import {
-    MainContainer,
-    ChatContainer,
-    MessageList,
-    Message as ChatMessage,
-    MessageInput,
-    TypingIndicator,
-} from '@chatscope/chat-ui-kit-react';
+// import {
+//     MainContainer,
+//     ChatContainer,
+//     MessageList,
+//     Message as ChatMessage,
+//     MessageInput,
+//     TypingIndicator,
+// } from '@chatscope/chat-ui-kit-react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import styled from 'styled-components';
-// import { OPENAI_API_KEY } from '../../../config';
-import { useAuth } from '../../../public/AuthContext';
+// import { OPENAI_API_KEY } from '../../config';
+import { useAuth } from '../../public/AuthContext';
 import Link from 'next/link';
+import { BsFillSendFill } from 'react-icons/bs';
+import { AiFillDelete } from 'react-icons/ai';
 
 const firebaseConfig = {
     apiKey: process.env.FIRESTORE_API_KEY,
@@ -34,23 +36,107 @@ const db = firebase.firestore();
 // const API_KEY = OPENAI_API_KEY;
 // const API_KEY = process.env.OPENAI_API_KEY;
 
+// const ChatRoomContainer = styled.div`
+//     position: fixed;
+//     bottom: 0px;
+//     right: 50px;
+//     height: 700px;
+//     width: 380px;
+//     z-index: 1;
+//     margin: 0;
+// `;
+
+// const StyledApp = styled.div`
+//     font-family: Arial, Helvetica, sans-serif;
+//     background-color: #f5f5f5;
+//     /* height: 100vh; */
+// `;
+
+// const StyledMainContainer = styled(MainContainer)`
+//     height: 100%;
+// `;
+
+// const StyledChatContainer = styled(ChatContainer)`
+//     display: flex;
+//     flex-direction: column;
+//     justify-content: space-between;
+//     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+//     background-color: #ffffff;
+//     border-radius: 9px;
+//     margin: 50px auto;
+//     max-width: 600px;
+//     height: 80%;
+//     padding-top: 8px;
+// `;
+
+// const DirectLink = styled(Link)`
+//     text-decoration: none;
+//     color: black;
+// `;
+
+// const StyledChatMessage = styled(ChatMessage)`
+//     &.cs-message--incoming {
+//         .cs-message__content {
+//             background-color: #fdd5ae;
+//         }
+//     }
+
+//     &.cs-message--outgoing {
+//         .cs-message__content {
+//             background-color: #f9d99c;
+//         }
+//     }
+// `;
+interface MessageProps {
+    position: 'incoming' | 'outgoing';
+}
+
+interface SendIconProps {
+    active: boolean;
+    size: number;
+}
+
+const ChatRoomContainer = styled.div`
+    position: fixed;
+    bottom: 0px;
+    right: 50px;
+    height: 700px;
+    width: 380px;
+    z-index: 1;
+    margin: 0;
+`;
+
+const ChatRoomTitle = styled.p`
+    text-align: center;
+    margin: 0 0 10px;
+    padding: 8px 16px;
+    background-color: #000;
+    color: white;
+    border-top-left-radius: 9px;
+    border-top-right-radius: 9px;
+    font-size: 18px;
+`;
+
 const StyledApp = styled.div`
     font-family: Arial, Helvetica, sans-serif;
     background-color: #f5f5f5;
-    height: 100vh;
 `;
 
-const StyledMainContainer = styled(MainContainer)`
+const StyledMainContainer = styled.div`
     height: 100%;
 `;
 
-const StyledChatContainer = styled(ChatContainer)`
+const StyledChatContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     background-color: #ffffff;
-    border-radius: 6px;
+    border-radius: 9px;
     margin: 50px auto;
     max-width: 600px;
     height: 80%;
+    /* padding-top: 8px; */
 `;
 
 const DirectLink = styled(Link)`
@@ -58,7 +144,93 @@ const DirectLink = styled(Link)`
     color: black;
 `;
 
-const AISols = () => {
+const MessageList = styled.div`
+    flex: 1;
+    overflow-y: auto;
+    position: relative;
+`;
+
+const Message = styled.div<MessageProps>`
+    padding: 8px 16px;
+    margin: 8px;
+    max-width: 70%;
+    border-radius: 12px;
+    word-wrap: break-word;
+    width: fit-content;
+    font-size: 14px;
+    ${(props) =>
+        props.position === 'incoming'
+            ? `
+        background-color: #c4c4c4;
+        margin-left: auto;
+        `
+            : `
+        background-color: #dfdfdf;
+        margin-right: auto;
+    `}
+`;
+
+const TypingIndicator = styled.div`
+    font-size: 12px;
+    color: #656565;
+    padding: 8px 16px;
+    margin: 8px;
+    position: absolute;
+    bottom: 0;
+    margin: 0;
+`;
+
+const MessageInputContainer = styled.div`
+    display: flex;
+    align-items: center;
+    /* border-top: 1px solid #ccc; */
+`;
+
+const MessageInput = styled.input`
+    flex: 1;
+    padding: 16px;
+    border: none;
+    outline: none;
+
+    &::placeholder {
+        letter-spacing: 1px;
+    }
+`;
+
+const SendButton = styled.button`
+    padding: 8px 0;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`;
+
+const SendIcon = styled(BsFillSendFill)<SendIconProps>`
+    color: ${(props) => (props.active ? '#000' : '#ccc')};
+`;
+
+const DeleteButton = styled.button`
+    padding: 8px 16px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    svg {
+        color: #ccc;
+    }
+    &:hover {
+        svg {
+            color: red;
+        }
+    }
+`;
+
+const AIChatRoom = () => {
+    const ICON_SIZE = 18;
     const { userUid } = useAuth();
     const INITIAL_MESSAGE = [
         {
@@ -69,10 +241,29 @@ const AISols = () => {
     ];
     const [isTyping, setIsTyping] = useState(false);
     const [messages, setMessages] = useState(INITIAL_MESSAGE);
+    const [inputMessage, setInputMessage] = useState('');
+    const messageListRef = useRef<HTMLDivElement>(null);
 
-    const handleSend = async (message: string) => {
+    // const handleSend = async (message: string) => {
+    //     const newMessage = {
+    //         message,
+    //         direction: 'outgoing',
+    //         sender: 'user',
+    //         sentTime: new Date().toLocaleString(),
+    //     };
+
+    //     const newMessages = [...messages, newMessage];
+
+    //     setMessages(newMessages);
+
+    //     setIsTyping(true);
+    //     await processMessageToChatGPT(newMessages);
+    // };
+    const handleSend = async () => {
+        if (inputMessage.trim() === '') return;
+
         const newMessage = {
-            message,
+            message: inputMessage,
             direction: 'outgoing',
             sender: 'user',
             sentTime: new Date().toLocaleString(),
@@ -81,9 +272,21 @@ const AISols = () => {
         const newMessages = [...messages, newMessage];
 
         setMessages(newMessages);
+        setInputMessage('');
 
         setIsTyping(true);
         await processMessageToChatGPT(newMessages);
+        messageListRef.current?.scrollTo(0, messageListRef.current?.scrollHeight);
+    };
+
+    const handleInputChange = (e: { target: { value: SetStateAction<string> } }) => {
+        setInputMessage(e.target.value);
+    };
+
+    const handleKeyPress = (e: { key: string }) => {
+        if (e.key === 'Enter') {
+            handleSend();
+        }
     };
 
     async function storeQuestionAndAnswer(question: { message: any }, answer: { message: any; sender?: string }) {
@@ -126,18 +329,6 @@ const AISols = () => {
             messages: apiMessages,
         };
 
-        // console.log('apiMessages:', apiMessages);
-        // console.log('apiRequestBody:', apiRequestBody);
-
-        // await fetch('https://api.openai.com/v1/chat/completions', {
-        //     method: 'POST',
-
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //         Authorization: `Bearer ${API_KEY}`,
-        //     },
-        //     body: JSON.stringify(apiRequestBody),
-        // })
         await fetch('/api/gpt/AISols', {
             method: 'POST',
             headers: {
@@ -238,44 +429,38 @@ const AISols = () => {
     console.log(userUid);
 
     return (
-        <StyledApp>
-            {userUid ? (
-                <div style={{ position: 'relative', height: '100vh', width: '100%' }}>
-                    <StyledMainContainer>
-                        <StyledChatContainer>
-                            <MessageList
-                                scrollBehavior='smooth'
-                                typingIndicator={isTyping ? <TypingIndicator content='ChatGPT is typing' /> : null}
-                            >
-                                {messages.map((message, i) => {
-                                    return (
-                                        <ChatMessage
-                                            key={i}
-                                            model={{
-                                                position: 0,
-                                                direction: message.sender === 'ChatGPT' ? 'incoming' : 'outgoing',
-                                                message: message.message,
-                                                sentTime: message.sentTime,
-                                                sender: message.sender,
-                                            }}
-                                        />
-                                    );
-                                })}
-                            </MessageList>
-                            <MessageInput placeholder='Type message here' onSend={handleSend} />
-                        </StyledChatContainer>
-                    </StyledMainContainer>
-                    <button onClick={clearHistory}>clear</button>
-                </div>
-            ) : (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                    <DirectLink href='/membership/SignIn'>
-                        <p>請先登入再使用此功能</p>
-                    </DirectLink>
-                </div>
-            )}
-        </StyledApp>
+        <ChatRoomContainer>
+            <StyledMainContainer>
+                <StyledChatContainer>
+                    <ChatRoomTitle>智慧解題助教</ChatRoomTitle>
+
+                    <MessageList ref={messageListRef}>
+                        {messages.map((message, i) => (
+                            <Message key={i} position={message.sender === 'ChatGPT' ? 'outgoing' : 'incoming'}>
+                                {message.message}
+                            </Message>
+                        ))}
+                        {isTyping && <TypingIndicator>🤖 回覆中...</TypingIndicator>}
+                        {/* <TypingIndicator>🤖 回覆中...</TypingIndicator> */}
+                    </MessageList>
+                    <MessageInputContainer>
+                        <MessageInput
+                            placeholder='輸入問題'
+                            value={inputMessage}
+                            onChange={handleInputChange}
+                            onKeyPress={handleKeyPress}
+                        />
+                        <SendButton onClick={handleSend}>
+                            <SendIcon size={ICON_SIZE} active={inputMessage.trim() !== ''} />
+                        </SendButton>
+                        <DeleteButton onClick={clearHistory}>
+                            <AiFillDelete size={ICON_SIZE + 4} />
+                        </DeleteButton>
+                    </MessageInputContainer>
+                </StyledChatContainer>
+            </StyledMainContainer>
+        </ChatRoomContainer>
     );
 };
 
-export default AISols;
+export default AIChatRoom;

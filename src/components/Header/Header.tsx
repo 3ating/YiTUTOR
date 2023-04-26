@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
+import { useAuth } from '../../../public/AuthContext';
+import { FaUserCircle } from 'react-icons/fa';
 
 const HeaderWrapper = styled.header`
     display: flex;
@@ -71,7 +73,7 @@ const SignInBtn = styled(Link)`
     text-align: center;
     color: #f5f5f5;
     background: #000000;
-    opacity: 0.7;
+    /* opacity: 0.7; */
     text-decoration: none;
 
     /* &:hover {
@@ -106,6 +108,8 @@ const LogoLink = styled(Link)`
 `;
 
 const Header: React.FC = () => {
+    const { isLoading } = useAuth();
+
     return (
         <HeaderWrapper>
             <LogoLink href={'/'}>
@@ -114,12 +118,13 @@ const Header: React.FC = () => {
             <NavContainer>
                 <MenuContainer>
                     <Menu href='/teacher/Teachers'>尋找老師</Menu>
-                    <Menu href='/gpt/AISols'>智慧解題</Menu>
+                    {/* <Menu href='/gpt/AISols'>智慧解題</Menu> */}
                     <Menu href='/streamroom/VideoChat'>線上教室</Menu>
                 </MenuContainer>
                 <SignBtnContainer>
                     <SignUpBtn href='/membership/SignUp'>註 冊</SignUpBtn>
-                    <SignInBtn href='/membership/SignIn'>登 入</SignInBtn>
+                    {/* <SignInBtn href='/membership/SignIn'>登 入</SignInBtn> */}
+                    <SignInBtn href='/membership/SignIn'>{isLoading ? '登 出' : '登 入'}</SignInBtn>
                 </SignBtnContainer>
             </NavContainer>
         </HeaderWrapper>

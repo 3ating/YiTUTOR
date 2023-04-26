@@ -7,9 +7,10 @@ import online from './onlne.png';
 import ai from './ai.png';
 import board from './board.png';
 import teacherImg from './teacherimg.png';
-import Slider from 'react-slick';
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
+import AIChat from '../AIChatBtn';
+// import Slider from 'react-slick';
+// import 'slick-carousel/slick/slick.css';
+// import 'slick-carousel/slick/slick-theme.css';
 
 const BannerContainer = styled.div`
     display: flex;
@@ -318,9 +319,9 @@ export default function Main() {
                             </TeacherDescription>
                             <TeacherBtn>購買課程</TeacherBtn>
                         </TeacherInfoContainer>
-                    </TeacherCard>
+                    </TeacherCard> */}
 
-                    <TeacherCard>
+                    {/* <TeacherCard>
                         <TeacherImg src={teacherImg} alt='Online' />
                         <CoursePrice>NT$3000/50分鐘</CoursePrice>
                         <Hightline />
@@ -336,6 +337,7 @@ export default function Main() {
                     </TeacherCard> */}
                 </TeachersContainer>
             </TeachersInfoContainer>
+            <AIChat />
         </>
     );
 }
