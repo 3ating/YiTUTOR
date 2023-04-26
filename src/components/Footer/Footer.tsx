@@ -48,7 +48,7 @@ const SocialLink = styled.a`
 const Footer: React.FC = () => {
     return (
         <FooterWrapper>
-            <Logo>YiTUTOR</Logo>
+            {/* <Logo>YiTUTOR</Logo> */}
             <FooterText>© 2023 YiTUTOR All rights reserved.</FooterText>
             <SocialLinks>
                 <SocialLink href='https://www.facebook.com/'>

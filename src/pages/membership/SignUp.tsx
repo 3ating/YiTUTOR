@@ -5,6 +5,88 @@ import 'firebase/compat/auth';
 import 'firebase/compat/storage';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import Header from '@/components/Header/Header';
+import Footer from '@/components/Footer/Footer';
+import styled from 'styled-components';
+import Image from 'next/image';
+import SignUpImg from './signup.png';
+
+const firebaseConfig = {
+    apiKey: 'AIzaSyDrG9uBznJyP7Fe_4JRwVG7pvR7SjScQsg',
+    authDomain: 'board-12c3c.firebaseapp.com',
+    projectId: 'board-12c3c',
+    storageBucket: 'board-12c3c.appspot.com',
+    messagingSenderId: '662676665549',
+    appId: '1:662676665549:web:d2d23417c365f3ec666584',
+    measurementId: 'G-YY6Q81WPY9',
+};
+
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.firestore();
+const auth = firebase.auth();
+const storage = firebase.storage();
+
+const PageContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    /* justify-content: space-between; */
+    min-height: 100vh;
+`;
+
+const SignupContainer = styled.div`
+    width: 100%;
+    height: 100%;
+    display: flex;
+    height: calc(100vh - 130px);
+`;
+
+const WelcomeContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    width: 40%;
+    height: 100%;
+    /* border: 1px solid black; */
+    background: antiquewhite;
+    height: calc(100vh - 130px);
+`;
+
+const WelcomeTextContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    width: 400px;
+    margin: 20px 0 45px;
+`;
+
+const WelcomeTitle = styled.p`
+    font-size: 40px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    margin: 20px 0 0;
+`;
+
+const WelcomeText = styled.p`
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    color: gray;
+    margin: 5px 0 0 0;
+    line-height: 25px;
+`;
+
+const SignUpImage = styled(Image)`
+    width: 450px;
+    height: auto;
+`;
+
+const SignupInputContainer = styled.div`
+    width: 60%;
+    border: 1px solid black;
+`;
 
 const styles: { [key: string]: CSSProperties } = {
     form: {
@@ -25,22 +107,6 @@ const styles: { [key: string]: CSSProperties } = {
         marginTop: '1rem',
     },
 };
-const firebaseConfig = {
-    apiKey: 'AIzaSyDrG9uBznJyP7Fe_4JRwVG7pvR7SjScQsg',
-    authDomain: 'board-12c3c.firebaseapp.com',
-    projectId: 'board-12c3c',
-    storageBucket: 'board-12c3c.appspot.com',
-    messagingSenderId: '662676665549',
-    appId: '1:662676665549:web:d2d23417c365f3ec666584',
-    measurementId: 'G-YY6Q81WPY9',
-};
-
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
-const db = firebase.firestore();
-const auth = firebase.auth();
-const storage = firebase.storage();
 
 const RegistrationForm = () => {
     const [name, setName] = useState('');
@@ -193,123 +259,152 @@ const RegistrationForm = () => {
     };
 
     return (
-        <>
-            <form onSubmit={handleSubmit} style={styles.form}>
-                <label style={styles.label}>
-                    大頭貼：
-                    <input type='file' accept='image/*' onChange={(e) => handleAvatarChange(e)} />
-                </label>
-                {avatarPreview && (
-                    <div>
-                        <img
-                            src={avatarPreview}
-                            alt='Avatar Preview'
-                            style={{ width: '100px', objectFit: 'cover', borderRadius: '50%' }}
-                        />
-                    </div>
-                )}
-                <label>
-                    姓名：
-                    <input type='text' value={name} onChange={(e) => setName(e.target.value)} />
-                </label>
-                <label>
-                    Email：
-                    <input type='email' value={email} onChange={(e) => setEmail(e.target.value)} />
-                </label>
-                <label>
-                    密碼：
-                    <input type='password' value={password} onChange={(e) => setPassword(e.target.value)} />
-                </label>
-                <label>
-                    手機號碼：
-                    <input type='tel' value={phone} onChange={(e) => setPhone(e.target.value)} />
-                </label>
-                <label>
-                    身份：
-                    <select value={userType} onChange={(e) => setUserType(e.target.value)}>
-                        <option value=''>請選擇</option>
-                        <option value='student'>學生</option>
-                        <option value='teacher'>老師</option>
-                    </select>
-                </label>
-                {userType === 'teacher' && (
-                    <>
-                        <label>
-                            簡述：
-                            <input type='text' value={description} onChange={(e) => setDescription(e.target.value)} />
+        <PageContainer>
+            <Header />
+            <SignupContainer>
+                <WelcomeContainer>
+                    <WelcomeTextContainer>
+                        <WelcomeTitle>
+                            Welcome to <br /> YiTUTOR
+                        </WelcomeTitle>
+                        <WelcomeText>
+                            填寫右邊的註冊資訊，選擇老師或學生
+                            <br />
+                            成為YiTUTOR的一員，與我們一同成長吧！
+                        </WelcomeText>
+                    </WelcomeTextContainer>
+                    <SignUpImage src={SignUpImg} alt='Sign Up' />
+                </WelcomeContainer>
+                <SignupInputContainer>
+                    <form onSubmit={handleSubmit} style={styles.form}>
+                        <label style={styles.label}>
+                            大頭貼：
+                            <input type='file' accept='image/*' onChange={(e) => handleAvatarChange(e)} />
                         </label>
-                        <label>
-                            自我介紹：
-                            <textarea value={intro} onChange={(e) => setIntro(e.target.value)} rows={10} cols={50} />
-                        </label>
-                        <div>
-                            <label>科目：</label>
-                            {subjects.map((subject, index) => (
-                                <input
-                                    key={index}
-                                    type='text'
-                                    value={subject}
-                                    onChange={(e) => handleSubjectChange(index, e.target.value)}
+                        {avatarPreview && (
+                            <div>
+                                <img
+                                    src={avatarPreview}
+                                    alt='Avatar Preview'
+                                    style={{ width: '100px', objectFit: 'cover', borderRadius: '50%' }}
                                 />
-                            ))}
-                            <button type='button' onClick={addSubject}>
-                                新增科目
-                            </button>
-                        </div>
+                            </div>
+                        )}
                         <label>
-                            1 堂課價格：
-                            <input
-                                type='number'
-                                value={price[1] || ''}
-                                onChange={(e) => handlePriceChange(1, e.target.value)}
-                            />
+                            姓名：
+                            <input type='text' value={name} onChange={(e) => setName(e.target.value)} />
                         </label>
                         <label>
-                            5 堂課價格：
-                            <input
-                                type='number'
-                                value={price[5] || ''}
-                                onChange={(e) => handlePriceChange(5, e.target.value)}
-                            />
+                            Email：
+                            <input type='email' value={email} onChange={(e) => setEmail(e.target.value)} />
                         </label>
                         <label>
-                            10 堂課價格：
-                            <input
-                                type='number'
-                                value={price[10] || ''}
-                                onChange={(e) => handlePriceChange(10, e.target.value)}
-                            />
+                            密碼：
+                            <input type='password' value={password} onChange={(e) => setPassword(e.target.value)} />
                         </label>
-                        <fieldset>
-                            <legend>Available Time Slots:</legend>
-                            {Object.keys(selectedTimes).map((day) => (
-                                <fieldset key={day}>
-                                    <legend>{day}:</legend>
-                                    {Array.from({ length: 12 }, (_, i) => i + 9).map((hour) => (
-                                        <label key={hour}>
-                                            <input
-                                                type='checkbox'
-                                                onChange={(e) => handleTimeChange(day, hour, e.target.checked)}
-                                            />
-                                            {hour}:00
-                                        </label>
+                        <label>
+                            手機號碼：
+                            <input type='tel' value={phone} onChange={(e) => setPhone(e.target.value)} />
+                        </label>
+                        <label>
+                            身份：
+                            <select value={userType} onChange={(e) => setUserType(e.target.value)}>
+                                <option value=''>請選擇</option>
+                                <option value='student'>學生</option>
+                                <option value='teacher'>老師</option>
+                            </select>
+                        </label>
+                        {userType === 'teacher' && (
+                            <>
+                                <label>
+                                    簡述：
+                                    <input
+                                        type='text'
+                                        value={description}
+                                        onChange={(e) => setDescription(e.target.value)}
+                                    />
+                                </label>
+                                <label>
+                                    自我介紹：
+                                    <textarea
+                                        value={intro}
+                                        onChange={(e) => setIntro(e.target.value)}
+                                        rows={10}
+                                        cols={50}
+                                    />
+                                </label>
+                                <div>
+                                    <label>科目：</label>
+                                    {subjects.map((subject, index) => (
+                                        <input
+                                            key={index}
+                                            type='text'
+                                            value={subject}
+                                            onChange={(e) => handleSubjectChange(index, e.target.value)}
+                                        />
+                                    ))}
+                                    <button type='button' onClick={addSubject}>
+                                        新增科目
+                                    </button>
+                                </div>
+                                <label>
+                                    1 堂課價格：
+                                    <input
+                                        type='number'
+                                        value={price[1] || ''}
+                                        onChange={(e) => handlePriceChange(1, e.target.value)}
+                                    />
+                                </label>
+                                <label>
+                                    5 堂課價格：
+                                    <input
+                                        type='number'
+                                        value={price[5] || ''}
+                                        onChange={(e) => handlePriceChange(5, e.target.value)}
+                                    />
+                                </label>
+                                <label>
+                                    10 堂課價格：
+                                    <input
+                                        type='number'
+                                        value={price[10] || ''}
+                                        onChange={(e) => handlePriceChange(10, e.target.value)}
+                                    />
+                                </label>
+                                <fieldset>
+                                    <legend>Available Time Slots:</legend>
+                                    {Object.keys(selectedTimes).map((day) => (
+                                        <fieldset key={day}>
+                                            <legend>{day}:</legend>
+                                            {Array.from({ length: 12 }, (_, i) => i + 9).map((hour) => (
+                                                <label key={hour}>
+                                                    <input
+                                                        type='checkbox'
+                                                        onChange={(e) => handleTimeChange(day, hour, e.target.checked)}
+                                                    />
+                                                    {hour}:00
+                                                </label>
+                                            ))}
+                                        </fieldset>
                                     ))}
                                 </fieldset>
-                            ))}
-                        </fieldset>
-                        <label>
-                            證明文件：
-                            <input type='file' accept='image/*' onChange={handleFileChange} />
-                        </label>
-                    </>
-                )}
-                <button type='submit' style={styles.button}>
-                    提交
-                </button>
-                {message && <p>{message}</p>}
-            </form>
-            <Link href='SignIn'>已經有帳號，前往登入</Link>
-        </>
+                                <label>
+                                    證明文件：
+                                    <input type='file' accept='image/*' onChange={handleFileChange} />
+                                </label>
+                            </>
+                        )}
+                        <button type='submit' style={styles.button}>
+                            提交
+                        </button>
+                        {message && <p>{message}</p>}
+                    </form>
+                    <Link href='SignIn'>已經有帳號，前往登入</Link>
+                </SignupInputContainer>
+            </SignupContainer>
+
+            <Footer />
+        </PageContainer>
     );
 };
 

@@ -451,7 +451,7 @@ const AIChatRoom = () => {
                             onKeyPress={handleKeyPress}
                         />
                         <SendButton onClick={handleSend}>
-                            <SendIcon size={ICON_SIZE} active={inputMessage.trim() !== ''} />
+                            <SendIcon size={ICON_SIZE} active={inputMessage.trim() ? true : false} />
                         </SendButton>
                         <DeleteButton onClick={clearHistory}>
                             <AiFillDelete size={ICON_SIZE + 4} />

@@ -656,7 +656,12 @@ const UserProfile = () => {
                             </UserInformationContainer>
                             {(isEditingEmail || isEditingPhone) && (
                                 <>
-                                    <ConfirmButton onClick={() => handleSave('email' || 'phone')}>確認</ConfirmButton>
+                                    {isEditingEmail && (
+                                        <ConfirmButton onClick={() => handleSave('email')}>確認</ConfirmButton>
+                                    )}
+                                    {isEditingPhone && (
+                                        <ConfirmButton onClick={() => handleSave('phone')}>確認</ConfirmButton>
+                                    )}
                                     <CancelButton
                                         onClick={() => {
                                             setIsEditingEmail(false);
