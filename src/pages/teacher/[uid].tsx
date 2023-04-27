@@ -428,7 +428,7 @@ const TeacherDetails = () => {
                 <SubHeading>評價</SubHeading>
                 <Text>{teacher.evaluation}</Text>
             </Section>
-            <Section>
+            {/* <Section>
                 <SubHeading>認證</SubHeading>
                 <Text>{teacher.certification ? '是' : '否'}</Text>
             </Section>
@@ -437,7 +437,7 @@ const TeacherDetails = () => {
                     <SubHeading>證書</SubHeading>
                     <a href={teacher.document}>查看證書</a>
                 </Section>
-            )}
+            )} */}
             <DirectLink href={'/teacher/Teachers'}>
                 <button>尋找其他教師</button>
             </DirectLink>

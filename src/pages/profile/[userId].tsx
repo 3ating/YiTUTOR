@@ -12,6 +12,10 @@ import Schedule from '../Schedule';
 import Button from '@/components/Button';
 import { AiFillEdit } from 'react-icons/ai';
 
+type BookedCoursesContainerProps = {
+    isBookedCourseEmpty: boolean;
+};
+
 const MainWrapper = styled.div`
     display: flex;
     flex-direction: column;
@@ -108,7 +112,7 @@ const UserInformation = styled.p`
     letter-spacing: 1.5px;
 `;
 
-const UserInforContent = styled.p`
+const UserInforContent = styled.div`
     font-weight: 400;
     font-size: 16px;
     line-height: 19px;
@@ -340,6 +344,7 @@ const DirectLink = styled(Link)`
 
 const TeacherLink = styled(Link)`
     text-decoration: none;
+    color: #ffab34;
     transition: color 0.2s ease;
 `;
 
@@ -349,11 +354,11 @@ const ProfileWrapper = styled.div`
     /* border: 1px solid red; */
 `;
 
-const ProfileMiddleContainer = styled.div`
+const ProfileMiddleContainer = styled.div<BookedCoursesContainerProps>`
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 40%;
+    width: ${(props) => (props.isBookedCourseEmpty ? '75%' : '40%')};
     height: 100%;
     /* border: 1px solid black; */
 `;
@@ -372,15 +377,16 @@ const CourseLine = styled.div`
     background: black;
 `;
 
-const BookedCoursesContainer = styled.div`
-    display: grid;
+const BookedCoursesContainer = styled.div<BookedCoursesContainerProps>`
+    display: ${(props) => (props.isBookedCourseEmpty ? 'flex' : 'grid')};
     grid-template-columns: 1fr 1fr;
     justify-items: center;
+    align-items: center;
     grid-gap: 1rem;
     width: 518.4px;
-    /* height: 100%; */
     padding: 30px 0;
     box-sizing: border-box;
+    justify-content: center;
 `;
 
 const ProfilRightContainer = styled.div`
@@ -411,9 +417,9 @@ const ModifiedInput = styled.input`
     outline: none;
     transition: border-color 0.2s ease-in-out;
     width: 100%;
-    &:focus {
+    /* &:focus {
         border-color: #ffab34;
-    }
+    } */
 `;
 
 const ProfileLeftContainer = styled.div`
@@ -426,10 +432,19 @@ const ProfileLeftContainer = styled.div`
 const EditContainer = styled.div`
     display: flex;
     justify-content: space-between;
+    margin-top: 15px;
 `;
 
 const IconWrapper = styled.div`
     cursor: pointer;
+`;
+
+const NoBookedCourse = styled.div`
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    letter-spacing: 1px;
+    color: #878787;
 `;
 
 interface UserInfo {
@@ -499,9 +514,6 @@ const UserProfile = () => {
     //         setEditedUserInfo({ ...editedUserInfo, [name]: value });
     //     }
     // };
-    const isUserInfoKey = (key: string): key is keyof UserInfo => {
-        return key in UserInfo;
-    };
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, fieldName: string) => {
         const { value } = event.target;
@@ -517,9 +529,15 @@ const UserProfile = () => {
 
     const handleEdit = (fieldName: string) => {
         if (fieldName === 'email') {
-            setIsEditingEmail(true);
+            if (isEditingPhone) {
+                setIsEditingPhone(false);
+            }
+            setIsEditingEmail(!isEditingEmail);
         } else if (fieldName === 'phone') {
-            setIsEditingPhone(true);
+            if (isEditingEmail) {
+                setIsEditingEmail(false);
+            }
+            setIsEditingPhone(!isEditingPhone);
         }
         setEditedUserInfo(userInfo);
     };
@@ -562,15 +580,17 @@ const UserProfile = () => {
 
             const fetchBookingData = async (bookings: Booking[]) => {
                 const usersCollectionRef = collection(db, 'users');
-                const bookingsDataPromises = bookings.map(async (booking) => {
-                    const bookingDocRef = doc(usersCollectionRef, booking.teacherId || booking.studentId);
-                    const bookingDocSnapshot = await getDoc(bookingDocRef);
-                    const bookingData = bookingDocSnapshot.data() as TeacherInfo;
-                    return { ...booking, teacherInfo: bookingData };
-                });
+                if (bookings) {
+                    const bookingsDataPromises = bookings.map(async (booking) => {
+                        const bookingDocRef = doc(usersCollectionRef, booking.teacherId || booking.studentId);
+                        const bookingDocSnapshot = await getDoc(bookingDocRef);
+                        const bookingData = bookingDocSnapshot.data() as TeacherInfo;
+                        return { ...booking, teacherInfo: bookingData };
+                    });
 
-                const teachersData = await Promise.all(bookingsDataPromises);
-                setBookingsInfo(teachersData);
+                    const teachersData = await Promise.all(bookingsDataPromises);
+                    setBookingsInfo(teachersData);
+                }
             };
 
             fetchUserData();
@@ -676,11 +696,18 @@ const UserProfile = () => {
                     </UserInfoBox>
                 </ProfileLeftContainer>
 
-                <ProfileMiddleContainer>
+                <ProfileMiddleContainer
+                    isBookedCourseEmpty={userInfo.userType === 'teacher' && bookingsInfo.length === 0}
+                >
                     <CourseTitle>預約課程</CourseTitle>
                     <CourseLine />
-                    <BookedCoursesContainer>
-                        {bookingsInfo.length > 0 &&
+                    <BookedCoursesContainer isBookedCourseEmpty={bookingsInfo.length === 0}>
+                        {userInfo.userType === 'teacher' && bookingsInfo.length === 0 ? (
+                            <NoBookedCourse>目前無學生預約課程</NoBookedCourse>
+                        ) : userInfo.userType === 'student' && bookingsInfo.length === 0 ? (
+                            <NoBookedCourse>無預約課程</NoBookedCourse>
+                        ) : (
+                            bookingsInfo.length > 0 &&
                             bookingsInfo.map((booking, index) => (
                                 <DirectLink
                                     key={index}
@@ -702,41 +729,50 @@ const UserProfile = () => {
                                         </BookingInfo>
                                     </BookingCard>
                                 </DirectLink>
-                            ))}
+                            ))
+                        )}
                     </BookedCoursesContainer>
                 </ProfileMiddleContainer>
                 <ProfilRightContainer>
-                    <CourseTitle>購買課程</CourseTitle>
-                    <CourseLine />
-
-                    <PurchasedContainer>
-                        {userInfo?.courses && Object.entries(userInfo.courses).length > 0 && (
-                            <CourseCardContainer>
-                                {Object.entries(userInfo.courses).map(([courseId, courseData]) => (
-                                    <DirectLink key={courseId} href={`../teacher/${courseData.teacherid}`}>
-                                        <CourseCard>
-                                            <CourseInfo>
-                                                <CourseLabel>科目:</CourseLabel>
-                                                <CourseValue>{courseData.subject}</CourseValue>
-                                            </CourseInfo>
-                                            <CourseInfo>
-                                                <CourseLabel>家教:</CourseLabel>
-                                                <CourseValue>{courseData.teachername}</CourseValue>
-                                            </CourseInfo>
-                                            <CourseInfo>
-                                                <CourseLabel>剩餘堂數:</CourseLabel>
-                                                <CourseValue>{courseData.quantity}</CourseValue>
-                                            </CourseInfo>
-                                            <CourseInfo>
-                                                <CourseLabel>價格:</CourseLabel>
-                                                <CourseValue>{courseData.price}</CourseValue>
-                                            </CourseInfo>
-                                        </CourseCard>
-                                    </DirectLink>
-                                ))}
-                            </CourseCardContainer>
-                        )}
-                    </PurchasedContainer>
+                    {userInfo.userType === 'student' && (
+                        <>
+                            <CourseTitle>購買課程</CourseTitle>
+                            <CourseLine />
+                            <PurchasedContainer>
+                                {userInfo?.courses && Object.entries(userInfo.courses).length > 0 ? (
+                                    <CourseCardContainer>
+                                        {Object.entries(userInfo.courses).map(([courseId, courseData]) => (
+                                            <DirectLink key={courseId} href={`../teacher/${courseData.teacherid}`}>
+                                                <CourseCard>
+                                                    <CourseInfo>
+                                                        <CourseLabel>科目:</CourseLabel>
+                                                        <CourseValue>{courseData.subject}</CourseValue>
+                                                    </CourseInfo>
+                                                    <CourseInfo>
+                                                        <CourseLabel>家教:</CourseLabel>
+                                                        <CourseValue>{courseData.teachername}</CourseValue>
+                                                    </CourseInfo>
+                                                    <CourseInfo>
+                                                        <CourseLabel>剩餘堂數:</CourseLabel>
+                                                        <CourseValue>{courseData.quantity}</CourseValue>
+                                                    </CourseInfo>
+                                                    <CourseInfo>
+                                                        <CourseLabel>價格:</CourseLabel>
+                                                        <CourseValue>{courseData.price}</CourseValue>
+                                                    </CourseInfo>
+                                                </CourseCard>
+                                            </DirectLink>
+                                        ))}
+                                    </CourseCardContainer>
+                                ) : (
+                                    <NoBookedCourse>
+                                        無已購買課程，快去<TeacherLink href={'/teacher/Teachers'}>尋找老師</TeacherLink>
+                                        吧！
+                                    </NoBookedCourse>
+                                )}
+                            </PurchasedContainer>
+                        </>
+                    )}
                 </ProfilRightContainer>
             </ProfileWrapper>
             <Footer />

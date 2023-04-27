@@ -441,11 +441,11 @@ const RegistrationForm = () => {
     const [description, setDescription] = useState('');
     const [subject, setSubject] = useState('');
     const [price, setPrice] = useState<{ [key: number]: number | undefined }>({});
-    const [document, setDocument] = useState('');
+    // const [document, setDocument] = useState('');
 
     const [subjects, setSubjects] = useState(['']);
     const [documentFile, setDocumentFile] = useState<File | null>(null);
-    const [certification, setCertification] = useState(false);
+    // const [certification, setCertification] = useState(false);
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [avatarPreview, setAvatarPreview] = useState('');
     const [intro, setIntro] = useState('');
@@ -560,8 +560,8 @@ const RegistrationForm = () => {
                                 description,
                                 subject: selectedSubjects,
                                 price: priceArray,
-                                document: documentUrl,
-                                certification,
+                                // document: documentUrl,
+                                // certification,
                                 intro,
                                 selectedTimes: selectedTimesArray,
                             }),
@@ -577,7 +577,7 @@ const RegistrationForm = () => {
                             setDescription('');
                             setSubject('');
                             setPrice({});
-                            setDocument('');
+                            // setDocument('');
                             setSubjects(['']);
                             setAvatarFile(null);
                         })
