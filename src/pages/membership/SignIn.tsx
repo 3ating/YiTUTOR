@@ -107,7 +107,8 @@ const UserInfo = styled.div`
 
 const UserContent = styled.p`
     margin: 0;
-    font-size: 18px;
+    font-size: 21px;
+    letter-spacing: 1px;
     color: #333;
 `;
 
@@ -116,6 +117,7 @@ const Avatar = styled.img`
     border-radius: 50%;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     margin-bottom: 10px;
+    border: 2px solid gray;
 `;
 
 const spin = keyframes`
@@ -173,11 +175,7 @@ const SignIn = () => {
                             <LoginFormWrapper>
                                 <UserInfo>
                                     {userInfo?.avatar && (
-                                        <Avatar
-                                            src={userInfo.avatar}
-                                            // alt={`${userInfo.name} 的大頭照`}
-                                            // style={{ width: '100px', borderRadius: '50%' }}
-                                        />
+                                        <Avatar src={userInfo.avatar} alt={`${userInfo.name} 的大頭照`} />
                                     )}
                                     <UserContent>{userInfo?.name}</UserContent>
                                     <UserContent>{userInfo?.email}</UserContent>

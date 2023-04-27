@@ -18,6 +18,7 @@ const Logo = styled.h1`
     font-weight: 700;
     font-size: 40px;
     line-height: 47px;
+    margin: 0;
 `;
 
 const NavContainer = styled.div`
@@ -102,13 +103,27 @@ const SignUpBtn = styled(Link)`
     } */
 `;
 
+const UserAvatar = styled.img`
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid gray;
+`;
+
 const LogoLink = styled(Link)`
     text-decoration: none;
     color: black;
 `;
 
+const AvatarLink = styled(Link)`
+    text-decoration: none;
+    color: #000;
+`;
+
 const Header: React.FC = () => {
-    const { isLoading } = useAuth();
+    const { userInfo, userUid, isLoading } = useAuth();
+    console.log(userInfo);
 
     return (
         <HeaderWrapper>
@@ -122,9 +137,16 @@ const Header: React.FC = () => {
                     <Menu href='/streamroom/VideoChat'>線上教室</Menu>
                 </MenuContainer>
                 <SignBtnContainer>
-                    <SignUpBtn href='/membership/SignUp'>註 冊</SignUpBtn>
-                    {/* <SignInBtn href='/membership/SignIn'>登 入</SignInBtn> */}
-                    <SignInBtn href='/membership/SignIn'>{isLoading ? '登 出' : '登 入'}</SignInBtn>
+                    {isLoading ? (
+                        <AvatarLink href={`/membership/SignIn`} passHref>
+                            <UserAvatar src={userInfo?.avatar} alt='User Avatar' />
+                        </AvatarLink>
+                    ) : (
+                        <>
+                            <SignUpBtn href='/membership/SignUp'>註 冊</SignUpBtn>
+                            <SignInBtn href='/membership/SignIn'>登 入</SignInBtn>
+                        </>
+                    )}
                 </SignBtnContainer>
             </NavContainer>
         </HeaderWrapper>

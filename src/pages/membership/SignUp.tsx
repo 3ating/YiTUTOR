@@ -347,8 +347,8 @@ const PriceInput = styled.input`
         transform: translateY(-1rem);
     }
 
-    -webkit-appearance: none;
-    -moz-appearance: textfield;
+    /* -webkit-appearance: none;
+    -moz-appearance: textfield; */
     &::-webkit-inner-spin-button {
         -webkit-appearance: none;
         margin: 0;

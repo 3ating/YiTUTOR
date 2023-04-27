@@ -8,9 +8,7 @@ import ai from './ai.png';
 import board from './board.png';
 import teacherImg from './teacherimg.png';
 import AIChat from '../AIChatBtn';
-// import Slider from 'react-slick';
-// import 'slick-carousel/slick/slick.css';
-// import 'slick-carousel/slick/slick-theme.css';
+import Link from 'next/link';
 
 const BannerContainer = styled.div`
     display: flex;
@@ -196,6 +194,11 @@ const TeacherBtn = styled(PrimaryButton)`
     width: 100%;
 `;
 
+const DirectLink = styled(Link)`
+    text-decoration: none;
+    color: black;
+`;
+
 export default function Main() {
     const settings = {
         dots: true,
@@ -210,7 +213,9 @@ export default function Main() {
             <BannerContainer>
                 <BannerTextContainer>
                     <BannerText>Easy to Learn, Easy to Achieve with YiTUTOR</BannerText>
-                    <PrimaryButton>立即加入</PrimaryButton>
+                    <DirectLink href={'/membership/SignUp'}>
+                        <PrimaryButton>立即加入</PrimaryButton>
+                    </DirectLink>
                 </BannerTextContainer>
                 <Image src={mainImg} width={700} alt='Banner image' style={{ margin: '0 auto' }} />
             </BannerContainer>
