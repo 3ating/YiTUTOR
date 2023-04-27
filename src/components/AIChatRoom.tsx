@@ -109,12 +109,13 @@ const ChatRoomContainer = styled.div`
 const ChatRoomTitle = styled.p`
     text-align: center;
     margin: 0 0 10px;
-    padding: 8px 16px;
+    padding: 12px 16px;
     background-color: #000;
     color: white;
     border-top-left-radius: 9px;
     border-top-right-radius: 9px;
     font-size: 18px;
+    margin-bottom: 14px;
 `;
 
 const StyledApp = styled.div`
@@ -224,7 +225,7 @@ const DeleteButton = styled.button`
     }
     &:hover {
         svg {
-            color: red;
+            color: #000;
         }
     }
 `;
@@ -310,7 +311,7 @@ const AIChatRoom = () => {
             {
                 role: 'system',
                 content:
-                    '你是一個專業的補習班老師，個性一板一眼，只會回答國文、數學、英文、物理和化學等科目的相關考題，若是被問到考題以外的問題請你回答：「此問題與學習無關，請您重新發問！」',
+                    '你是一個專業的補習班老師，個性一板一眼，若是被問到考題以外的問題請你回答：「此問題與學習無關，請您重新發問！」',
             },
         ].concat(
             chatMessages.map((messageObject) => {
