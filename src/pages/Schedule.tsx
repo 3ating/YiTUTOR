@@ -6,7 +6,8 @@ const ScheduleContainer = styled.div`
     flex-direction: column;
     align-items: center;
     width: 100%;
-    margin-top: 2rem;
+    margin: 0;
+    /* margin-top: 2rem; */
 `;
 
 const DayRow = styled.div`
@@ -14,37 +15,53 @@ const DayRow = styled.div`
     justify-content: flex-start;
     align-items: center;
     width: 100%;
+    max-width: 500px;
+    flex-wrap: wrap;
     margin-bottom: 1rem;
+`;
+
+const TimeContainer = styled.div`
+    display: flex;
+    margin-top: 20px;
 `;
 
 const DayLabel = styled.div`
     width: 40px;
-    text-align: center;
+    /* text-align: center; */
     font-weight: bold;
 `;
 
 const TimeSlot = styled.div<{ selected: boolean }>`
     width: 100px;
     height: 35px;
-    border: 2px solid #3f51b5;
+    border: 2px solid #ccc;
     border-radius: 4px;
-    background-color: ${(props) => (props.selected ? 'white' : '#3f51b5')};
-    color: ${(props) => (props.selected ? '#3f51b5' : 'white')};
+    background-color: ${(props) => (props.selected ? 'white' : '#f0f0f0')};
+    color: ${(props) => (props.selected ? '#333' : '#666')};
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: ${(props) => (props.selected ? 'pointer' : 'not-allowed')};
     transition: all 0.2s ease-in-out;
+    margin: 0 10px 8px 0;
 
     ${(props) =>
         props.selected &&
         `
         &:hover {
-            background-color: white;
-            color: #3f51b5;
-            transform: scale(1.1);
+            background-color: #ffab34;
+            color: #fff;
+            border-color: #ffab34; 
         }
     `}
+`;
+
+const NoTimeContent = styled.p`
+    font-size: 20px;
+    /* font-weight: 600; */
+    color: gray;
+    letter-spacing: 2px;
+    line-height: 35px;
 `;
 
 interface UserInfo {
@@ -81,6 +98,17 @@ const Schedule: React.FC<ScheduleProps> = ({
     const currentWeekday = selectedDate.getDay();
     const dayMapping = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
+    const hasAvailableTimeInThreeDays = () => {
+        for (let i = 0; i < 3; i++) {
+            const dayIndex = (currentWeekday + i) % 7;
+            const hours = getSelectedTimesForDay(dayIndex);
+            if (hours.length > 0) {
+                return true;
+            }
+        }
+        return false;
+    };
+
     const renderTimeSlots = (hours: number[], day: string) => {
         const timeSlots = [];
         for (let i = 9; i <= 21; i++) {
@@ -98,7 +126,7 @@ const Schedule: React.FC<ScheduleProps> = ({
 
     const renderWeekdays = () => {
         const weekdays = [];
-        for (let i = 0; i < 7; i++) {
+        for (let i = 0; i < 3; i++) {
             const day = new Date(selectedDate);
             day.setDate(selectedDate.getDate() + i);
             weekdays.push(day.toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' }));
@@ -108,7 +136,7 @@ const Schedule: React.FC<ScheduleProps> = ({
 
     const getSelectedTimesForDay = (dayIndex: number) => {
         if (!selectedTimes) {
-            return []; // 或其他默认值
+            return [];
         }
 
         const dayName = dayMapping[dayIndex];
@@ -131,15 +159,20 @@ const Schedule: React.FC<ScheduleProps> = ({
 
                 if (hours.length > 0) {
                     return (
-                        <DayRow key={index}>
+                        <TimeContainer key={index}>
                             <DayLabel>{dateLabel}</DayLabel>
-                            {renderTimeSlots(hours, dayMapping[dayIndex])}
-                        </DayRow>
+                            <DayRow>{renderTimeSlots(hours, dayMapping[dayIndex])}</DayRow>
+                        </TimeContainer>
                     );
                 } else {
                     return null;
                 }
             })}
+            {!hasAvailableTimeInThreeDays() && (
+                <NoTimeContent>
+                    近三日無可預約時段 <br /> 請選擇其他日期
+                </NoTimeContent>
+            )}
         </ScheduleContainer>
     );
 };

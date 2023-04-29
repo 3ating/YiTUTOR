@@ -747,7 +747,7 @@ const RegistrationForm = () => {
                                             required
                                             value={description}
                                             onChange={(e) => setDescription(e.target.value)}
-                                            rows={4}
+                                            rows={2}
                                             cols={50}
                                             maxLength={60}
                                         />
@@ -759,7 +759,7 @@ const RegistrationForm = () => {
                                             required
                                             value={intro}
                                             onChange={(e) => setIntro(e.target.value)}
-                                            rows={7}
+                                            rows={5}
                                             cols={50}
                                         />
                                     </TeacherInfoLabel>

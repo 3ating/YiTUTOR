@@ -75,9 +75,11 @@ const CalendarDaysGrid = styled.div`
 
 interface CalendarProps {
     handleSelectDate: (date: Date) => void;
+    setShowBookButtons: (show: boolean) => void;
+    setSelectedTime: (time: string) => void;
 }
 
-export default function Calendar({ handleSelectDate }: CalendarProps) {
+export default function Calendar({ handleSelectDate, setShowBookButtons, setSelectedTime }: CalendarProps) {
     const [selectedDate, setSelectedDate] = useState(new Date());
 
     const prevMonth = () => {
@@ -130,6 +132,8 @@ export default function Calendar({ handleSelectDate }: CalendarProps) {
                         const handleClickDate = () => {
                             handleSelectDate(date);
                             setSelectedDate(date);
+                            setShowBookButtons(false);
+                            setSelectedTime('');
                         };
                         days.push(
                             <CalendarDay
