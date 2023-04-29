@@ -266,12 +266,21 @@ const RoomTitle = styled.p<TypographyProps>`
 
 const CenteredContainer = styled.div`
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
 `;
 
+const UnLoginText = styled.p`
+    font-size: 24px;
+    letter-spacing: 2px;
+    margin: 0 0 5px;
+`;
+
 const DirectLink = styled(Link)`
+    font-size: 24px;
+    letter-spacing: 2px;
     text-decoration: none;
     color: black;
 `;
@@ -310,7 +319,7 @@ const configuration = {
 
 const VideoChat: React.FC = () => {
     const ICON_SIZE = 22;
-    const { userUid, userInfo } = useAuth();
+    const { userUid, userInfo, isLoading } = useAuth();
     const [showLocalVideo, setShowLocalVideo] = useState(true);
     const localVideoRef = useRef<HTMLVideoElement | null>(null);
     const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -638,8 +647,8 @@ const VideoChat: React.FC = () => {
     const seconds = timeRemaining % 60;
     const formattedSeconds = seconds.toString().padStart(2, '0');
 
-    // console.log(userUid);
-    console.log(userInfo);
+    console.log('userUid', userUid);
+    console.log('isLoading', isLoading);
 
     return (
         <MainWrapper>
@@ -726,7 +735,8 @@ const VideoChat: React.FC = () => {
                 </OnlineClassContainer>
             ) : (
                 <CenteredContainer>
-                    <DirectLink href='/membership/SignIn'>請先登入再使用此功能</DirectLink>
+                    <UnLoginText>請先登入再使用此功能</UnLoginText>
+                    <DirectLink href='/membership/SignIn'>點我登入</DirectLink>
                 </CenteredContainer>
             )}
             <Footer />

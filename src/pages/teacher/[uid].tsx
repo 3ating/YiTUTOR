@@ -34,26 +34,27 @@ const MainWrapper = styled.div`
 
 const TeacherContainer = styled.div`
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 30px;
 `;
 
-const TeacherTopContainer = styled.div`
+const TeacherLeftContainer = styled.div`
     display: flex;
+    flex-direction: column;
     justify-content: center;
-    width: 100%;
-    margin-top: 20px;
+    width: 70%;
 `;
 
 const TeacherIntroContainer = styled.div`
-    width: 95%;
+    width: 100%;
     background-color: #ffffff;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
     display: flex;
-    padding: 30px 30px;
+    padding: 50px;
     border-radius: 9px;
-    margin: 0 0 0 10px;
+    margin: 0 0 20px;
 `;
 
 const TeacherAvatarContainer = styled.div`
@@ -69,11 +70,7 @@ const TeacherContentContainer = styled.div`
     justify-content: flex-start;
 `;
 
-const ScrollableContent = styled.div`
-    max-height: 200px;
-    overflow-y: auto;
-    padding-right: 8px;
-`;
+const TeacherTextContainer = styled.div``;
 
 const AvailableTimeContainer = styled.div`
     width: 100%;
@@ -82,25 +79,38 @@ const AvailableTimeContainer = styled.div`
     box-sizing: border-box;
     display: flex;
     justify-content: center;
-    padding: 30px 30px;
+    flex-direction: column;
+    padding: 50px;
     border-radius: 9px;
-    margin: 10px 10px 0 10px;
+    margin: 0;
 `;
 
-const TeacherBottomContainer = styled.div`
-    width: 98.5%;
-    height: 100%;
+// const TeacherRightContainer = styled.div`
+//     width: 30%;
+//     display: flex;
+//     justify-content: flex-start;
+//     flex-direction: column;
+//     align-items: center;
+//     padding-left: 25px;
+//     /* overflow-y: auto; */
+// `;
+
+const TeacherRightContainer = styled.div`
+    width: 30%;
     display: flex;
     justify-content: flex-start;
     flex-direction: column;
     align-items: center;
-    overflow-x: hidden;
-    /* overflow-y: auto; */
-    margin-bottom: 20px;
+    padding-left: 25px;
+    position: fixed;
+    right: 5px;
+    top: 95px;
+    height: 100%;
+    overflow-y: auto;
 `;
 
 const CoursePriceContainer = styled.div`
-    width: 95%;
+    width: 100%;
     height: 100%;
     background-color: #ffffff;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -206,11 +216,23 @@ const Text = styled.p`
     margin-bottom: 10px;
 `;
 
+const NameTopContainer = styled.div`
+    display: flex;
+    margin-bottom: 30px;
+    /* justify-content: center; */
+`;
+
+const NameRatingContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+`;
+
 const TeacherContactContainer = styled.div`
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    margin-top: 25px;
 `;
 
 const TeacherEmailContainer = styled.div`
@@ -236,7 +258,6 @@ const TeacherPhone = styled(TeacherEmail)``;
 const Avatar = styled.img`
     max-width: 200px;
     border-radius: 50%;
-    margin-bottom: 15px;
     object-fit: cover;
     border: 2px solid gray;
 `;
@@ -319,6 +340,7 @@ const ConfirmationDialogContent = styled.div`
 const CalendarAndSchedule = styled.div`
     display: flex;
     flex-wrap: nowrap;
+    margin-bottom: 30px;
 `;
 
 const ScheduleContainer = styled.div`
@@ -331,7 +353,7 @@ const ScheduleContainer = styled.div`
 `;
 
 const ScheduleTitle = styled.p`
-    font-size: 25px;
+    font-size: 30px;
     margin: 0 0 15px;
     letter-spacing: 1px;
 `;
@@ -354,15 +376,16 @@ const CoursePriceButtonContainer = styled.div`
     flex-direction: column;
     align-items: center;
     width: 100%;
-    margin-top: 10px;
+    margin: 25px 0;
 `;
 
 const CourseContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
     /* margin-top: 10px; */
-    width: 40%;
+    /* width: 40%; */
 `;
 
 const CoursePriceSubHeading = styled.p`
@@ -463,13 +486,14 @@ const CalendarHintContainer = styled.div`
     display: flex;
     flex-direction: column;
     width: fit-content;
-    margin-right: 50px;
+    /* margin-top: 20px; */
+    width: 100%;
 `;
 
 const CalendarHintTitle = styled.p`
     font-size: 30px;
     letter-spacing: 2px;
-    margin: 0 0 15px 0;
+    margin: 30px 0 0 0;
 `;
 
 const CalendarHintContentContainer = styled.div`
@@ -532,7 +556,7 @@ const db = firebase.firestore();
 const TeacherDetails = () => {
     const ICON_SIZE = 20;
 
-    const { user, userInfo, isLoading, userUid } = useAuth();
+    const { userInfo, isLoading, userUid } = useAuth();
     const router = useRouter();
     const { uid } = router.query;
 
@@ -560,8 +584,8 @@ const TeacherDetails = () => {
     // };
 
     const handlePurchaseClick = (priceObj: { qty: number; price: number }) => {
-        if (userInfo?.userType === 'teacher') {
-            toast.error('老師身份無法購買課程');
+        if (userInfo?.userType !== 'student') {
+            toast.error('請確認是否登入 / 為學生身份');
         } else {
             setSelectedPrice(priceObj);
             setConfirmPurchase(true);
@@ -616,8 +640,11 @@ const TeacherDetails = () => {
     }, [uid]);
 
     const handleTimeSlotClick = () => {
-        // setSelectedTime(time);
-        setShowBookButtons(true);
+        if (userInfo?.userType === 'teacher') {
+            toast.error('請確認是否登入 / 為學生身份');
+        } else {
+            setShowBookButtons(true);
+        }
     };
 
     const handleConfirmBook = async () => {
@@ -718,13 +745,13 @@ const TeacherDetails = () => {
     return (
         <MainWrapper>
             <Header />
-            <ToastContainer position={toast.POSITION.TOP_CENTER} autoClose={1000} style={{ maxWidth: '250px' }} />
+            <ToastContainer position={toast.POSITION.TOP_CENTER} autoClose={1000} />
 
             {/* <Container> */}
             <TeacherContainer>
-                <TeacherTopContainer>
+                <TeacherLeftContainer>
                     <TeacherIntroContainer>
-                        <TeacherAvatarContainer>
+                        {/* <TeacherAvatarContainer>
                             <Avatar src={teacher.avatar} alt={`${teacher.name} 的大頭照`} />
                             <TeacherContactContainer>
                                 <TeacherEmailContainer>
@@ -736,93 +763,34 @@ const TeacherDetails = () => {
                                     <TeacherPhone>{teacher.phone}</TeacherPhone>
                                 </TeacherPhoneContainer>
                             </TeacherContactContainer>
-                        </TeacherAvatarContainer>
+                        </TeacherAvatarContainer> */}
                         <TeacherContentContainer>
-                            <TeacherNameContainer>
-                                <TeacherName>{teacher.name}</TeacherName>
-                                <TeacherSubjectContainer>
-                                    <TeacherSubject>{teacher.subject?.join(', ')}</TeacherSubject>
-                                </TeacherSubjectContainer>
-                            </TeacherNameContainer>
-                            <RatingContainer>
-                                <RatingNumber>{formattedRating}</RatingNumber>
-                                {renderStars(rating)}
-                            </RatingContainer>
+                            <NameTopContainer>
+                                <TeacherAvatarContainer>
+                                    <Avatar src={teacher.avatar} alt={`${teacher.name} 的大頭照`} />
+                                </TeacherAvatarContainer>
+                                <NameRatingContainer>
+                                    <TeacherNameContainer>
+                                        <TeacherName>{teacher.name}</TeacherName>
+                                        <TeacherSubjectContainer>
+                                            <TeacherSubject>{teacher.subject?.join(', ')}</TeacherSubject>
+                                        </TeacherSubjectContainer>
+                                    </TeacherNameContainer>
+                                    <RatingContainer>
+                                        <RatingNumber>{formattedRating}</RatingNumber>
+                                        {renderStars(rating)}
+                                    </RatingContainer>
+                                </NameRatingContainer>
+                            </NameTopContainer>
                             <TitleLine />
-                            <ScrollableContent>
+                            <TeacherTextContainer>
                                 <Description>{teacher.description}</Description>
                                 <Introduction>{teacher.intro}</Introduction>
-                            </ScrollableContent>
+                            </TeacherTextContainer>
                         </TeacherContentContainer>
                     </TeacherIntroContainer>
-                    <CourseContainer>
-                        {/* <PurchaseNotesContainer>
-                            <FiAlertTriangle size={23} />
-                            <PurchaseNotes>購買前請確認堂數是否正確</PurchaseNotes>
-                        </PurchaseNotesContainer> */}
-                        {/* <OnlineClassImage src={onlineclass} alt='Online class' /> */}
-                        <CoursePriceContainer>
-                            <Section>
-                                <CoursePriceSubHeading>課程價格</CoursePriceSubHeading>
-                                <TitleLine />
-                                <CoursePriceButtonContainer>
-                                    {teacher.price &&
-                                        teacher.price.map((priceObj: { qty: number; price: number }, idx: number) => {
-                                            return (
-                                                <PriceButton key={idx} onClick={() => handlePurchaseClick(priceObj)}>
-                                                    {priceObj.qty} 堂課: NT$ {priceObj.price} 元
-                                                </PriceButton>
-                                            );
-                                        })}
-                                </CoursePriceButtonContainer>
-                            </Section>
 
-                            {userInfo?.userType !== 'teacher' && (
-                                <ConfirmationDialog open={confirmPurchase} onClick={handleCancelPurchase}>
-                                    <ConfirmationDialogContent onClick={(e) => e.stopPropagation()}>
-                                        <ConfirmTitle>確認購買</ConfirmTitle>
-                                        <ConfirmText>
-                                            您確定要購買 {selectedPrice.qty} 堂課，價格為 {selectedPrice.price} 元嗎？
-                                        </ConfirmText>
-                                        <ConfirmBuyButton onClick={handleConfirmPurchase}>確認</ConfirmBuyButton>
-                                        <ConfirmBuyButton style={{ marginLeft: '10px' }} onClick={handleCancelPurchase}>
-                                            取消
-                                        </ConfirmBuyButton>
-                                    </ConfirmationDialogContent>
-                                </ConfirmationDialog>
-                            )}
-                        </CoursePriceContainer>
-                    </CourseContainer>
-                </TeacherTopContainer>
-                <TeacherBottomContainer>
                     <AvailableTimeContainer>
-                        <CalendarHintContainer>
-                            <CalendarHintTitle>預定課程須知</CalendarHintTitle>
-                            <CalendarHintContentContainer>
-                                <VscDebugBreakpointFunction />
-                                <CalendarHintContent>排定課程前請先確認有剩餘堂數</CalendarHintContent>
-                            </CalendarHintContentContainer>
-                            <CalendarHintContentContainer>
-                                <VscDebugBreakpointFunction />
-                                <CalendarHintContent>若無剩餘堂數請先去購買</CalendarHintContent>
-                            </CalendarHintContentContainer>
-                            <CalendarHintContentContainer>
-                                <VscDebugBreakpointFunction />
-                                <CalendarHintContent>先點選日曆中想上課的日期</CalendarHintContent>
-                            </CalendarHintContentContainer>
-                            <CalendarHintContentContainer>
-                                <VscDebugBreakpointFunction />
-                                <CalendarHintContent>出現近三天內老師能上課的時段</CalendarHintContent>
-                            </CalendarHintContentContainer>
-                            <CalendarHintContentContainer>
-                                <VscDebugBreakpointFunction />
-                                <CalendarHintContent>選定日期與時間後按下確認</CalendarHintContent>
-                            </CalendarHintContentContainer>
-                            <CalendarHintContentContainer>
-                                <VscDebugBreakpointFunction />
-                                <CalendarHintContent>課程排定成功 🎉</CalendarHintContent>
-                            </CalendarHintContentContainer>
-                        </CalendarHintContainer>
                         <CalendarAndSchedule>
                             <Calendar
                                 handleSelectDate={handleSelectDate}
@@ -848,8 +816,105 @@ const TeacherDetails = () => {
                                 )}
                             </ScheduleContainer>
                         </CalendarAndSchedule>
+                        <TitleLine />
+                        <CalendarHintContainer>
+                            <CalendarHintTitle>購買課程須知</CalendarHintTitle>
+                            <CalendarHintContentContainer>
+                                <VscDebugBreakpointFunction />
+                                <CalendarHintContent>
+                                    先選擇日曆中預上課的日期，右側會出現近三天老師能上課的時段
+                                </CalendarHintContent>
+                            </CalendarHintContentContainer>
+                            <CalendarHintContentContainer>
+                                <VscDebugBreakpointFunction />
+                                <CalendarHintContent>
+                                    若無出現時間， 表示近幾日無可預約時段，請重新選擇日期
+                                </CalendarHintContent>
+                            </CalendarHintContentContainer>
+                            <CalendarHintContentContainer>
+                                <VscDebugBreakpointFunction />
+                                <CalendarHintContent>選定日期與時間後按下確認，課程排定成功 🎉</CalendarHintContent>
+                            </CalendarHintContentContainer>
+                            <CalendarHintTitle>YiTUTOR 線上課程須知</CalendarHintTitle>
+
+                            <CalendarHintContentContainer>
+                                <VscDebugBreakpointFunction />
+                                <CalendarHintContent>
+                                    排定課程前請先確認有剩餘堂數。若無剩餘堂數，請先購買
+                                </CalendarHintContent>
+                            </CalendarHintContentContainer>
+                            <CalendarHintContentContainer>
+                                <VscDebugBreakpointFunction />
+                                <CalendarHintContent>
+                                    一次購買 5 堂或 10 堂通常有額外折扣（以老師訂定之價錢為主）
+                                </CalendarHintContent>
+                            </CalendarHintContentContainer>
+                            <CalendarHintContentContainer>
+                                <VscDebugBreakpointFunction />
+                                <CalendarHintContent>使用 YiTUTOR 線上上課不需額外下載通訊軟體</CalendarHintContent>
+                            </CalendarHintContentContainer>
+                            <CalendarHintContentContainer>
+                                <VscDebugBreakpointFunction />
+                                <CalendarHintContent>
+                                    課程時間為 50 分鐘，時間從老師與學生皆進線上教室後開始計算
+                                </CalendarHintContent>
+                            </CalendarHintContentContainer>
+                        </CalendarHintContainer>
                     </AvailableTimeContainer>
-                </TeacherBottomContainer>
+                </TeacherLeftContainer>
+
+                <TeacherRightContainer>
+                    <CourseContainer>
+                        {/* <PurchaseNotesContainer>
+                            <FiAlertTriangle size={23} />
+                            <PurchaseNotes>購買前請確認堂數是否正確</PurchaseNotes>
+                        </PurchaseNotesContainer> */}
+                        {/* <OnlineClassImage src={onlineclass} alt='Online class' /> */}
+                        <CoursePriceContainer>
+                            <Section>
+                                <CoursePriceSubHeading>課程價格</CoursePriceSubHeading>
+                                <TitleLine />
+                                <CoursePriceButtonContainer>
+                                    {teacher.price &&
+                                        teacher.price.map((priceObj: { qty: number; price: number }, idx: number) => {
+                                            return (
+                                                <PriceButton key={idx} onClick={() => handlePurchaseClick(priceObj)}>
+                                                    {priceObj.qty} 堂課: NT$ {priceObj.price} 元
+                                                </PriceButton>
+                                            );
+                                        })}
+                                </CoursePriceButtonContainer>
+                                <CoursePriceSubHeading>聯絡老師</CoursePriceSubHeading>
+                                <TitleLine />
+                                <TeacherContactContainer>
+                                    <TeacherEmailContainer>
+                                        <AiOutlineMail size={ICON_SIZE} />
+                                        <TeacherEmail>{teacher.email}</TeacherEmail>
+                                    </TeacherEmailContainer>
+                                    <TeacherPhoneContainer>
+                                        <AiOutlinePhone size={ICON_SIZE} />
+                                        <TeacherPhone>{teacher.phone}</TeacherPhone>
+                                    </TeacherPhoneContainer>
+                                </TeacherContactContainer>
+                            </Section>
+
+                            {userInfo?.userType !== 'teacher' && (
+                                <ConfirmationDialog open={confirmPurchase} onClick={handleCancelPurchase}>
+                                    <ConfirmationDialogContent onClick={(e) => e.stopPropagation()}>
+                                        <ConfirmTitle>確認購買</ConfirmTitle>
+                                        <ConfirmText>
+                                            您確定要購買 {selectedPrice.qty} 堂課，價格為 {selectedPrice.price} 元嗎？
+                                        </ConfirmText>
+                                        <ConfirmBuyButton onClick={handleConfirmPurchase}>確認</ConfirmBuyButton>
+                                        <ConfirmBuyButton style={{ marginLeft: '10px' }} onClick={handleCancelPurchase}>
+                                            取消
+                                        </ConfirmBuyButton>
+                                    </ConfirmationDialogContent>
+                                </ConfirmationDialog>
+                            )}
+                        </CoursePriceContainer>
+                    </CourseContainer>
+                </TeacherRightContainer>
             </TeacherContainer>
             {/* <Heading>{teacher.name}</Heading>
             <Image src={teacher.avatar} alt={`${teacher.name} 的大頭照`} />

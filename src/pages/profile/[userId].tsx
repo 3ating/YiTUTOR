@@ -16,6 +16,10 @@ type BookedCoursesContainerProps = {
     isBookedCourseEmpty: boolean;
 };
 
+interface ProfilRightContainerProps {
+    isTeacher: boolean;
+}
+
 const MainWrapper = styled.div`
     display: flex;
     flex-direction: column;
@@ -389,11 +393,11 @@ const BookedCoursesContainer = styled.div<BookedCoursesContainerProps>`
     justify-content: center;
 `;
 
-const ProfilRightContainer = styled.div`
+const ProfilRightContainer = styled.div<ProfilRightContainerProps>`
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 35%;
+    width: ${(props) => (props.isTeacher ? '0' : '35%')};
     height: 100%;
 `;
 
@@ -733,7 +737,7 @@ const UserProfile = () => {
                         )}
                     </BookedCoursesContainer>
                 </ProfileMiddleContainer>
-                <ProfilRightContainer>
+                <ProfilRightContainer isTeacher={userInfo.userType === 'teacher'}>
                     {userInfo.userType === 'student' && (
                         <>
                             <CourseTitle>購買課程</CourseTitle>
