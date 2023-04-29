@@ -18,8 +18,6 @@ import { BsStarHalf } from 'react-icons/bs';
 import { FiAlertTriangle } from 'react-icons/fi';
 import { VscDebugBreakpointFunction } from 'react-icons/vsc';
 import Button from '@/components/Button';
-import { Alert, AlertTitle } from '@material-ui/lab';
-import { Snackbar } from '@material-ui/core';
 
 interface StyledDialogProps {
     open: boolean;
@@ -546,7 +544,6 @@ const TeacherDetails = () => {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [selectedTime, setSelectedTime] = useState('');
     const [showBookButtons, setShowBookButtons] = useState(false);
-    const [alertOpen, setAlertOpen] = useState(false);
 
     const handleSelectDate = (date: Date) => {
         setSelectedDate(date);
@@ -560,18 +557,9 @@ const TeacherDetails = () => {
     //     setOpenChat(false);
     // };
 
-    // const handlePurchaseClick = (priceObj: { qty: number; price: number }) => {
-    //     setSelectedPrice(priceObj);
-    //     setConfirmPurchase(true);
-    // };
-
     const handlePurchaseClick = (priceObj: { qty: number; price: number }) => {
-        if (userInfo?.userType === 'teacher') {
-            setAlertOpen(true);
-        } else {
-            setSelectedPrice(priceObj);
-            setConfirmPurchase(true);
-        }
+        setSelectedPrice(priceObj);
+        setConfirmPurchase(true);
     };
 
     const handleConfirmPurchase = async () => {
@@ -622,13 +610,10 @@ const TeacherDetails = () => {
     }, [uid]);
 
     const handleTimeSlotClick = () => {
-        if (userInfo?.userType === 'teacher') {
-            setAlertOpen(true);
-        } else {
-            // setSelectedTime(time);
-            setShowBookButtons(true);
-        }
+        // setSelectedTime(time);
+        setShowBookButtons(true);
     };
+
     const handleConfirmBook = async () => {
         if (!userUid) return;
 
@@ -783,31 +768,19 @@ const TeacherDetails = () => {
                                         })}
                                 </CoursePriceButtonContainer>
                             </Section>
-                            {userInfo?.userType !== 'teacher' && (
-                                <ConfirmationDialog open={confirmPurchase} onClick={handleCancelPurchase}>
-                                    <ConfirmationDialogContent onClick={(e) => e.stopPropagation()}>
-                                        <ConfirmTitle>確認購買</ConfirmTitle>
-                                        <ConfirmText>
-                                            您確定要購買 {selectedPrice.qty} 堂課，價格為 {selectedPrice.price} 元嗎？
-                                        </ConfirmText>
-                                        <ConfirmBuyButton onClick={handleConfirmPurchase}>確認</ConfirmBuyButton>
-                                        <ConfirmBuyButton style={{ marginLeft: '10px' }} onClick={handleCancelPurchase}>
-                                            取消
-                                        </ConfirmBuyButton>
-                                    </ConfirmationDialogContent>
-                                </ConfirmationDialog>
-                            )}
 
-                            <Snackbar
-                                open={alertOpen}
-                                autoHideDuration={4000}
-                                onClose={() => setAlertOpen(false)}
-                                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                            >
-                                <Alert onClose={() => setAlertOpen(false)} severity='error'>
-                                    老師身份無法購買課程
-                                </Alert>
-                            </Snackbar>
+                            <ConfirmationDialog open={confirmPurchase} onClick={handleCancelPurchase}>
+                                <ConfirmationDialogContent onClick={(e) => e.stopPropagation()}>
+                                    <ConfirmTitle>確認購買</ConfirmTitle>
+                                    <ConfirmText>
+                                        您確定要購買 {selectedPrice.qty} 堂課，價格為 {selectedPrice.price} 元嗎？
+                                    </ConfirmText>
+                                    <ConfirmBuyButton onClick={handleConfirmPurchase}>確認</ConfirmBuyButton>
+                                    <ConfirmBuyButton style={{ marginLeft: '10px' }} onClick={handleCancelPurchase}>
+                                        取消
+                                    </ConfirmBuyButton>
+                                </ConfirmationDialogContent>
+                            </ConfirmationDialog>
                         </CoursePriceContainer>
                     </CourseContainer>
                 </TeacherTopContainer>
@@ -857,24 +830,13 @@ const TeacherDetails = () => {
                                         selectedTime={selectedTime}
                                     />
                                 </div>
-                                {userInfo?.userType !== 'teacher' && showBookButtons && (
+                                {showBookButtons && (
                                     <BookButtonContainer>
                                         <ConfirmButton onClick={handleConfirmBook}>確認</ConfirmButton>
                                         <RejectButton onClick={handleRejectBook}>拒絕</RejectButton>
                                     </BookButtonContainer>
                                 )}
                             </ScheduleContainer>
-
-                            <Snackbar
-                                open={alertOpen}
-                                autoHideDuration={4000}
-                                onClose={() => setAlertOpen(false)}
-                                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                            >
-                                <Alert onClose={() => setAlertOpen(false)} severity='error'>
-                                    老師身份無法購買課程
-                                </Alert>
-                            </Snackbar>
                         </CalendarAndSchedule>
                     </AvailableTimeContainer>
                 </TeacherBottomContainer>
