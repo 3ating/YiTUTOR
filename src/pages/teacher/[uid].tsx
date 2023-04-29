@@ -18,6 +18,9 @@ import { BsStarHalf } from 'react-icons/bs';
 import { FiAlertTriangle } from 'react-icons/fi';
 import { VscDebugBreakpointFunction } from 'react-icons/vsc';
 import Button from '@/components/Button';
+import { toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface StyledDialogProps {
     open: boolean;
@@ -26,7 +29,6 @@ interface StyledDialogProps {
 const MainWrapper = styled.div`
     display: flex;
     flex-direction: column;
-    /* height: 100vh; */
     background-color: antiquewhite;
 `;
 
@@ -558,8 +560,12 @@ const TeacherDetails = () => {
     // };
 
     const handlePurchaseClick = (priceObj: { qty: number; price: number }) => {
-        setSelectedPrice(priceObj);
-        setConfirmPurchase(true);
+        if (userInfo?.userType === 'teacher') {
+            toast.error('老師身份無法購買課程');
+        } else {
+            setSelectedPrice(priceObj);
+            setConfirmPurchase(true);
+        }
     };
 
     const handleConfirmPurchase = async () => {
@@ -712,6 +718,8 @@ const TeacherDetails = () => {
     return (
         <MainWrapper>
             <Header />
+            <ToastContainer position={toast.POSITION.TOP_CENTER} autoClose={1000} style={{ maxWidth: '250px' }} />
+
             {/* <Container> */}
             <TeacherContainer>
                 <TeacherTopContainer>
@@ -769,18 +777,20 @@ const TeacherDetails = () => {
                                 </CoursePriceButtonContainer>
                             </Section>
 
-                            <ConfirmationDialog open={confirmPurchase} onClick={handleCancelPurchase}>
-                                <ConfirmationDialogContent onClick={(e) => e.stopPropagation()}>
-                                    <ConfirmTitle>確認購買</ConfirmTitle>
-                                    <ConfirmText>
-                                        您確定要購買 {selectedPrice.qty} 堂課，價格為 {selectedPrice.price} 元嗎？
-                                    </ConfirmText>
-                                    <ConfirmBuyButton onClick={handleConfirmPurchase}>確認</ConfirmBuyButton>
-                                    <ConfirmBuyButton style={{ marginLeft: '10px' }} onClick={handleCancelPurchase}>
-                                        取消
-                                    </ConfirmBuyButton>
-                                </ConfirmationDialogContent>
-                            </ConfirmationDialog>
+                            {userInfo?.userType !== 'teacher' && (
+                                <ConfirmationDialog open={confirmPurchase} onClick={handleCancelPurchase}>
+                                    <ConfirmationDialogContent onClick={(e) => e.stopPropagation()}>
+                                        <ConfirmTitle>確認購買</ConfirmTitle>
+                                        <ConfirmText>
+                                            您確定要購買 {selectedPrice.qty} 堂課，價格為 {selectedPrice.price} 元嗎？
+                                        </ConfirmText>
+                                        <ConfirmBuyButton onClick={handleConfirmPurchase}>確認</ConfirmBuyButton>
+                                        <ConfirmBuyButton style={{ marginLeft: '10px' }} onClick={handleCancelPurchase}>
+                                            取消
+                                        </ConfirmBuyButton>
+                                    </ConfirmationDialogContent>
+                                </ConfirmationDialog>
+                            )}
                         </CoursePriceContainer>
                     </CourseContainer>
                 </TeacherTopContainer>
