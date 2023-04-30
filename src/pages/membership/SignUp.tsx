@@ -114,10 +114,10 @@ const SignupFormContainer = styled.div`
 `;
 
 const SignupTitle = styled.p`
-    font-size: 40px;
+    font-size: 30px;
     font-weight: 600;
     letter-spacing: 3px;
-    margin: 25px 0 20px;
+    margin: 25px 0 10px;
 `;
 
 const SignupTitleLine = styled.div`
@@ -306,7 +306,7 @@ const PriceContainer = styled.div`
     justify-content: space-between;
     position: relative;
     margin-bottom: 1.5rem;
-    margin: 20px 0 15px;
+    margin: 20px 0 10px;
     gap: 50px;
 `;
 
@@ -364,7 +364,7 @@ const TimeButtonContainer = styled.div`
     grid-template-columns: repeat(6, auto);
     gap: 10px;
     justify-content: center;
-    margin-top: 10px;
+    margin-top: 5px;
 `;
 
 const TimeSelectedTitle = styled.p`
@@ -837,7 +837,7 @@ const RegistrationForm = () => {
                             )}
                             {userType === 'teacher' && showTeacherDetails && finalStep && (
                                 <div>
-                                    <TimeSelectedTitle>選擇可以上課的時間 ⏰</TimeSelectedTitle>
+                                    {/* <TimeSelectedTitle>選擇可以上課的時間 ⏰</TimeSelectedTitle> */}
                                     {Object.keys(selectedTimes).map((day) => (
                                         <TimeDayContainer key={day}>
                                             <WeekDay>{convertDayToChinese(day)}</WeekDay>
