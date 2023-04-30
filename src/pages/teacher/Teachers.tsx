@@ -7,6 +7,15 @@ import { useAuth } from '../../../public/AuthContext';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
 import TeacherCardComponents from '../../components/TeacherCard';
+// import Select, { OptionProps, ControlProps, StylesConfig } from 'react-select';
+// import ReactSelect from 'react-select';
+import ReactSelect, { StylesConfig, OptionProps, CSSObjectWithLabel, GroupBase } from 'react-select';
+import { CSSObject } from '@emotion/react';
+
+type OptionType = {
+    label: string;
+    value: string;
+};
 
 const {
     TeachersContainer,
@@ -25,6 +34,14 @@ const PageContainer = styled.div`
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    background-color: antiquewhite;
+`;
+
+const TeachersPageContainer = styled.div`
+    background-color: antiquewhite;
+    padding: 50px 0 20px;
+    display: flex;
+    flex-direction: column;
 `;
 
 const TeacherContainer = styled.div`
@@ -35,10 +52,10 @@ const TeacherContainer = styled.div`
         'search search search search'
         'subject subject subject subject'
         'teacher teacher teacher teacher';
-    padding: 60px 20px 80px;
-    background-color: antiquewhite;
+    /* padding: 60px 0 80px; */
     flex: 1;
     justify-content: center;
+    margin-top: 30px;
 `;
 
 const TeacherCardWrapper = styled.div`
@@ -59,7 +76,6 @@ const DirectLink = styled(Link)`
 const SearchForm = styled.form`
     display: flex;
     justify-content: center;
-    margin-bottom: 20px;
     flex-wrap: wrap;
     grid-area: search;
 `;
@@ -72,7 +88,7 @@ const SearchInput = styled.input`
     width: 100%;
     height: 25px;
     max-width: 300px;
-    margin: 10px;
+    margin-right: 10px;
 `;
 
 const SubjectSelect = styled.select`
@@ -104,6 +120,49 @@ const SearchButton = styled.button`
         background-color: #3b8de1;
     }
 `;
+
+const customStyles: StylesConfig<OptionType, false> = {
+    control: (provided) => ({
+        ...provided,
+        border: '1px solid #ccc',
+        borderColor: '#ccc',
+        boxShadow: 'none',
+        borderRadius: '5px',
+        padding: '2px 10px',
+        fontSize: '16px',
+        backgroundColor: 'white',
+        marginBottom: '20px',
+        maxWidth: '300px',
+        margin: '0',
+        gridArea: 'subject',
+        marginLeft: '0',
+        marginRight: '5px',
+        minHeight: '45px',
+        cursor: 'pointer',
+        '&:hover': {
+            borderColor: '#999',
+        },
+    }),
+    option: (base: CSSObjectWithLabel, state: OptionProps<OptionType, false, GroupBase<OptionType>>) => ({
+        ...base,
+        backgroundColor: state.isFocused ? '#f0f0f0' : '#fff',
+        color: '#555',
+    }),
+};
+
+const subjectOptions: OptionType[] = [
+    { label: '全部科目', value: '' },
+    { label: '國文', value: '國文' },
+    { label: '英文', value: '英文' },
+    { label: '數學', value: '數學' },
+    { label: '物理', value: '物理' },
+    { label: '化學', value: '化學' },
+];
+
+const priceSortOptions: OptionType[] = [
+    { label: '由低到高', value: 'asc' },
+    { label: '由高到低', value: 'desc' },
+];
 
 const firebaseConfig = {
     apiKey: process.env.FIRESTORE_API_KEY,
@@ -140,34 +199,7 @@ const Teachers = () => {
     const [teachers, setTeachers] = useState<Teacher[]>([]);
     const [search, setSearch] = useState('');
     const [selectedSubject, setSelectedSubject] = useState('');
-
-    console.log('userUid:', userUid);
-    console.log('isLoading:', isLoading);
-
-    // const handleFilter = () => {
-    //     let query = db.collection('users').where('userType', '==', 'teacher');
-
-    //     if (selectedSubject) {
-    //         query = query.where('subject', 'array-contains', selectedSubject);
-    //     }
-
-    //     query.get().then((snapshot) => {
-    //         const filteredTeachersData = snapshot.docs
-    //             .map((doc) => {
-    //                 return {
-    //                     ...doc.data(),
-    //                     uid: doc.id,
-    //                 } as unknown as Teacher;
-    //             })
-    //             .filter((teacher) => teacher.name.toLowerCase().includes(search.toLowerCase()));
-
-    //         setTeachers(filteredTeachersData);
-    //     });
-    // };
-
-    // useEffect(() => {
-    //     handleFilter();
-    // }, []);
+    const [selectedPriceSort, setSelectedPriceSort] = useState('');
 
     const handleFilter = () => {
         let query = db.collection('users').where('userType', '==', 'teacher');
@@ -219,7 +251,7 @@ const Teachers = () => {
     return (
         <PageContainer>
             <Header />
-            <TeacherContainer>
+            <TeachersPageContainer>
                 <SearchForm
                     onSubmit={(e) => {
                         e.preventDefault();
@@ -232,52 +264,59 @@ const Teachers = () => {
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder='搜尋教師名字'
                     />
-                    <SubjectSelect
-                        value={selectedSubject}
-                        onChange={(e) => {
-                            setSelectedSubject(e.target.value);
-                        }}
-                    >
-                        <option value=''>選擇科目</option>
-                        <option value='國文'>國文</option>
-                        <option value='英文'>英文</option>
-                        <option value='數學'>數學</option>
-                        <option value='物理'>物理</option>
-                        <option value='化學'>化學</option>
-                    </SubjectSelect>
+                    <ReactSelect
+                        styles={customStyles}
+                        value={
+                            selectedPriceSort
+                                ? priceSortOptions.find((option) => option.value === selectedPriceSort)
+                                : null
+                        }
+                        options={priceSortOptions}
+                        placeholder='價格'
+                        onChange={(value) => setSelectedPriceSort((value as OptionType)?.value || '')}
+                    />
+
+                    <ReactSelect
+                        styles={customStyles}
+                        value={
+                            selectedSubject ? subjectOptions.find((option) => option.value === selectedSubject) : null
+                        }
+                        options={subjectOptions}
+                        placeholder='科目'
+                        onChange={(value) => setSelectedSubject((value as OptionType)?.value || '')}
+                    />
                 </SearchForm>
+                <TeacherContainer>
+                    {teachers.map((teacher, index) => (
+                        <TeacherCardWrapper key={index}>
+                            <TeacherCard>
+                                {teacher.avatar && (
+                                    <TeacherImg
+                                        src={teacher.avatar}
+                                        alt={`${teacher.name} 的大頭照`}
+                                        width={148}
+                                        height={148}
+                                    />
+                                )}
+                                <CoursePrice>NT${teacher.price?.[0]?.price}/50分鐘</CoursePrice>
+                                <Hightline />
+                                <TeacherInfoContainer>
+                                    <TeacherName>{teacher.name}</TeacherName>
+                                    <Subject>{teacher.subject}家教</Subject>
 
-                {/* <TeachersContainer>                </TeachersContainer> */}
+                                    <TeacherDescription>{teacher.description}</TeacherDescription>
+                                    <div>
+                                        <DirectLink href={`/teacher/${teacher.uid}`} key={teacher.uid}>
+                                            <TeacherBtn>購買課程</TeacherBtn>
+                                        </DirectLink>
+                                    </div>
+                                </TeacherInfoContainer>
+                            </TeacherCard>
+                        </TeacherCardWrapper>
+                    ))}
+                </TeacherContainer>
+            </TeachersPageContainer>
 
-                {teachers.map((teacher, index) => (
-                    <TeacherCardWrapper key={index}>
-                        <TeacherCard>
-                            {teacher.avatar && (
-                                <TeacherImg
-                                    src={teacher.avatar}
-                                    alt={`${teacher.name} 的大頭照`}
-                                    width={148}
-                                    height={148}
-                                />
-                            )}
-
-                            <CoursePrice>NT${teacher.price?.[0]?.price}/50分鐘</CoursePrice>
-                            <Hightline />
-                            <TeacherInfoContainer>
-                                <TeacherName>{teacher.name}</TeacherName>
-                                <Subject>{teacher.subject}家教</Subject>
-
-                                <TeacherDescription>{teacher.description}</TeacherDescription>
-                                <div>
-                                    <DirectLink href={`/teacher/${teacher.uid}`} key={teacher.uid}>
-                                        <TeacherBtn>購買課程</TeacherBtn>
-                                    </DirectLink>
-                                </div>
-                            </TeacherInfoContainer>
-                        </TeacherCard>
-                    </TeacherCardWrapper>
-                ))}
-            </TeacherContainer>
             <Footer />
         </PageContainer>
     );
