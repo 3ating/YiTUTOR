@@ -54,7 +54,7 @@ const TeacherIntroContainer = styled.div`
     display: flex;
     padding: 50px;
     border-radius: 9px;
-    margin: 0 0 20px;
+    margin: 0 0 10px;
 `;
 
 const TeacherAvatarContainer = styled.div`
@@ -101,7 +101,7 @@ const TeacherRightContainer = styled.div`
     justify-content: flex-start;
     flex-direction: column;
     align-items: center;
-    padding-left: 25px;
+    padding-left: 5px;
     position: fixed;
     right: 5px;
     top: 95px;
@@ -736,7 +736,7 @@ const TeacherDetails = () => {
 
     // console.log('userUid:', userUid);
     // console.log('teacherUID', uid);
-    console.log('userinfo:', userInfo?.userType);
+    console.log('userinfo:', userInfo);
 
     // console.log('teacher:', teacher);
     // console.log('selectedTime:', selectedTime);

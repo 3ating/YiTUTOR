@@ -14,6 +14,14 @@ import { RxBorderWidth } from 'react-icons/rx';
 import { AiOutlineClear } from 'react-icons/ai';
 import { IoShapesOutline } from 'react-icons/io5';
 
+interface ChatroomProps {
+    roomId: string | null;
+}
+interface IStyledCanvasProps {
+    cursorStyle: string;
+    hasNoRoomId: boolean;
+}
+
 const BoardContainer = styled.div`
     display: flex;
     flex-direction: column;
@@ -35,10 +43,11 @@ const StyledCanvas = styled.canvas<IStyledCanvasProps>`
     border: 2px solid #e8e8e8;
     background-color: #f8f8f8;
     box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
-    width: 98%;
+    width: 100%;
     height: 500px;
     border-radius: 9px;
     cursor: ${(props) => props.cursorStyle};
+    pointer-events: ${(props) => (props.hasNoRoomId ? 'none' : 'auto')};
 `;
 
 const StyledToolbar = styled.div`
@@ -111,13 +120,6 @@ if (!firebase.apps.length) {
 }
 
 const db = firebase.firestore();
-
-interface ChatroomProps {
-    roomId: string | null;
-}
-interface IStyledCanvasProps {
-    cursorStyle: string;
-}
 
 const Canvas = ({ roomId }: ChatroomProps) => {
     const MIN_DISTANCE = 5;
@@ -1043,6 +1045,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
             <StyledCanvasContainer>
                 <StyledCanvas
                     ref={canvasRef}
+                    hasNoRoomId={!roomId}
                     cursorStyle={cursorStyle}
                     onMouseDown={moveEnabled ? startMoving : scaleEnabled ? startScaling : startDrawing}
                     onMouseMove={(e) => {

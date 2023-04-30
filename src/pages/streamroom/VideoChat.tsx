@@ -13,8 +13,9 @@ import { AiFillSwitcher } from 'react-icons/ai';
 import { BsFillCameraVideoFill, BsFillCameraVideoOffFill, BsMicFill, BsMicMuteFill } from 'react-icons/bs';
 import { ImPhoneHangUp } from 'react-icons/im';
 import { TbMessageCircle2Filled, TbScreenShare } from 'react-icons/tb';
-import { FaVolumeDown, FaVolumeMute } from 'react-icons/fa';
+import { FaVolumeDown, FaVolumeMute, FaChalkboardTeacher } from 'react-icons/fa';
 import { RiVideoAddFill } from 'react-icons/ri';
+import { FcAlarmClock } from 'react-icons/fc';
 
 const firebaseConfig = {
     apiKey: process.env.FIRESTORE_API_KEY,
@@ -45,6 +46,14 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     active?: boolean;
 }
 
+interface LiveTextContainerProps {
+    bothUsersJoined: boolean;
+}
+
+interface TheOtherAvatarProps {
+    TheOtherUserJoined: boolean;
+}
+
 const MainWrapper = styled.div`
     display: flex;
     flex-direction: column;
@@ -53,15 +62,18 @@ const MainWrapper = styled.div`
 `;
 
 const OnlineClassContainer = styled.div`
-    position: relative;
-    margin: auto 0;
-    /* margin-top: 30px; */
-    /* height: calc(100vh - 160px); */
+    /* position: relative; */
+    padding: 0 30px;
+    height: calc(100vh - 130px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 `;
 
 const ClassContainer = styled.div`
     display: flex;
-    margin-top: 30px;
+    position: relative;
+    /* margin-top: 10px; */
 `;
 
 const VideoContainer = styled.div`
@@ -255,12 +267,20 @@ const TextField = styled.input`
     margin-bottom: 10px;
 `;
 
+const TimeAvatarContainer = styled.div`
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+`;
+
 const RoomTitle = styled.p<TypographyProps>`
-    position: absolute;
-    font-size: 16px;
+    display: flex;
+    align-items: flex-end;
+    font-size: 20px;
     margin: 0;
-    top: 8px;
-    left: 16px;
+    /* position: absolute;
+    top: 6px;
+    left: 20px; */
     z-index: 1;
 `;
 
@@ -305,8 +325,57 @@ const VideoScreen = styled.video`
     }
 `;
 
+const LiveTextContainer = styled.div<LiveTextContainerProps>`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: ${(props) => (props.bothUsersJoined ? '#ff5555' : '#ccc')};
+    width: 68px;
+    height: 25px;
+    border-radius: 9px;
+    position: absolute;
+    top: 5px;
+    right: 3px;
+    z-index: 1;
+`;
+
+const LiveText = styled.p`
+    font-size: 12px;
+    letter-spacing: 3px;
+    margin: 0;
+    color: white;
+`;
+
 const ChatRoomContainer = styled.div`
     /* margin: 20px 0 5px 0; */
+`;
+
+const AvatarContainer = styled.div`
+    display: flex;
+`;
+
+const Avatar = styled.img`
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    /* border: 2px solid gray; */
+    margin-right: 5px;
+`;
+
+const TheOtherAvatar = styled.img<TheOtherAvatarProps>`
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 5px;
+    filter: ${(props) => (props.TheOtherUserJoined ? 'none' : 'grayscale(100%)')};
+    opacity: ${(props) => (props.TheOtherUserJoined ? '1' : '0.5')};
+`;
+
+const ClassSubject = styled.p`
+    font-size: 25px;
+    margin: 0;
 `;
 
 const configuration = {
@@ -338,8 +407,12 @@ const VideoChat: React.FC = () => {
     const [showChatroom, setShowChatroom] = useState(false);
 
     const [timeRemaining, setTimeRemaining] = useState(50 * 60);
+    const [bothUsersJoined, setBothUsersJoined] = useState(false);
+    const [anotheruserAvatar, setAnotherUserAvatar] = useState('');
+    // const [classSubject, setClassSubject] = useState(null);
 
     const [isBackgroundBlurred, setIsBackgroundBlurred] = useState(false);
+    const [classUrlId, setClassUrlId] = useState<string | null>(null);
 
     const toggleBackgroundBlur = () => {
         setIsBackgroundBlurred(!isBackgroundBlurred);
@@ -370,6 +443,35 @@ const VideoChat: React.FC = () => {
             return null;
         }
     };
+    console.log('anotheruserAvatar', anotheruserAvatar);
+
+    const getUserAvatar = async (userId: string | null | undefined) => {
+        if (!userId) return '';
+
+        const db = firebase.firestore();
+        const userRef = db.collection('users').doc(userId);
+        const userSnapshot = await userRef.get();
+
+        if (userSnapshot.exists) {
+            return userSnapshot.data()?.avatar || '';
+        } else {
+            return '';
+        }
+    };
+
+    // const getSubject = async (userId: string | undefined, userType: string | undefined) => {
+    //     if (userType === 'teacher') {
+    //         return userInfo?.subject?.[0];
+    //     } else if (userType === 'student') {
+    //         const db = firebase.firestore();
+    //         const userRef = db.collection('users').doc(userId);
+    //         const userDoc = await userRef.get();
+    //         const userData = userDoc.data();
+    //         return userData ? userData.subject?.[0] : null;
+    //     }
+    //     return null;
+    // };
+
     const openUserMedia = async () => {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         localStream.current = stream;
@@ -381,6 +483,11 @@ const VideoChat: React.FC = () => {
 
         const urlParams = new URLSearchParams(window.location.search);
         const userId = urlParams.get('id');
+        setClassUrlId(userId);
+        const userAvatar = await getUserAvatar(userId);
+        setAnotherUserAvatar(userAvatar);
+        // const subject = await getSubject(userId ?? undefined, userInfo?.userType);
+        // setClassSubject(subject);
 
         const existingRoomId = await findRoomByUserId(userId);
 
@@ -457,6 +564,10 @@ const VideoChat: React.FC = () => {
             if (remoteVideoRef.current) {
                 remoteVideoRef.current.srcObject = remoteStream.current;
             }
+
+            if (localStream.current && remoteStream.current) {
+                setBothUsersJoined(true);
+            }
         };
 
         const callerCandidatesCollection = roomRef.collection('callerCandidates');
@@ -519,6 +630,9 @@ const VideoChat: React.FC = () => {
                 });
                 if (remoteVideoRef.current) {
                     remoteVideoRef.current.srcObject = remoteStream.current;
+                }
+                if (localStream.current && remoteStream.current) {
+                    setBothUsersJoined(true);
                 }
             };
 
@@ -634,21 +748,23 @@ const VideoChat: React.FC = () => {
     };
 
     useEffect(() => {
-        if (!roomId) return;
+        if (!bothUsersJoined) return;
 
         const timer = setInterval(() => {
             setTimeRemaining((prevTime) => prevTime - 1);
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [roomId]);
+    }, [bothUsersJoined]);
 
     const minutes = Math.floor(timeRemaining / 60);
     const seconds = timeRemaining % 60;
     const formattedSeconds = seconds.toString().padStart(2, '0');
 
-    console.log('userUid', userUid);
-    console.log('isLoading', isLoading);
+    // console.log('userUid', userUid);
+    // console.log('isLoading', isLoading);
+    // console.log('classSubject', classSubject);
+    console.log(classUrlId);
 
     return (
         <MainWrapper>
@@ -657,11 +773,32 @@ const VideoChat: React.FC = () => {
             {userUid ? (
                 <OnlineClassContainer>
                     {roomId && (
-                        <RoomTitle>
-                            {roomId} - ⏰ {minutes}:{formattedSeconds}
-                        </RoomTitle>
+                        <>
+                            <TimeAvatarContainer>
+                                <AvatarContainer>
+                                    <Avatar src={userInfo?.avatar} alt='User Avatar' />
+                                    {classUrlId && (
+                                        <TheOtherAvatar
+                                            src={anotheruserAvatar}
+                                            alt='User Avatar'
+                                            TheOtherUserJoined={bothUsersJoined}
+                                        />
+                                    )}
+                                </AvatarContainer>
+                                {/* <ClassSubject>{classSubject}</ClassSubject> */}
+                                <RoomTitle>
+                                    {/* {roomId} - */}
+                                    <FcAlarmClock size={26} /> {minutes}:{formattedSeconds}
+                                </RoomTitle>
+                            </TimeAvatarContainer>
+                        </>
                     )}
+
                     <ClassContainer>
+                        <LiveTextContainer bothUsersJoined={bothUsersJoined}>
+                            <LiveText>{classUrlId ? '上課中' : '試用中'}</LiveText>{' '}
+                        </LiveTextContainer>
+
                         <VideoContainer>
                             <div style={{ position: 'relative' }}>
                                 <Canvas roomId={roomId} />

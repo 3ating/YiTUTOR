@@ -354,7 +354,7 @@ const TeacherLink = styled(Link)`
 
 const ProfileWrapper = styled.div`
     display: flex;
-    height: 100%;
+    height: calc(100vh - 130px);
     /* border: 1px solid red; */
 `;
 
@@ -701,7 +701,7 @@ const UserProfile = () => {
                 </ProfileLeftContainer>
 
                 <ProfileMiddleContainer
-                    isBookedCourseEmpty={userInfo.userType === 'teacher' && bookingsInfo.length === 0}
+                    isBookedCourseEmpty={userInfo.userType === 'teacher' || bookingsInfo.length === 0}
                 >
                     <CourseTitle>預約課程</CourseTitle>
                     <CourseLine />
