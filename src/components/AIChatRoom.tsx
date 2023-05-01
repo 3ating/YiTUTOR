@@ -338,8 +338,7 @@ const AIChatRoom = () => {
             body: JSON.stringify(apiRequestBody),
         })
             .then((data) => {
-                console.log(data);
-
+                console.log('API response:', data);
                 return data.json();
             })
             .then((data) => {
