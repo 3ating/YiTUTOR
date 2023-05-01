@@ -278,6 +278,7 @@ const Avatar = styled.img`
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid gray;
+    aspect-ratio: 1/1;
 `;
 
 const Section = styled.div`

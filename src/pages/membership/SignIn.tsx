@@ -118,6 +118,7 @@ const Avatar = styled.img`
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     margin-bottom: 10px;
     border: 2px solid gray;
+    aspect-ratio: 1/1;
 `;
 
 const spin = keyframes`
