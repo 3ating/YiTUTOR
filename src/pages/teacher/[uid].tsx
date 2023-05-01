@@ -761,19 +761,6 @@ const TeacherDetails = () => {
             <TeacherContainer>
                 <TeacherLeftContainer>
                     <TeacherIntroContainer>
-                        {/* <TeacherAvatarContainer>
-                            <Avatar src={teacher.avatar} alt={`${teacher.name} 的大頭照`} />
-                            <TeacherContactContainer>
-                                <TeacherEmailContainer>
-                                    <AiOutlineMail size={ICON_SIZE} />
-                                    <TeacherEmail>{teacher.email}</TeacherEmail>
-                                </TeacherEmailContainer>
-                                <TeacherPhoneContainer>
-                                    <AiOutlinePhone size={ICON_SIZE} />
-                                    <TeacherPhone>{teacher.phone}</TeacherPhone>
-                                </TeacherPhoneContainer>
-                            </TeacherContactContainer>
-                        </TeacherAvatarContainer> */}
                         <TeacherContentContainer>
                             <NameTopContainer>
                                 <TeacherAvatarContainer>
@@ -926,95 +913,6 @@ const TeacherDetails = () => {
                     </CourseContainer>
                 </TeacherRightContainer>
             </TeacherContainer>
-            {/* <Heading>{teacher.name}</Heading>
-            <Image src={teacher.avatar} alt={`${teacher.name} 的大頭照`} />
-            <Section>
-                <SubHeading>關於我</SubHeading>
-                <Text>{teacher.description}</Text>
-            </Section>
-            <Section>
-                <SubHeading>自我介紹</SubHeading>
-                <Text>{teacher.intro}</Text>
-            </Section>
-            <Section>
-                <SubHeading>聯繫方式</SubHeading>
-                <Text>電子郵件: {teacher.email}</Text>
-                <Text>電話: {teacher.phone}</Text>
-            </Section>
-            <Section>
-                <SubHeading>科目</SubHeading>
-                <Text>{teacher.subject?.join(', ')}</Text>
-            </Section>
-            <Section>
-                <SubHeading>課程價格</SubHeading>
-                <Text>
-                    {teacher.price &&
-                        teacher.price.map((priceObj: { qty: number; price: number }, idx: number) => {
-                            return (
-                                <PriceButton key={idx} onClick={() => handlePurchaseClick(priceObj)}>
-                                    {priceObj.qty} 堂課: {priceObj.price} 元
-                                </PriceButton>
-                            );
-                        })}
-                </Text>
-            </Section>
-
-            <Section>
-                <SubHeading>選擇欲預約的日期 & 時間</SubHeading>
-                <CalendarAndSchedule>
-                    <Calendar handleSelectDate={handleSelectDate} />
-                    <ScheduleContainer>
-                        <Schedule
-                            selectedTimes={teacher.selectedTimes}
-                            selectedDate={selectedDate}
-                            onTimeSlotClick={handleTimeSlotClick}
-                            setSelectedTime={setSelectedTime}
-                            selectedTime={selectedTime}
-                        />
-                        {showBookButtons && (
-                            <div>
-                                <ConfirmButton onClick={handleConfirmBook}>確認</ConfirmButton>
-                                <RejectButton onClick={handleRejectBook}>拒絕</RejectButton>
-                            </div>
-                        )}
-                    </ScheduleContainer>
-                </CalendarAndSchedule>
-            </Section>
-
-            <ConfirmationDialog open={confirmPurchase} onClick={handleCancelPurchase}>
-                <ConfirmationDialogContent onClick={(e) => e.stopPropagation()}>
-                    <h3>確認購買</h3>
-                    <p>
-                        您確定要購買 {selectedPrice.qty} 堂課，價格為 {selectedPrice.price} 元嗎？
-                    </p>
-                    <button onClick={handleConfirmPurchase}>確認購買</button>
-                    <button onClick={handleCancelPurchase}>取消</button>
-                </ConfirmationDialogContent>
-            </ConfirmationDialog>
-
-            <Section>
-                <SubHeading>評價</SubHeading>
-                <Text>{teacher.evaluation}</Text>
-            </Section>
-            
-            <DirectLink href={'/teacher/Teachers'}>
-                <button>尋找其他教師</button>
-            </DirectLink> */}
-
-            {/* <button onClick={handleOpenChat}>與我聊聊</button> */}
-            {/* <Dialog open={openChat} onClose={handleCloseChat} maxWidth='md' fullWidth>
-                <DialogContent>
-                    <ChatRoom teacherId={uid ? (uid as string) : ''} />
-                </DialogContent>
-            </Dialog> */}
-
-            {/* <ChatIcon onClick={handleOpenChat} />
-            <StyledDialog open={openChat} onClick={handleCloseChat}>
-                <StyledDialogContent onClick={(e) => e.stopPropagation()}>
-                    <ChatRoom selectedUserId={uid ? (uid as string) : ''} />
-                </StyledDialogContent>
-            </StyledDialog> */}
-            {/* </Container> */}
             <Footer />
         </MainWrapper>
     );
