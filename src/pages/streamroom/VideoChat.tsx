@@ -394,6 +394,8 @@ const VideoChat: React.FC = () => {
     const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
     const localStream = useRef<MediaStream | null>(null);
     const remoteStream = useRef<MediaStream | null>(null);
+    const timerRef = useRef<any>(null);
+
     const [peerConnection, setPeerConnection] = useState<RTCPeerConnection | null>(null);
     const [roomId, setRoomId] = useState<string | null>(null);
     const [roomDialogOpen, setRoomDialogOpen] = useState(false);
@@ -428,6 +430,12 @@ const VideoChat: React.FC = () => {
             remoteVideoRef.current.srcObject = remoteStream.current;
         }
     }, [localStream, remoteStream]);
+
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('id');
+        setClassUrlId(userId);
+    }, []);
 
     const findRoomByUserId = async (userId: string | null) => {
         if (!userId) return null;
@@ -481,15 +489,15 @@ const VideoChat: React.FC = () => {
             localVideoRef.current.srcObject = localStream.current;
         }
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const userId = urlParams.get('id');
-        setClassUrlId(userId);
-        const userAvatar = await getUserAvatar(userId);
+        // const urlParams = new URLSearchParams(window.location.search);
+        // const userId = urlParams.get('id');
+        // setClassUrlId(userId);
+        const userAvatar = await getUserAvatar(classUrlId);
         setAnotherUserAvatar(userAvatar);
         // const subject = await getSubject(userId ?? undefined, userInfo?.userType);
         // setClassSubject(subject);
 
-        const existingRoomId = await findRoomByUserId(userId);
+        const existingRoomId = await findRoomByUserId(classUrlId);
 
         if (existingRoomId) {
             setRoomIdInput(existingRoomId);
@@ -523,6 +531,9 @@ const VideoChat: React.FC = () => {
         if (roomId) {
             const db = firebase.firestore();
             const roomRef = db.collection('rooms').doc(roomId);
+
+            await roomRef.update({ callEnded: true });
+
             const calleeCandidates = await roomRef.collection('calleeCandidates').get();
             calleeCandidates.forEach(async (candidate) => {
                 await candidate.ref.delete();
@@ -533,6 +544,7 @@ const VideoChat: React.FC = () => {
             });
             await roomRef.delete();
         }
+        setBothUsersJoined(false);
     };
 
     const createRoom = async () => {
@@ -594,6 +606,9 @@ const VideoChat: React.FC = () => {
         // Listen for remote description
         roomRef.onSnapshot(async (snapshot) => {
             const data = snapshot.data();
+            if (data?.callEnded) {
+                hangUp();
+            }
             if (data?.answer && !pc.currentRemoteDescription) {
                 const rtcSessionDescription = new RTCSessionDescription(data.answer);
                 await pc.setRemoteDescription(rtcSessionDescription);
@@ -620,6 +635,13 @@ const VideoChat: React.FC = () => {
         const db = firebase.firestore();
         const roomRef = db.collection('rooms').doc(`${roomId}`);
         const roomSnapshot = await roomRef.get();
+
+        roomRef.onSnapshot(async (snapshot) => {
+            const data = snapshot.data();
+            if (data?.callEnded) {
+                hangUp();
+            }
+        });
 
         if (roomSnapshot.exists) {
             const pc = new RTCPeerConnection(configuration);

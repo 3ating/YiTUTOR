@@ -45,7 +45,7 @@ const TeacherInfoContainer = styled.div`
     display: flex;
     flex-direction: column;
     padding: 0 46px;
-    /* width: 355px; */
+    width: 228px;
 `;
 
 const TeacherName = styled.p`

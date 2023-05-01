@@ -26,6 +26,24 @@ interface StyledDialogProps {
     open: boolean;
 }
 
+interface Teacher {
+    selectedTimes: { day: string; hours: number[] }[];
+    uid: string;
+    name: string;
+    description?: string;
+    avatar?: string;
+    certification?: boolean;
+    courses?: Record<string, any>;
+    document?: string;
+    email?: string;
+    phone?: string;
+    price?: { qty: number; price: number }[];
+    subject?: string[];
+    userType?: string;
+    intro?: string;
+    evaluation?: number[];
+}
+
 const MainWrapper = styled.div`
     display: flex;
     flex-direction: column;
@@ -516,24 +534,6 @@ const BookButtonContainer = styled.div`
     justify-content: center;
 `;
 
-interface Teacher {
-    selectedTimes: { day: string; hours: number[] }[];
-    uid: string;
-    name: string;
-    description?: string;
-    avatar?: string;
-    certification?: boolean;
-    courses?: Record<string, any>;
-    document?: string;
-    email?: string;
-    evaluation?: string;
-    phone?: string;
-    price?: { qty: number; price: number }[];
-    subject?: string[];
-    userType?: string;
-    intro?: string;
-}
-
 interface ChatRoomProps {
     teacherId?: string | string[] | undefined;
 }
@@ -727,7 +727,16 @@ const TeacherDetails = () => {
         return stars;
     };
 
-    const rating = 4;
+    const calculateAverageRating = (evaluations: number[] | undefined) => {
+        if (!evaluations || evaluations.length === 0) {
+            return 0;
+        }
+
+        const sum = evaluations.reduce((acc, current) => acc + current, 0);
+        return sum / evaluations.length;
+    };
+
+    const rating = calculateAverageRating(teacher?.evaluation);
     const formattedRating = rating.toFixed(1);
 
     if (!teacher) {
@@ -736,9 +745,9 @@ const TeacherDetails = () => {
 
     // console.log('userUid:', userUid);
     // console.log('teacherUID', uid);
-    console.log('userinfo:', userInfo);
+    // console.log('userinfo:', userInfo);
 
-    // console.log('teacher:', teacher);
+    console.log('teacher:', teacher);
     // console.log('selectedTime:', selectedTime);
     // console.log('selectedDate:', selectedDate);
 

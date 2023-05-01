@@ -89,6 +89,7 @@ const SearchInput = styled.input`
     height: 25px;
     max-width: 300px;
     margin-right: 10px;
+    letter-spacing: 1px;
 `;
 
 const SubjectSelect = styled.select`
@@ -139,6 +140,8 @@ const customStyles: StylesConfig<OptionType, false> = {
         marginRight: '5px',
         minHeight: '45px',
         cursor: 'pointer',
+        letterSpacing: '1px',
+        width: '150px',
         '&:hover': {
             borderColor: '#999',
         },
@@ -151,7 +154,7 @@ const customStyles: StylesConfig<OptionType, false> = {
 };
 
 const subjectOptions: OptionType[] = [
-    { label: '全部科目', value: '' },
+    { label: '預設', value: '' },
     { label: '國文', value: '國文' },
     { label: '英文', value: '英文' },
     { label: '數學', value: '數學' },
@@ -160,6 +163,7 @@ const subjectOptions: OptionType[] = [
 ];
 
 const priceSortOptions: OptionType[] = [
+    { label: '預設', value: '' },
     { label: '由低到高', value: 'asc' },
     { label: '由高到低', value: 'desc' },
 ];
@@ -209,7 +213,7 @@ const Teachers = () => {
         }
 
         query.get().then((snapshot) => {
-            const filteredTeachersData = snapshot.docs
+            let filteredTeachersData = snapshot.docs
                 .map((doc) => {
                     return {
                         ...doc.data(),
@@ -218,13 +222,38 @@ const Teachers = () => {
                 })
                 .filter((teacher) => teacher.name.toLowerCase().includes(search.toLowerCase()));
 
+            filteredTeachersData = sortTeachers(filteredTeachersData);
+
             setTeachers(filteredTeachersData);
         });
+    };
+
+    const sortTeachers = (teachersList: Teacher[]) => {
+        if (selectedPriceSort) {
+            teachersList.sort((a, b) => {
+                const aPrice = a.price?.[0]?.price || 0;
+                const bPrice = b.price?.[0]?.price || 0;
+
+                if (selectedPriceSort === 'asc') {
+                    return aPrice - bPrice;
+                } else if (selectedPriceSort === 'desc') {
+                    return bPrice - aPrice;
+                }
+
+                return 0;
+            });
+        }
+        return teachersList;
     };
 
     useEffect(() => {
         handleFilter();
     }, [search, selectedSubject]);
+
+    useEffect(() => {
+        const sortedTeachers = sortTeachers([...teachers]);
+        setTeachers(sortedTeachers);
+    }, [selectedPriceSort]);
 
     useEffect(() => {
         const unsubscribe = db
@@ -262,7 +291,7 @@ const Teachers = () => {
                         type='text'
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        placeholder='搜尋教師名字'
+                        placeholder='搜尋老師名字'
                     />
                     <ReactSelect
                         styles={customStyles}
@@ -272,7 +301,7 @@ const Teachers = () => {
                                 : null
                         }
                         options={priceSortOptions}
-                        placeholder='價格'
+                        placeholder='價格排序'
                         onChange={(value) => setSelectedPriceSort((value as OptionType)?.value || '')}
                     />
 
