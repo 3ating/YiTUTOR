@@ -562,7 +562,7 @@ const RegistrationForm = () => {
                                 subject: selectedSubjects,
                                 price: priceArray,
                                 // evaluation,
-                                evaluation: randomRating,
+                                evaluation: [...evaluation, randomRating],
                                 intro,
                                 selectedTimes: selectedTimesArray,
                             }),
