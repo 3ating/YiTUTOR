@@ -65,7 +65,7 @@ const PageContainer = styled.div`
 
 const TeachersPageContainer = styled.div`
     background-color: antiquewhite;
-    padding: 50px 0 20px;
+    padding: 50px 0 80px;
     display: flex;
     flex-direction: column;
 `;
