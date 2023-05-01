@@ -1,6 +1,7 @@
 import React, { HTMLAttributes, useEffect, useRef, useState, ButtonHTMLAttributes } from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
+import { useRouter } from 'next/router';
 import ScreenSharing from './ScreenSharing';
 import ClassChatroom from './ClassChatroom';
 import Canvas from './canvas/Canvas';
@@ -16,6 +17,7 @@ import { TbMessageCircle2Filled, TbScreenShare } from 'react-icons/tb';
 import { FaVolumeDown, FaVolumeMute, FaChalkboardTeacher } from 'react-icons/fa';
 import { RiVideoAddFill } from 'react-icons/ri';
 import { FcAlarmClock } from 'react-icons/fc';
+import { Modal, Rate, Button } from 'antd';
 
 const firebaseConfig = {
     apiKey: process.env.FIRESTORE_API_KEY,
@@ -388,13 +390,14 @@ const configuration = {
 
 const VideoChat: React.FC = () => {
     const ICON_SIZE = 22;
+    const router = useRouter();
     const { userUid, userInfo, isLoading } = useAuth();
     const [showLocalVideo, setShowLocalVideo] = useState(true);
     const localVideoRef = useRef<HTMLVideoElement | null>(null);
     const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
     const localStream = useRef<MediaStream | null>(null);
     const remoteStream = useRef<MediaStream | null>(null);
-    const timerRef = useRef<any>(null);
+    const prevBothUsersJoined = useRef(false);
 
     const [peerConnection, setPeerConnection] = useState<RTCPeerConnection | null>(null);
     const [roomId, setRoomId] = useState<string | null>(null);
@@ -415,6 +418,8 @@ const VideoChat: React.FC = () => {
 
     const [isBackgroundBlurred, setIsBackgroundBlurred] = useState(false);
     const [classUrlId, setClassUrlId] = useState<string | null>(null);
+    const [showRatingModal, setShowRatingModal] = useState(false);
+    const [teacherRating, setTeacherRating] = useState<number | null>(null);
 
     const toggleBackgroundBlur = () => {
         setIsBackgroundBlurred(!isBackgroundBlurred);
@@ -451,7 +456,6 @@ const VideoChat: React.FC = () => {
             return null;
         }
     };
-    console.log('anotheruserAvatar', anotheruserAvatar);
 
     const getUserAvatar = async (userId: string | null | undefined) => {
         if (!userId) return '';
@@ -502,10 +506,10 @@ const VideoChat: React.FC = () => {
         if (existingRoomId) {
             setRoomIdInput(existingRoomId);
             await joinRoomById(existingRoomId);
-            console.log('有人開房間：', existingRoomId);
+            // console.log('有人開房間：', existingRoomId);
         } else {
             await createRoom();
-            console.log('沒人開房間');
+            // console.log('沒人開房間');
         }
         setCameraEnabled(true);
     };
@@ -545,6 +549,9 @@ const VideoChat: React.FC = () => {
             await roomRef.delete();
         }
         setBothUsersJoined(false);
+        // if (userInfo?.userType === 'student') {
+        //     setShowRatingModal(true);
+        // }
     };
 
     const createRoom = async () => {
@@ -554,12 +561,12 @@ const VideoChat: React.FC = () => {
         const pc = new RTCPeerConnection(configuration);
 
         pc.oniceconnectionstatechange = (event) => {
-            console.log('ICE connection state change:', pc.iceConnectionState);
+            // console.log('ICE connection state change:', pc.iceConnectionState);
             // handle ICE connection state change here
         };
 
         setPeerConnection(pc);
-        console.log('localstream in create room:', localStream.current);
+        // console.log('localstream in create room:', localStream.current);
 
         if (localStream.current) {
             localStream.current.getTracks().forEach((track) => {
@@ -584,7 +591,7 @@ const VideoChat: React.FC = () => {
 
         const callerCandidatesCollection = roomRef.collection('callerCandidates');
         pc.onicecandidate = (event) => {
-            console.log('onicecandidate event triggered:', event);
+            // console.log('onicecandidate event triggered:', event);
             if (event.candidate) {
                 callerCandidatesCollection.add(event.candidate.toJSON());
             }
@@ -659,11 +666,11 @@ const VideoChat: React.FC = () => {
             };
 
             pc.oniceconnectionstatechange = (event) => {
-                console.log('ICE connection state change:', pc.iceConnectionState);
+                // console.log('ICE connection state change:', pc.iceConnectionState);
             };
 
             setPeerConnection(pc);
-            console.log('localstream in joinroom:', localStream);
+            // console.log('localstream in joinroom:', localStream);
 
             if (localStream.current) {
                 localStream.current.getTracks().forEach((track) => {
@@ -720,8 +727,6 @@ const VideoChat: React.FC = () => {
     useEffect(() => {
         if (peerConnection) {
             const handleIceCandidate = async (event: RTCPeerConnectionIceEvent) => {
-                console.log('handleIceCandidate');
-
                 if (event.candidate && roomId) {
                     const roomRef = db.collection('rooms').doc(roomId);
                     const role = localStream.current && !remoteStream.current?.getTracks().length ? 'caller' : 'callee';
@@ -769,6 +774,27 @@ const VideoChat: React.FC = () => {
         setShowChatroom(!showChatroom);
     };
 
+    const submitRating = async () => {
+        console.log('classUrlId:', classUrlId); // Add this line
+        console.log('teacherRating:', teacherRating);
+        if (classUrlId && teacherRating !== null) {
+            const db = firebase.firestore();
+            const userRef = db.collection('users').doc(classUrlId);
+            await userRef.update({
+                evaluation: firebase.firestore.FieldValue.arrayUnion(teacherRating),
+            });
+        }
+        setShowRatingModal(false);
+        router.push('/');
+    };
+
+    useEffect(() => {
+        if (prevBothUsersJoined.current && !bothUsersJoined && userInfo?.userType === 'student') {
+            setShowRatingModal(true);
+        }
+        prevBothUsersJoined.current = bothUsersJoined;
+    }, [bothUsersJoined, userInfo]);
+
     useEffect(() => {
         if (!bothUsersJoined) return;
 
@@ -786,7 +812,6 @@ const VideoChat: React.FC = () => {
     // console.log('userUid', userUid);
     // console.log('isLoading', isLoading);
     // console.log('classSubject', classSubject);
-    console.log(classUrlId);
 
     return (
         <MainWrapper>
@@ -890,6 +915,24 @@ const VideoChat: React.FC = () => {
                         <HangUpButton onClick={hangUp} disabled={!localStream || !roomId}>
                             <ImPhoneHangUp size={ICON_SIZE} />
                         </HangUpButton>
+
+                        <Modal
+                            title='為老師評分'
+                            open={showRatingModal}
+                            onCancel={() => setShowRatingModal(false)}
+                            footer={[
+                                <Button
+                                    key='submit'
+                                    type='primary'
+                                    onClick={submitRating}
+                                    style={{ backgroundColor: '#ffab34' }}
+                                >
+                                    送出
+                                </Button>,
+                            ]}
+                        >
+                            <Rate onChange={(value: number) => setTeacherRating(value)} />
+                        </Modal>
                     </ButtonsContainer>
                 </OnlineClassContainer>
             ) : (

@@ -32,7 +32,7 @@ const CoursePrice = styled.p`
     font-size: 24px;
     line-height: 32px;
     letter-spacing: 0.05em;
-    margin: 24px 0 12px;
+    margin: 17px 0 9px;
 `;
 
 const Hightline = styled.div`
@@ -53,7 +53,7 @@ const TeacherName = styled.p`
     font-size: 32px;
     line-height: 42px;
     letter-spacing: 0.05em;
-    margin: 28px 0 0 0;
+    margin: 12px 0 0 0;
 `;
 
 const Subject = styled.p`

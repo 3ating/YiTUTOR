@@ -11,6 +11,8 @@ import TeacherCardComponents from '../../components/TeacherCard';
 // import ReactSelect from 'react-select';
 import ReactSelect, { StylesConfig, OptionProps, CSSObjectWithLabel, GroupBase } from 'react-select';
 import { CSSObject } from '@emotion/react';
+import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
+import { BsStarHalf } from 'react-icons/bs';
 
 type OptionType = {
     label: string;
@@ -29,6 +31,30 @@ const {
     TeacherDescription,
     TeacherBtn,
 } = TeacherCardComponents;
+
+const RatingContainer = styled.div`
+    display: flex;
+    align-items: center;
+    margin: 5px 0 0;
+`;
+
+const RatingNumber = styled.p`
+    font-size: 18px;
+    font-weight: 550;
+    margin: 0;
+`;
+
+const StarIcon = styled(AiFillStar)`
+    color: #f5c518;
+`;
+
+const EmptyStarIcon = styled(AiOutlineStar)`
+    color: #f5c518;
+`;
+
+const HalfStarIcon = styled(BsStarHalf)`
+    color: #f5c518;
+`;
 
 const PageContainer = styled.div`
     display: flex;
@@ -186,14 +212,13 @@ const db = firebase.firestore();
 
 interface Teacher {
     uid: string;
-    evaluation: JSX.Element;
+    evaluation: number[];
     subject: any;
     name: string;
     email: string;
     phone: string;
     userType: string;
     description?: string;
-    // subjects?: string[];
     price?: { qty: number; price: number }[];
     avatar?: string;
 }
@@ -274,6 +299,33 @@ const Teachers = () => {
         };
     }, []);
 
+    const calculateAverage = (ratings: number[]) => {
+        if (ratings.length === 0) {
+            return 0;
+        }
+
+        const sum = ratings.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+        return sum / ratings.length;
+    };
+
+    const renderStars = (rating: number) => {
+        const fullStars = Math.floor(rating);
+        const halfStar = rating % 1 >= 0.5;
+        const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+        return (
+            <>
+                {Array.from({ length: fullStars }, (_, i) => (
+                    <StarIcon key={i} />
+                ))}
+                {halfStar && <HalfStarIcon />}
+                {Array.from({ length: emptyStars }, (_, i) => (
+                    <EmptyStarIcon key={i} />
+                ))}
+            </>
+        );
+    };
+
     console.log(teachers);
     console.log(selectedSubject);
 
@@ -332,7 +384,10 @@ const Teachers = () => {
                                 <TeacherInfoContainer>
                                     <TeacherName>{teacher.name}</TeacherName>
                                     <Subject>{teacher.subject}家教</Subject>
-
+                                    <RatingContainer>
+                                        <RatingNumber>{calculateAverage(teacher.evaluation).toFixed(1)}</RatingNumber>
+                                        {renderStars(parseFloat(calculateAverage(teacher.evaluation).toFixed(1)))}
+                                    </RatingContainer>
                                     <TeacherDescription>{teacher.description}</TeacherDescription>
                                     <div>
                                         <DirectLink href={`/teacher/${teacher.uid}`} key={teacher.uid}>
