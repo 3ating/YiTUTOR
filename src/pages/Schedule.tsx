@@ -7,6 +7,8 @@ const ScheduleContainer = styled.div`
     align-items: center;
     width: 100%;
     margin: 0;
+    align-items: flex-start;
+
     /* margin-top: 2rem; */
 `;
 

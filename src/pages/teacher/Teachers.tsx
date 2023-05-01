@@ -300,7 +300,7 @@ const Teachers = () => {
     }, []);
 
     const calculateAverage = (ratings: number[] = []) => {
-        if (ratings.length === 0) {
+        if (!Array.isArray(ratings) || ratings.length === 0) {
             return 0;
         }
 
