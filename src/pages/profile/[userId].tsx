@@ -700,9 +700,7 @@ const UserProfile = () => {
                     </UserInfoBox>
                 </ProfileLeftContainer>
 
-                <ProfileMiddleContainer
-                    isBookedCourseEmpty={userInfo.userType === 'teacher' || bookingsInfo.length === 0}
-                >
+                <ProfileMiddleContainer isBookedCourseEmpty={userInfo.userType === 'teacher'}>
                     <CourseTitle>預約課程</CourseTitle>
                     <CourseLine />
                     <BookedCoursesContainer isBookedCourseEmpty={bookingsInfo.length === 0}>
