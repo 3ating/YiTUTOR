@@ -14,7 +14,6 @@ export default async function handler(
 ) {
     if (req.method === 'POST') {
         const API_KEY = process.env.OPENAI_API_KEY;
-        console.log('API_KEY:', API_KEY);
         const apiRequestBody = req.body;
 
         try {

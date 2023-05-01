@@ -337,6 +337,14 @@ const AIChatRoom = () => {
             },
             body: JSON.stringify(apiRequestBody),
         })
+            //  await fetch('/api/gpt/AISols', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //         'Authorization': `Bearer ${OPENAI_API_KEY}`,
+            //     },
+            //     body: JSON.stringify(apiRequestBody),
+            // })
             .then((data) => {
                 console.log('API response:', data);
                 return data.json();
