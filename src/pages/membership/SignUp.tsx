@@ -459,7 +459,7 @@ const RegistrationForm = () => {
         // Sunday: new Set(),
     });
 
-    const [evaluation, setEvaluation] = useState([5]);
+    const [evaluation, setEvaluation] = useState([]);
     const [showTeacherDetails, setShowTeacherDetails] = useState(false);
     const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
     const [finalStep, setFinalStep] = useState(false);
