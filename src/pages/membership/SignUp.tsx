@@ -513,6 +513,7 @@ const RegistrationForm = () => {
 
     const handleSubmit = async (e: { preventDefault: () => void }) => {
         e.preventDefault();
+        const randomRating = Math.floor(Math.random() * 5) + 1;
 
         if (userType === 'teacher' && !showTeacherDetails) {
             setShowTeacherDetails(true);
@@ -560,9 +561,8 @@ const RegistrationForm = () => {
                                 description,
                                 subject: selectedSubjects,
                                 price: priceArray,
-                                evaluation,
-                                // document: documentUrl,
-                                // certification,
+                                // evaluation,
+                                evaluation: [...evaluation, randomRating],
                                 intro,
                                 selectedTimes: selectedTimesArray,
                             }),
