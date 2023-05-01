@@ -584,7 +584,7 @@ const TeacherDetails = () => {
     // };
 
     const handlePurchaseClick = (priceObj: { qty: number; price: number }) => {
-        if (userInfo?.userType !== 'student') {
+        if (userInfo?.userType !== 'student' || !isLoading) {
             toast.error('請確認是否登入 / 為學生身份');
         } else {
             setSelectedPrice(priceObj);
@@ -640,7 +640,7 @@ const TeacherDetails = () => {
     }, [uid]);
 
     const handleTimeSlotClick = () => {
-        if (userInfo?.userType === 'teacher') {
+        if (userInfo?.userType === 'teacher' || !isLoading) {
             toast.error('請確認是否登入 / 為學生身份');
         } else {
             setShowBookButtons(true);

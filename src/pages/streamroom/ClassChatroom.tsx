@@ -11,7 +11,7 @@ const ChatroomContainer = styled.div`
     display: flex;
     flex-direction: column;
     max-width: 400px;
-    width: 85%;
+    /* width: 85%; */
     height: 495px;
     background-color: #f5f5f5;
     padding: 5px 15px;

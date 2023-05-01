@@ -76,10 +76,12 @@ const ClassContainer = styled.div`
     display: flex;
     position: relative;
     /* margin-top: 10px; */
+    gap: 10px;
 `;
 
 const VideoContainer = styled.div`
     width: 100%;
+    position: relative;
     /* display: flex; */
 `;
 
@@ -842,10 +844,6 @@ const VideoChat: React.FC = () => {
                     )}
 
                     <ClassContainer>
-                        <LiveTextContainer bothUsersJoined={bothUsersJoined}>
-                            <LiveText>{classUrlId ? '上課中' : '試用中'}</LiveText>{' '}
-                        </LiveTextContainer>
-
                         <VideoContainer>
                             <div style={{ position: 'relative' }}>
                                 <Canvas roomId={roomId} />
@@ -865,6 +863,9 @@ const VideoChat: React.FC = () => {
                                     style={{ backgroundColor: 'white' }}
                                 ></VideoScreen>
                             </div>
+                            <LiveTextContainer bothUsersJoined={bothUsersJoined}>
+                                <LiveText>{classUrlId ? '上課中' : '試用中'}</LiveText>{' '}
+                            </LiveTextContainer>
                         </VideoContainer>
                         {showChatroom && (
                             <ChatRoomContainer>

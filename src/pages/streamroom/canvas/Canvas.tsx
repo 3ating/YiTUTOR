@@ -59,8 +59,10 @@ const StyledToolbar = styled.div`
     padding: 12px 8px;
     border-radius: 7px;
     position: absolute;
-    left: 2%;
-    top: 19%;
+    /* left: 2%; */
+    left: 20px;
+    /* top: 19%; */
+    top: 92.5px;
     gap: 5px;
 `;
 
