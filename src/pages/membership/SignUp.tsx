@@ -463,6 +463,7 @@ const RegistrationForm = () => {
     const [showTeacherDetails, setShowTeacherDetails] = useState(false);
     const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
     const [finalStep, setFinalStep] = useState(false);
+    const [passwordError, setPasswordError] = useState('');
 
     const router = useRouter();
 
@@ -513,6 +514,14 @@ const RegistrationForm = () => {
 
     const handleSubmit = async (e: { preventDefault: () => void }) => {
         e.preventDefault();
+
+        if (password.length < 8) {
+            setPasswordError('密碼至少需要8個字符');
+            return;
+        } else {
+            setPasswordError('');
+        }
+
         const randomRating = Math.floor(Math.random() * 5);
 
         if (userType === 'teacher' && !showTeacherDetails) {
@@ -722,6 +731,7 @@ const RegistrationForm = () => {
                                                 value={password}
                                                 onChange={(e) => setPassword(e.target.value)}
                                             />
+                                            <InputHint>{passwordError || '至少由8個數字或英文組成'}</InputHint>
                                         </UserInfoLabel>
                                         <UserInfoLabel>
                                             身份：
@@ -814,26 +824,6 @@ const RegistrationForm = () => {
                                             </PriceItem>
                                         </PriceContainer>
                                     </TeacherInfoLabel>
-
-                                    {/* <fieldset>
-                                        <legend>Available Time Slots:</legend>
-                                        {Object.keys(selectedTimes).map((day) => (
-                                            <fieldset key={day}>
-                                                <legend>{day}:</legend>
-                                                {Array.from({ length: 12 }, (_, i) => i + 9).map((hour) => (
-                                                    <label key={hour}>
-                                                        <input
-                                                            type='checkbox'
-                                                            onChange={(e) =>
-                                                                handleTimeChange(day, hour, e.target.checked)
-                                                            }
-                                                        />
-                                                        {hour}:00
-                                                    </label>
-                                                ))}
-                                            </fieldset>
-                                        ))}
-                                    </fieldset> */}
                                 </>
                             )}
                             {userType === 'teacher' && showTeacherDetails && finalStep && (

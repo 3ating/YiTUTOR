@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useRouter } from 'next/router';
 import { FaRobot } from 'react-icons/fa';
 import { AiOutlineClose } from 'react-icons/ai';
+import { useAuth } from '../../public/AuthContext';
 import AIChatRoom from './AIChatRoom';
+import { Modal, Button, message, Alert } from 'antd';
 
 const ChatButtonWrapper = styled.button<{ showChatRoom: boolean }>`
     display: flex;
@@ -29,10 +32,17 @@ const ChatButtonWrapper = styled.button<{ showChatRoom: boolean }>`
 `;
 
 const AIChatBtn = () => {
+    const router = useRouter();
     const [showChatRoom, setShowChatRoom] = useState(false);
+    const [showAlert, setShowAlert] = useState(false);
+    const { isLoading } = useAuth();
 
     const handleShowChatRoom = () => {
-        setShowChatRoom((prevShowChatRoom) => !prevShowChatRoom);
+        if (!isLoading) {
+            setShowAlert(true);
+        } else {
+            setShowChatRoom((prevShowChatRoom) => !prevShowChatRoom);
+        }
     };
 
     return (
@@ -41,6 +51,15 @@ const AIChatBtn = () => {
                 {showChatRoom ? <AiOutlineClose /> : <FaRobot />}
             </ChatButtonWrapper>
             {showChatRoom && <AIChatRoom />}
+            {showAlert && (
+                <Alert
+                    message='請先登入'
+                    type='warning'
+                    closable
+                    onClose={() => setShowAlert(false)}
+                    style={{ position: 'fixed', bottom: 100, right: 20, zIndex: 3 }}
+                />
+            )}
         </>
     );
 };

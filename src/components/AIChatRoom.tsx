@@ -1,13 +1,5 @@
 import { SetStateAction, useEffect, useRef, useState } from 'react';
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
-// import {
-//     MainContainer,
-//     ChatContainer,
-//     MessageList,
-//     Message as ChatMessage,
-//     MessageInput,
-//     TypingIndicator,
-// } from '@chatscope/chat-ui-kit-react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import styled from 'styled-components';
@@ -16,6 +8,7 @@ import { useAuth } from '../../public/AuthContext';
 import Link from 'next/link';
 import { BsFillSendFill } from 'react-icons/bs';
 import { AiFillDelete } from 'react-icons/ai';
+import { Spin } from 'antd';
 
 const firebaseConfig = {
     apiKey: process.env.FIRESTORE_API_KEY,
@@ -36,57 +29,6 @@ const db = firebase.firestore();
 // const API_KEY = OPENAI_API_KEY;
 // const API_KEY = process.env.OPENAI_API_KEY;
 
-// const ChatRoomContainer = styled.div`
-//     position: fixed;
-//     bottom: 0px;
-//     right: 50px;
-//     height: 700px;
-//     width: 380px;
-//     z-index: 1;
-//     margin: 0;
-// `;
-
-// const StyledApp = styled.div`
-//     font-family: Arial, Helvetica, sans-serif;
-//     background-color: #f5f5f5;
-//     /* height: 100vh; */
-// `;
-
-// const StyledMainContainer = styled(MainContainer)`
-//     height: 100%;
-// `;
-
-// const StyledChatContainer = styled(ChatContainer)`
-//     display: flex;
-//     flex-direction: column;
-//     justify-content: space-between;
-//     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-//     background-color: #ffffff;
-//     border-radius: 9px;
-//     margin: 50px auto;
-//     max-width: 600px;
-//     height: 80%;
-//     padding-top: 8px;
-// `;
-
-// const DirectLink = styled(Link)`
-//     text-decoration: none;
-//     color: black;
-// `;
-
-// const StyledChatMessage = styled(ChatMessage)`
-//     &.cs-message--incoming {
-//         .cs-message__content {
-//             background-color: #fdd5ae;
-//         }
-//     }
-
-//     &.cs-message--outgoing {
-//         .cs-message__content {
-//             background-color: #f9d99c;
-//         }
-//     }
-// `;
 interface MessageProps {
     position: 'incoming' | 'outgoing';
 }
@@ -118,11 +60,6 @@ const ChatRoomTitle = styled.p`
     margin-bottom: 14px;
 `;
 
-const StyledApp = styled.div`
-    font-family: Arial, Helvetica, sans-serif;
-    background-color: #f5f5f5;
-`;
-
 const StyledMainContainer = styled.div`
     height: 100%;
 `;
@@ -138,11 +75,6 @@ const StyledChatContainer = styled.div`
     max-width: 600px;
     height: 80%;
     /* padding-top: 8px; */
-`;
-
-const DirectLink = styled(Link)`
-    text-decoration: none;
-    color: black;
 `;
 
 const MessageList = styled.div`
@@ -174,10 +106,10 @@ const Message = styled.div<MessageProps>`
 const TypingIndicator = styled.div`
     font-size: 12px;
     color: #656565;
-    padding: 8px 16px;
+    padding: 0 20px 0;
     margin: 8px;
-    position: absolute;
-    bottom: 0;
+    /* position: absolute; */
+    /* bottom: 0; */
     margin: 0;
 `;
 
@@ -192,9 +124,9 @@ const MessageInput = styled.input`
     padding: 16px;
     border: none;
     outline: none;
-
     &::placeholder {
-        letter-spacing: 1px;
+        letter-spacing: 1.5px;
+        color: #ccc;
     }
 `;
 
@@ -232,7 +164,7 @@ const DeleteButton = styled.button`
 
 const AIChatRoom = () => {
     const ICON_SIZE = 18;
-    const { userUid } = useAuth();
+    const { userUid, isLoading } = useAuth();
     const INITIAL_MESSAGE = [
         {
             message: '我是智慧解題機器人🤖，我會盡我所能為你解答任何考題！',
@@ -245,21 +177,6 @@ const AIChatRoom = () => {
     const [inputMessage, setInputMessage] = useState('');
     const messageListRef = useRef<HTMLDivElement>(null);
 
-    // const handleSend = async (message: string) => {
-    //     const newMessage = {
-    //         message,
-    //         direction: 'outgoing',
-    //         sender: 'user',
-    //         sentTime: new Date().toLocaleString(),
-    //     };
-
-    //     const newMessages = [...messages, newMessage];
-
-    //     setMessages(newMessages);
-
-    //     setIsTyping(true);
-    //     await processMessageToChatGPT(newMessages);
-    // };
     const handleSend = async () => {
         if (inputMessage.trim() === '') return;
 
@@ -435,21 +352,65 @@ const AIChatRoom = () => {
 
     // console.log('messages:', messages);
     console.log(userUid);
+    console.log('isLoading', isLoading);
+
+    const DotLoadingIcon = () => {
+        return (
+            <span>
+                <i className='dot' />
+                <i className='dot' />
+                <i className='dot' />
+                <style jsx>{`
+                    .dot {
+                        display: inline-block;
+                        width: 6px;
+                        height: 6px;
+                        border-radius: 50%;
+                        background-color: #ccc;
+                        margin-right: 4px;
+                        animation: dotBounce 1.4s infinite ease-in-out;
+                    }
+                    .dot:last-child {
+                        margin-right: 0;
+                    }
+                    .dot:nth-child(1) {
+                        animation-delay: -0.32s;
+                    }
+                    .dot:nth-child(2) {
+                        animation-delay: -0.16s;
+                    }
+                    @keyframes dotBounce {
+                        0%,
+                        80%,
+                        100% {
+                            transform: translateY(0);
+                        }
+                        40% {
+                            transform: translateY(-30%);
+                        }
+                    }
+                `}</style>
+            </span>
+        );
+    };
 
     return (
         <ChatRoomContainer>
             <StyledMainContainer>
                 <StyledChatContainer>
                     <ChatRoomTitle>智慧解題助教</ChatRoomTitle>
-
                     <MessageList ref={messageListRef}>
                         {messages.map((message, i) => (
                             <Message key={i} position={message.sender === 'ChatGPT' ? 'outgoing' : 'incoming'}>
                                 {message.message}
                             </Message>
                         ))}
-                        {isTyping && <TypingIndicator>🤖 回覆中...</TypingIndicator>}
-                        {/* <TypingIndicator>🤖 回覆中...</TypingIndicator> */}
+                        {isTyping && (
+                            <TypingIndicator>
+                                <Spin indicator={<DotLoadingIcon />} style={{ marginRight: 8 }} />
+                                {/* 回覆中... */}
+                            </TypingIndicator>
+                        )}
                     </MessageList>
                     <MessageInputContainer>
                         <MessageInput
