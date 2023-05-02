@@ -346,14 +346,6 @@ const AIChatRoom = () => {
         }
     }
 
-    useEffect(() => {
-        fetchUserHistory();
-    }, [userUid]);
-
-    // console.log('messages:', messages);
-    console.log(userUid);
-    console.log('isLoading', isLoading);
-
     const DotLoadingIcon = () => {
         return (
             <span>
@@ -393,6 +385,20 @@ const AIChatRoom = () => {
             </span>
         );
     };
+
+    const scrollToBottom = () => {
+        if (messageListRef.current) {
+            messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+        }
+    };
+
+    useEffect(() => {
+        fetchUserHistory();
+    }, [userUid]);
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
 
     return (
         <ChatRoomContainer>

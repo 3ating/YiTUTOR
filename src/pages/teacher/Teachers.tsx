@@ -194,6 +194,12 @@ const priceSortOptions: OptionType[] = [
     { label: '由高到低', value: 'desc' },
 ];
 
+const ratingSortOptions: OptionType[] = [
+    { label: '預設', value: '' },
+    { label: '由高到低', value: 'desc' },
+    { label: '由低到高', value: 'asc' },
+];
+
 const firebaseConfig = {
     apiKey: process.env.FIRESTORE_API_KEY,
     authDomain: 'board-12c3c.firebaseapp.com',
@@ -229,6 +235,7 @@ const Teachers = () => {
     const [search, setSearch] = useState('');
     const [selectedSubject, setSelectedSubject] = useState('');
     const [selectedPriceSort, setSelectedPriceSort] = useState('');
+    const [selectedRatingSort, setSelectedRatingSort] = useState('');
 
     const handleFilter = () => {
         let query = db.collection('users').where('userType', '==', 'teacher');
@@ -268,12 +275,28 @@ const Teachers = () => {
                 return 0;
             });
         }
+
+        if (selectedRatingSort) {
+            teachersList.sort((a, b) => {
+                const aRating = calculateAverage(a.evaluation);
+                const bRating = calculateAverage(b.evaluation);
+
+                if (selectedRatingSort === 'asc') {
+                    return aRating - bRating;
+                } else if (selectedRatingSort === 'desc') {
+                    return bRating - aRating;
+                }
+
+                return 0;
+            });
+        }
+
         return teachersList;
     };
 
     useEffect(() => {
         handleFilter();
-    }, [search, selectedSubject]);
+    }, [search, selectedSubject, selectedPriceSort, selectedRatingSort]);
 
     useEffect(() => {
         const sortedTeachers = sortTeachers([...teachers]);
@@ -355,6 +378,18 @@ const Teachers = () => {
                         options={priceSortOptions}
                         placeholder='價格排序'
                         onChange={(value) => setSelectedPriceSort((value as OptionType)?.value || '')}
+                    />
+
+                    <ReactSelect
+                        styles={customStyles}
+                        value={
+                            selectedRatingSort
+                                ? ratingSortOptions.find((option) => option.value === selectedRatingSort)
+                                : null
+                        }
+                        options={ratingSortOptions}
+                        placeholder='評分排序'
+                        onChange={(value) => setSelectedRatingSort((value as OptionType)?.value || '')}
                     />
 
                     <ReactSelect
