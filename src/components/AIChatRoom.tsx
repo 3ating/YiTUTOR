@@ -405,13 +405,12 @@ const AIChatRoom = () => {
                                 {message.message}
                             </Message>
                         ))}
-                        {isTyping && (
-                            <TypingIndicator>
-                                <Spin indicator={<DotLoadingIcon />} style={{ marginRight: 8 }} />
-                                {/* 回覆中... */}
-                            </TypingIndicator>
-                        )}
                     </MessageList>
+                    {isTyping && (
+                        <TypingIndicator>
+                            <Spin indicator={<DotLoadingIcon />} style={{ marginRight: 8 }} />
+                        </TypingIndicator>
+                    )}
                     <MessageInputContainer>
                         <MessageInput
                             placeholder='輸入問題'
