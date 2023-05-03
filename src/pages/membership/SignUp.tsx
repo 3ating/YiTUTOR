@@ -15,6 +15,7 @@ import { AiOutlineCamera } from 'react-icons/ai';
 import Select, { OptionProps, ControlProps, StylesConfig } from 'react-select';
 import ReactSelect from 'react-select';
 import { CSSObject } from '@emotion/react';
+import { useAuth } from '../../../public/AuthContext';
 
 const firebaseConfig = {
     apiKey: 'AIzaSyDrG9uBznJyP7Fe_4JRwVG7pvR7SjScQsg',
@@ -428,8 +429,8 @@ const userTypeOptions = [
 ];
 
 const RegistrationForm = () => {
+    const { isLoading } = useAuth();
     const availableSubjects = ['國文', '英文', '數學', '物理', '化學'];
-
     const avatarInputRef = useRef<HTMLInputElement>(null);
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -644,8 +645,10 @@ const RegistrationForm = () => {
         }
     };
 
-    console.log(finalStep);
-    console.log(selectedSubjects);
+    if (isLoading) {
+        router.push('/');
+        return;
+    }
 
     return (
         <PageContainer>

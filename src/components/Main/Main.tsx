@@ -12,6 +12,7 @@ import Link from 'next/link';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import TeacherCardComponents from '../TeacherCard';
+import { useAuth } from '../../../public/AuthContext';
 
 const {
     TeacherImg,
@@ -63,6 +64,7 @@ const BannerText = styled.p`
     font-size: 48px;
     line-height: 64px;
     margin-bottom: 0;
+    letter-spacing: 1px;
 `;
 
 const FeaturesContainer = styled.div`
@@ -203,6 +205,21 @@ const ScrollButton = styled.button`
     border: none;
     font-size: 24px;
     cursor: pointer;
+    background-color: #acacac;
+    color: white;
+    border-radius: 50%;
+    width: auto;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+    padding: 0 12px;
+    margin: 0 8px 100px;
+
+    &:hover {
+        background-color: #000;
+    }
 `;
 
 interface Teacher {
@@ -235,6 +252,7 @@ if (!firebase.apps.length) {
 const db = firebase.firestore();
 
 export default function Main() {
+    const { isLoading } = useAuth();
     const [scrollIndex, setScrollIndex] = useState(0);
     const [teachers, setTeachers] = useState<Teacher[]>([]);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -298,9 +316,13 @@ export default function Main() {
         <>
             <BannerContainer>
                 <BannerTextContainer>
-                    <BannerText>Easy to Learn, Easy to Achieve with YiTUTOR</BannerText>
+                    <BannerText>
+                        Easy to Learn
+                        <br /> Easy to Achieve <br />
+                        with YiTUTOR
+                    </BannerText>
                     <DirectLink href={'/membership/SignUp'}>
-                        <PrimaryButton>立即加入</PrimaryButton>
+                        {!isLoading && <PrimaryButton>立即加入</PrimaryButton>}
                     </DirectLink>
                 </BannerTextContainer>
                 <Image src={mainImg} width={700} alt='Banner image' style={{ margin: '0 auto' }} />
