@@ -11,6 +11,10 @@ const HeaderWrapper = styled.header`
     background-color: #ffd335;
     height: 65px;
     padding: 0 40px;
+    /* position: absolute;
+    top: 0;
+    width: 100%;
+    box-sizing: border-box; */
 `;
 
 const Logo = styled.h1`

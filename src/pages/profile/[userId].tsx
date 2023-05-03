@@ -60,6 +60,7 @@ const Avatar = styled.img`
     width: 182px;
     border-radius: 50%;
     margin: 20px auto;
+    aspect-ratio: 1/1;
 `;
 
 const UserInfoContainer = styled.div`
@@ -300,6 +301,7 @@ const BookingAvatar = styled.img`
     width: 80px;
     border-radius: 50%;
     margin-right: 1rem;
+    aspect-ratio: 1/1;
 `;
 
 const BookingInfo = styled.div`
@@ -424,6 +426,10 @@ const ModifiedInput = styled.input`
     /* &:focus {
         border-color: #ffab34;
     } */
+    &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
 `;
 
 const ProfileLeftContainer = styled.div`
@@ -661,7 +667,7 @@ const UserProfile = () => {
                                         {isEditingPhone ? (
                                             <>
                                                 <ModifiedInput
-                                                    type='tel'
+                                                    type='number'
                                                     name='phone'
                                                     value={editedUserInfo?.phone || ''}
                                                     onChange={(e) => handleChange(e, 'phone')}

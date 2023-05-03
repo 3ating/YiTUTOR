@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import Image from 'next/image';
 import PrimaryButton from '../Button';
@@ -6,9 +6,37 @@ import mainImg from './mainImg.png';
 import online from './onlne.png';
 import ai from './ai.png';
 import board from './board.png';
-import teacherImg from './teacherimg.png';
+// import teacherImg from './teacherimg.png';
 import AIChat from '../AIChatBtn';
 import Link from 'next/link';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
+import TeacherCardComponents from '../TeacherCard';
+
+const {
+    TeacherImg,
+    TeacherCard,
+    CoursePrice,
+    TeacherInfoContainer,
+    TeacherName,
+    Subject,
+    TeacherDescription,
+    TeacherBtn,
+    RatingContainer,
+    RatingNumber,
+    calculateAverage,
+    renderStars,
+} = TeacherCardComponents;
+
+const TeacherCardWrapper = styled.div`
+    width: 100%;
+    padding: 0 10px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+`;
 
 const BannerContainer = styled.div`
     display: flex;
@@ -46,7 +74,7 @@ const FeaturesContainer = styled.div`
     margin-bottom: 40px;
 `;
 
-const MainMainDescriptionContainer = styled.div`
+const MainDescriptionContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -135,63 +163,27 @@ const TeachersContainer = styled.div`
     justify-content: center;
     gap: 26px;
     margin-bottom: 143px;
-`;
-
-const TeacherImg = styled(Image)`
-    margin-top: 20px;
-    border-radius: 50%;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-`;
-
-const TeacherCard = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 320px;
-    height: 538px;
-    border: 1px black solid;
-`;
-
-const CoursePrice = styled.p`
-    font-weight: 700;
-    font-size: 24px;
-    line-height: 32px;
-    letter-spacing: 0.05em;
-`;
-
-const TeacherInfoContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    padding: 0 46px;
-`;
-
-const TeacherName = styled.p`
-    font-weight: 700;
-    font-size: 32px;
-    line-height: 42px;
-    letter-spacing: 0.05em;
-    margin: 0;
-`;
-
-const Subject = styled.p`
-    font-weight: 400;
-    font-size: 20px;
-    letter-spacing: 0.05em;
-    line-height: 27px;
-    margin: 5px 0 0 0;
-`;
-
-const TeacherDescription = styled.p`
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 19px;
-    letter-spacing: 0.05em;
-    color: #999999;
-    margin-bottom: 35px;
-`;
-
-const TeacherBtn = styled(PrimaryButton)`
+    overflow-x: hidden;
+    position: relative;
     width: 100%;
+    transition: transform 0.5s ease;
+    flex-wrap: nowrap;
+`;
+
+const Mask = styled.div`
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 1) 0%,
+        rgba(255, 255, 255, 0) 20%,
+        rgba(255, 255, 255, 0) 80%,
+        rgba(255, 255, 255, 1) 100%
+    );
+    pointer-events: none;
 `;
 
 const DirectLink = styled(Link)`
@@ -199,15 +191,109 @@ const DirectLink = styled(Link)`
     color: black;
 `;
 
+const ScrollButtonContainer = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+`;
+
+const ScrollButton = styled.button`
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+`;
+
+interface Teacher {
+    uid: string;
+    evaluation: number[];
+    subject: any;
+    name: string;
+    email: string;
+    phone: string;
+    userType: string;
+    description?: string;
+    price?: { qty: number; price: number }[];
+    avatar?: string;
+}
+
+const firebaseConfig = {
+    apiKey: process.env.FIRESTORE_API_KEY,
+    authDomain: 'board-12c3c.firebaseapp.com',
+    projectId: 'board-12c3c',
+    storageBucket: 'board-12c3c.appspot.com',
+    messagingSenderId: '662676665549',
+    appId: '1:662676665549:web:d2d23417c365f3ec666584',
+    measurementId: 'G-YY6Q81WPY9',
+};
+
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+
+const db = firebase.firestore();
+
 export default function Main() {
-    const settings = {
-        dots: true,
-        infinite: true,
-        speed: 500,
-        slidesToShow: 3,
-        slidesToScroll: 1,
-        adaptiveHeight: true,
+    const [scrollIndex, setScrollIndex] = useState(0);
+    const [teachers, setTeachers] = useState<Teacher[]>([]);
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    const handleScrollLeft = () => {
+        const container = containerRef.current;
+        if (container) {
+            const cardWidth = container.clientWidth / 3;
+            const cardsToMove = 3;
+            const totalScroll = cardWidth * cardsToMove;
+            if (container.scrollLeft === 0) {
+                container.scrollLeft = cardWidth * (teachers.length - cardsToMove);
+            } else {
+                container.scrollLeft -= totalScroll;
+            }
+        }
     };
+
+    const handleScrollRight = () => {
+        const container = containerRef.current;
+        if (container) {
+            const cardWidth = container.clientWidth / 3;
+            const cardsToMove = 3;
+            const totalScroll = cardWidth * cardsToMove;
+            if (container.scrollLeft === cardWidth * (teachers.length - cardsToMove)) {
+                container.scrollLeft = 0;
+            } else {
+                container.scrollLeft += totalScroll;
+            }
+        }
+    };
+
+    const renderTeacherCards = (cards: string | any[], index: number, cardsToShow = 3) => {
+        const start = index * cardsToShow;
+        const end = start + cardsToShow;
+        return cards.slice(start, end);
+    };
+
+    useEffect(() => {
+        const unsubscribe = db
+            .collection('users')
+            .where('userType', '==', 'teacher')
+            .onSnapshot((snapshot) => {
+                const teachersData: Teacher[] = snapshot.docs.map((doc) => {
+                    return {
+                        ...doc.data(),
+                        uid: doc.id,
+                    } as unknown as Teacher;
+                });
+                setTeachers(teachersData);
+            });
+
+        return () => {
+            unsubscribe();
+        };
+    }, []);
+
+    console.log('teachers', teachers.length);
+
     return (
         <>
             <BannerContainer>
@@ -220,10 +306,10 @@ export default function Main() {
                 <Image src={mainImg} width={700} alt='Banner image' style={{ margin: '0 auto' }} />
             </BannerContainer>
             <FeaturesContainer>
-                <MainMainDescriptionContainer>
+                <MainDescriptionContainer>
                     <MainDescription>Discover personalized online tutoring</MainDescription>
                     <MainDescriptionHightline />
-                </MainMainDescriptionContainer>
+                </MainDescriptionContainer>
                 <FeatureBoxContainer>
                     <FeatureBox>
                         <Image src={online} alt='Online' />
@@ -260,87 +346,58 @@ export default function Main() {
                 </FeatureBoxContainer>
             </FeaturesContainer>
             <TeachersInfoContainer>
-                <MainMainDescriptionContainer>
+                <MainDescriptionContainer>
                     <MainDescription>Discover personalized online tutoring</MainDescription>
                     <MainDescriptionHightline />
-                </MainMainDescriptionContainer>
+                </MainDescriptionContainer>
 
-                <TeachersContainer>
-                    <TeacherCard>
-                        <TeacherImg src={teacherImg} alt='Online' />
-                        <CoursePrice>NT$3000/50分鐘</CoursePrice>
-                        <Hightline />
-                        <TeacherInfoContainer>
-                            <TeacherName>Sam</TeacherName>
-                            <Subject>英文家教</Subject>
-                            <TeacherDescription>
-                                👩🏻‍🎓澳洲碩士畢業⭐️旅居澳洲六年多⭐️雅思專家⭐️過往學生一律7分以上⭐️台灣國際學校SAT數學老師⭐️
-                                IELTS 寫作、口說邏輯思考⭐️OET考試技...
-                            </TeacherDescription>
-                            <TeacherBtn>購買課程</TeacherBtn>
-                        </TeacherInfoContainer>
-                    </TeacherCard>
-
-                    <TeacherCard>
-                        <TeacherImg src={teacherImg} alt='Online' />
-                        <CoursePrice>NT$3000/50分鐘</CoursePrice>
-                        <Hightline />
-                        <TeacherInfoContainer>
-                            <TeacherName>Sam</TeacherName>
-                            <Subject>英文家教</Subject>
-                            <TeacherDescription>
-                                👩🏻‍🎓澳洲碩士畢業⭐️旅居澳洲六年多⭐️雅思專家⭐️過往學生一律7分以上⭐️台灣國際學校SAT數學老師⭐️
-                                IELTS 寫作、口說邏輯思考⭐️OET考試技...
-                            </TeacherDescription>
-                            <TeacherBtn>購買課程</TeacherBtn>
-                        </TeacherInfoContainer>
-                    </TeacherCard>
-
-                    <TeacherCard>
-                        <TeacherImg src={teacherImg} alt='Online' />
-                        <CoursePrice>NT$3000/50分鐘</CoursePrice>
-                        <Hightline />
-                        <TeacherInfoContainer>
-                            <TeacherName>Sam</TeacherName>
-                            <Subject>英文家教</Subject>
-                            <TeacherDescription>
-                                👩🏻‍🎓澳洲碩士畢業⭐️旅居澳洲六年多⭐️雅思專家⭐️過往學生一律7分以上⭐️台灣國際學校SAT數學老師⭐️
-                                IELTS 寫作、口說邏輯思考⭐️OET考試技...
-                            </TeacherDescription>
-                            <TeacherBtn>購買課程</TeacherBtn>
-                        </TeacherInfoContainer>
-                    </TeacherCard>
-
-                    {/* <TeacherCard>
-                        <TeacherImg src={teacherImg} alt='Online' />
-                        <CoursePrice>NT$3000/50分鐘</CoursePrice>
-                        <Hightline />
-                        <TeacherInfoContainer>
-                            <TeacherName>Sam</TeacherName>
-                            <Subject>英文家教</Subject>
-                            <TeacherDescription>
-                                👩🏻‍🎓澳洲碩士畢業⭐️旅居澳洲六年多⭐️雅思專家⭐️過往學生一律7分以上⭐️台灣國際學校SAT數學老師⭐️
-                                IELTS 寫作、口說邏輯思考⭐️OET考試技...
-                            </TeacherDescription>
-                            <TeacherBtn>購買課程</TeacherBtn>
-                        </TeacherInfoContainer>
-                    </TeacherCard> */}
-
-                    {/* <TeacherCard>
-                        <TeacherImg src={teacherImg} alt='Online' />
-                        <CoursePrice>NT$3000/50分鐘</CoursePrice>
-                        <Hightline />
-                        <TeacherInfoContainer>
-                            <TeacherName>Sam</TeacherName>
-                            <Subject>英文家教</Subject>
-                            <TeacherDescription>
-                                👩🏻‍🎓澳洲碩士畢業⭐️旅居澳洲六年多⭐️雅思專家⭐️過往學生一律7分以上⭐️台灣國際學校SAT數學老師⭐️
-                                IELTS 寫作、口說邏輯思考⭐️OET考試技...
-                            </TeacherDescription>
-                            <TeacherBtn>購買課程</TeacherBtn>
-                        </TeacherInfoContainer>
-                    </TeacherCard> */}
-                </TeachersContainer>
+                <ScrollButtonContainer>
+                    <ScrollButton onClick={handleScrollLeft}>&lt;</ScrollButton>
+                    <TeachersContainer
+                        ref={containerRef}
+                        style={{
+                            transform: `translateX(-${scrollIndex * 100}%)`,
+                        }}
+                    >
+                        {teachers &&
+                            teachers.map((teacher, index) => (
+                                <TeacherCardWrapper key={index}>
+                                    <TeacherCard>
+                                        {teacher.avatar && (
+                                            <TeacherImg
+                                                src={teacher.avatar}
+                                                alt={`${teacher.name} 的大頭照`}
+                                                width={148}
+                                                height={148}
+                                            />
+                                        )}
+                                        <CoursePrice>NT${teacher.price?.[0]?.price}/50分鐘</CoursePrice>
+                                        <Hightline />
+                                        <TeacherInfoContainer>
+                                            <TeacherName>{teacher.name}</TeacherName>
+                                            <Subject>{teacher.subject}家教</Subject>
+                                            <RatingContainer>
+                                                <RatingNumber>
+                                                    {calculateAverage(teacher.evaluation).toFixed(1)}
+                                                </RatingNumber>
+                                                {renderStars(
+                                                    parseFloat(calculateAverage(teacher.evaluation).toFixed(1))
+                                                )}
+                                            </RatingContainer>
+                                            <TeacherDescription>{teacher.description}</TeacherDescription>
+                                            <div>
+                                                <DirectLink href={`/teacher/${teacher.uid}`} key={teacher.uid}>
+                                                    <TeacherBtn>購買課程</TeacherBtn>
+                                                </DirectLink>
+                                            </div>
+                                        </TeacherInfoContainer>
+                                    </TeacherCard>
+                                </TeacherCardWrapper>
+                            ))}
+                        <Mask />
+                    </TeachersContainer>
+                    <ScrollButton onClick={handleScrollRight}>&gt;</ScrollButton>
+                </ScrollButtonContainer>
             </TeachersInfoContainer>
             <AIChat />
         </>

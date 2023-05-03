@@ -10,6 +10,10 @@ const FooterWrapper = styled.footer`
     height: 65px;
     padding: 0 40px;
     margin-top: auto;
+    /* position: absolute;
+    bottom: 0;
+    width: 100%;
+    box-sizing: border-box; */
 `;
 
 const Logo = styled.h1`
