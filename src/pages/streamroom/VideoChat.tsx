@@ -18,6 +18,7 @@ import { FaVolumeDown, FaVolumeMute, FaChalkboardTeacher } from 'react-icons/fa'
 import { RiVideoAddFill } from 'react-icons/ri';
 import { FcAlarmClock } from 'react-icons/fc';
 import { Modal, Rate, Button } from 'antd';
+import { Tooltip, message } from 'antd';
 
 const firebaseConfig = {
     apiKey: process.env.FIRESTORE_API_KEY,
@@ -393,7 +394,7 @@ const configuration = {
 const VideoChat: React.FC = () => {
     const ICON_SIZE = 22;
     const router = useRouter();
-    const { userUid, userInfo, isLoading } = useAuth();
+    const { userUid, userInfo } = useAuth();
     const [showLocalVideo, setShowLocalVideo] = useState(true);
     const localVideoRef = useRef<HTMLVideoElement | null>(null);
     const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -509,8 +510,10 @@ const VideoChat: React.FC = () => {
             setRoomIdInput(existingRoomId);
             await joinRoomById(existingRoomId);
             // console.log('有人開房間：', existingRoomId);
+            message.success(`Hello！您已成功進入線上教室`);
         } else {
             await createRoom();
+            message.success(`Hello！您已成功進入線上教室`);
             // console.log('沒人開房間');
         }
         setCameraEnabled(true);
@@ -777,8 +780,6 @@ const VideoChat: React.FC = () => {
     };
 
     const submitRating = async () => {
-        console.log('classUrlId:', classUrlId); // Add this line
-        console.log('teacherRating:', teacherRating);
         if (classUrlId && teacherRating !== null) {
             const db = firebase.firestore();
             const userRef = db.collection('users').doc(classUrlId);
@@ -794,11 +795,15 @@ const VideoChat: React.FC = () => {
         if (prevBothUsersJoined.current && !bothUsersJoined && userInfo?.userType === 'student') {
             setShowRatingModal(true);
         }
+        if (prevBothUsersJoined.current && !bothUsersJoined && userInfo?.userType === 'teacher') {
+            router.push('/');
+        }
         prevBothUsersJoined.current = bothUsersJoined;
     }, [bothUsersJoined, userInfo]);
 
     useEffect(() => {
         if (!bothUsersJoined) return;
+        message.success('線上上課開始');
 
         const timer = setInterval(() => {
             setTimeRemaining((prevTime) => prevTime - 1);
@@ -814,6 +819,7 @@ const VideoChat: React.FC = () => {
     // console.log('userUid', userUid);
     // console.log('isLoading', isLoading);
     // console.log('classSubject', classSubject);
+    // console.log(userInfo);
 
     return (
         <MainWrapper>
@@ -875,18 +881,23 @@ const VideoChat: React.FC = () => {
                     </ClassContainer>
 
                     <ButtonsContainer>
-                        <CreateButton onClick={openUserMedia} primary={roomId == null} disabled={roomId !== null}>
-                            <RiVideoAddFill size={ICON_SIZE} />
-                        </CreateButton>
+                        <Tooltip title='開啟鏡頭 / 進入教室'>
+                            <CreateButton onClick={openUserMedia} primary={roomId == null} disabled={roomId !== null}>
+                                <RiVideoAddFill size={ICON_SIZE} />
+                            </CreateButton>
+                        </Tooltip>
 
-                        <VideoScreenButton
-                            active={showLocalVideo}
-                            onClick={toggleVideoScreen}
-                            disabled={!localStream || !roomId}
-                        >
-                            <AiFillSwitcher size={ICON_SIZE} />
-                        </VideoScreenButton>
+                        <Tooltip title='切換視訊'>
+                            <VideoScreenButton
+                                active={showLocalVideo}
+                                onClick={toggleVideoScreen}
+                                disabled={!localStream || !roomId}
+                            >
+                                <AiFillSwitcher size={ICON_SIZE} />
+                            </VideoScreenButton>
+                        </Tooltip>
 
+                        {/* <Tooltip title='螢幕分享'> */}
                         <ScreenSharing
                             localStream={localStream.current}
                             peerConnection={peerConnection}
@@ -894,28 +905,49 @@ const VideoChat: React.FC = () => {
                             setIsScreenSharing={setIsScreenSharing}
                             roomId={roomId}
                         />
+                        {/* </Tooltip> */}
 
-                        <ChatButton active={!showChatroom} onClick={toggleChat} disabled={!remoteStream || !roomId}>
-                            <TbMessageCircle2Filled size={ICON_SIZE} />
-                        </ChatButton>
+                        <Tooltip title='聊天室'>
+                            <ChatButton active={!showChatroom} onClick={toggleChat} disabled={!remoteStream || !roomId}>
+                                <TbMessageCircle2Filled size={ICON_SIZE} />
+                            </ChatButton>
+                        </Tooltip>
 
-                        <ControlButton active={isVideoEnabled} onClick={toggleVideo} disabled={!localStream || !roomId}>
-                            {isVideoEnabled ? (
-                                <BsFillCameraVideoFill size={ICON_SIZE} />
-                            ) : (
-                                <BsFillCameraVideoOffFill size={ICON_SIZE} />
-                            )}
-                        </ControlButton>
-                        <ControlButton active={!isMicMuted} onClick={toggleMic} disabled={!localStream || !roomId}>
-                            {isMicMuted ? <BsMicMuteFill size={ICON_SIZE} /> : <BsMicFill size={ICON_SIZE} />}
-                        </ControlButton>
-                        <ControlButton active={isAudioMuted} onClick={toggleAudio} disabled={!remoteStream || !roomId}>
-                            {isAudioMuted ? <FaVolumeDown size={ICON_SIZE} /> : <FaVolumeMute size={ICON_SIZE} />}
-                        </ControlButton>
+                        <Tooltip title='視訊開關'>
+                            <ControlButton
+                                active={isVideoEnabled}
+                                onClick={toggleVideo}
+                                disabled={!localStream || !roomId}
+                            >
+                                {isVideoEnabled ? (
+                                    <BsFillCameraVideoFill size={ICON_SIZE} />
+                                ) : (
+                                    <BsFillCameraVideoOffFill size={ICON_SIZE} />
+                                )}
+                            </ControlButton>
+                        </Tooltip>
 
-                        <HangUpButton onClick={hangUp} disabled={!localStream || !roomId}>
-                            <ImPhoneHangUp size={ICON_SIZE} />
-                        </HangUpButton>
+                        <Tooltip title='音訊開關'>
+                            <ControlButton active={!isMicMuted} onClick={toggleMic} disabled={!localStream || !roomId}>
+                                {isMicMuted ? <BsMicMuteFill size={ICON_SIZE} /> : <BsMicFill size={ICON_SIZE} />}
+                            </ControlButton>
+                        </Tooltip>
+
+                        <Tooltip title='音量開關'>
+                            <ControlButton
+                                active={isAudioMuted}
+                                onClick={toggleAudio}
+                                disabled={!remoteStream || !roomId}
+                            >
+                                {isAudioMuted ? <FaVolumeDown size={ICON_SIZE} /> : <FaVolumeMute size={ICON_SIZE} />}
+                            </ControlButton>
+                        </Tooltip>
+
+                        <Tooltip title='離開教室'>
+                            <HangUpButton onClick={hangUp} disabled={!localStream || !roomId}>
+                                <ImPhoneHangUp size={ICON_SIZE} />
+                            </HangUpButton>
+                        </Tooltip>
 
                         <Modal
                             title='為老師評分'

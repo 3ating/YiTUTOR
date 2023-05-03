@@ -13,6 +13,7 @@ import {
 import { RxBorderWidth } from 'react-icons/rx';
 import { AiOutlineClear } from 'react-icons/ai';
 import { IoShapesOutline } from 'react-icons/io5';
+import { Tooltip } from 'antd';
 
 interface ChatroomProps {
     roomId: string | null;
@@ -1069,9 +1070,11 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                 />
                 <StyledToolbar>
                     <RelativeDiv>
-                        <ToolIcon onClick={handleColorLineClick}>
-                            <MdOutlineColorLens />
-                        </ToolIcon>
+                        <Tooltip title='畫筆顏色' placement='right'>
+                            <ToolIcon onClick={handleColorLineClick}>
+                                <MdOutlineColorLens />
+                            </ToolIcon>
+                        </Tooltip>
                         <StyledInput
                             type='color'
                             value={color}
@@ -1081,9 +1084,11 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                         />
                     </RelativeDiv>
                     <RelativeDiv>
-                        <ToolIcon onClick={handleLineWidthPickerClick}>
-                            <RxBorderWidth />
-                        </ToolIcon>
+                        <Tooltip title='畫筆粗細' placement='right'>
+                            <ToolIcon onClick={handleLineWidthPickerClick}>
+                                <RxBorderWidth />
+                            </ToolIcon>
+                        </Tooltip>
                         {showLineWidthPicker && (
                             // <StyledInput
                             //     type='range'
@@ -1105,9 +1110,11 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                         )}
                     </RelativeDiv>
                     <RelativeDiv>
-                        <ToolIcon onClick={handleShapeIconClick}>
-                            <IoShapesOutline />
-                        </ToolIcon>
+                        <Tooltip title='圖案' placement='right'>
+                            <ToolIcon onClick={handleShapeIconClick}>
+                                <IoShapesOutline />
+                            </ToolIcon>
+                        </Tooltip>
                         <StyledSelect
                             value={shape || ''}
                             onChange={(e) => setShape(e.target.value)}
@@ -1121,9 +1128,11 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                         </StyledSelect>
                     </RelativeDiv>
                     <RelativeDiv>
-                        <ToolIcon onClick={handleColorWandClick}>
-                            <MdOutlineBorderColor />
-                        </ToolIcon>
+                        <Tooltip title='框線顏色' placement='right'>
+                            <ToolIcon onClick={handleColorWandClick}>
+                                <MdOutlineBorderColor />
+                            </ToolIcon>
+                        </Tooltip>
                         <StyledInput
                             type='color'
                             value={selectedItemColor}
@@ -1135,10 +1144,18 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                             isVisible={colorPickerVisible}
                         />
                     </RelativeDiv>
-                    <ToolIconAno as={MdContentCopy} onClick={copySelectedItem} />
-                    <ToolIconAno as={MdContentPaste} onClick={pasteClipboardItem} />
-                    <ToolIconAno as={MdOutlineDelete} onClick={deleteSelectedItem} />
-                    <ToolIconAno as={AiOutlineClear} onClick={handleClearCanvas} />
+                    <Tooltip title='複製' placement='right'>
+                        <ToolIconAno as={MdContentCopy} onClick={copySelectedItem} />
+                    </Tooltip>
+                    <Tooltip title='貼上' placement='right'>
+                        <ToolIconAno as={MdContentPaste} onClick={pasteClipboardItem} />
+                    </Tooltip>
+                    <Tooltip title='刪除' placement='right'>
+                        <ToolIconAno as={MdOutlineDelete} onClick={deleteSelectedItem} />
+                    </Tooltip>
+                    <Tooltip title='清空' placement='right'>
+                        <ToolIconAno as={AiOutlineClear} onClick={handleClearCanvas} />
+                    </Tooltip>
                 </StyledToolbar>
             </StyledCanvasContainer>
         </BoardContainer>

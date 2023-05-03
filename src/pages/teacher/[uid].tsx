@@ -21,6 +21,7 @@ import Button from '@/components/Button';
 import { toast } from 'react-toastify';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Loader from '@/components/Loader';
 
 interface StyledDialogProps {
     open: boolean;
@@ -741,7 +742,7 @@ const TeacherDetails = () => {
     const formattedRating = rating.toFixed(1);
 
     if (!teacher) {
-        return <div>Loading...</div>;
+        return <Loader />;
     }
 
     // console.log('userUid:', userUid);

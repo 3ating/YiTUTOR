@@ -11,6 +11,7 @@ import Calendar from '../Calendar';
 import Schedule from '../Schedule';
 import Button from '@/components/Button';
 import { AiFillEdit } from 'react-icons/ai';
+import Loader from '@/components/Loader';
 
 type BookedCoursesContainerProps = {
     isBookedCourseEmpty: boolean;
@@ -612,7 +613,7 @@ const UserProfile = () => {
     console.log(userInfo);
 
     if (!userInfo) {
-        return <div>Loading...</div>;
+        return <Loader />;
     }
 
     return (

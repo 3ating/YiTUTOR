@@ -6,6 +6,7 @@ import 'firebase/compat/firestore';
 import styled from 'styled-components';
 import { useAuth } from '../../../public/AuthContext';
 import { TbScreenShare } from 'react-icons/tb';
+import { Tooltip } from 'antd';
 
 // import { db } from '../../firebase';
 
@@ -273,19 +274,21 @@ const ScreenSharing: React.FC<ScreenSharingProps> = ({
 
     return (
         <>
-            {!isScreenSharing ? (
-                <ShareScreenButton
-                    active={isScreenSharing}
-                    onClick={openScreenShare}
-                    disabled={!localStream || !roomId}
-                >
-                    <TbScreenShare size={ICON_SIZE} />
-                </ShareScreenButton>
-            ) : (
-                <ShareScreenButton active={isScreenSharing} onClick={stopScreenShare}>
-                    <TbScreenShare size={ICON_SIZE} />
-                </ShareScreenButton>
-            )}
+            <Tooltip title='螢幕分享'>
+                {!isScreenSharing ? (
+                    <ShareScreenButton
+                        active={isScreenSharing}
+                        onClick={openScreenShare}
+                        disabled={!localStream || !roomId}
+                    >
+                        <TbScreenShare size={ICON_SIZE} />
+                    </ShareScreenButton>
+                ) : (
+                    <ShareScreenButton active={isScreenSharing} onClick={stopScreenShare}>
+                        <TbScreenShare size={ICON_SIZE} />
+                    </ShareScreenButton>
+                )}
+            </Tooltip>
             <RemoteScreen ref={remoteScreenRef} show={!!remoteScreen} autoPlay muted />
         </>
 
