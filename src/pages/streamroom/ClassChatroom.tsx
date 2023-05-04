@@ -83,8 +83,14 @@ const MessagesContainer = styled.div`
     background-color: #f5f5f5;
 `;
 
+const MessageContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: ${({ ownMessage }: { ownMessage: boolean }) => (ownMessage ? 'flex-end' : 'flex-start')};
+`;
+
 const MessageBubble = styled.div`
-    margin-bottom: 6px;
+    margin-bottom: 4px;
     padding: 5px 15px;
     background-color: ${({ ownMessage }: { ownMessage: boolean }) => (ownMessage ? 'white' : '#e9e8e8')};
     color: ${({ ownMessage }: { ownMessage: boolean }) => (ownMessage ? '#333' : '#333')};
@@ -98,6 +104,14 @@ const MessageSender = styled.strong`
     font-size: 13px;
     color: ${({ ownMessage }: { ownMessage: boolean }) => (ownMessage ? '#333' : '#555')};
     margin-right: 8px;
+`;
+
+const MessageTimestamp = styled.span`
+    font-size: 10px;
+    color: ${({ ownMessage }: { ownMessage: boolean }) => (ownMessage ? '#999' : '#999')};
+    margin-right: ${({ ownMessage }: { ownMessage: boolean }) => (ownMessage ? '4px' : '0')};
+    margin-left: ${({ ownMessage }: { ownMessage: boolean }) => (ownMessage ? '0' : '4px')};
+    display: block;
 `;
 
 const MessageRow = styled.div`
@@ -204,10 +218,21 @@ export default function ClassChatroom({ roomId, toggleChat }: ChatroomProps) {
                     const ownMessage = message.name === name;
                     return (
                         <MessageRow key={message.id} ownMessage={ownMessage}>
-                            <MessageBubble ownMessage={ownMessage}>
-                                <MessageSender ownMessage={ownMessage}>{message.name}</MessageSender>
-                                {message.content}
-                            </MessageBubble>
+                            <MessageContainer ownMessage={ownMessage}>
+                                <MessageBubble ownMessage={ownMessage}>
+                                    <MessageSender ownMessage={ownMessage}>
+                                        {ownMessage ? '你' : message.name}
+                                    </MessageSender>
+                                    {message.content}
+                                </MessageBubble>
+                                <MessageTimestamp ownMessage={ownMessage}>
+                                    {message.timestamp.toDate().toLocaleTimeString('zh-TW', {
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        hour12: false,
+                                    })}
+                                </MessageTimestamp>
+                            </MessageContainer>
                         </MessageRow>
                     );
                 })}

@@ -246,6 +246,7 @@ const AIChatRoom = () => {
             model: 'gpt-3.5-turbo',
             messages: apiMessages,
         };
+        console.log('apiRequestBody:', apiRequestBody);
 
         await fetch('/api/gpt/AISols', {
             method: 'POST',

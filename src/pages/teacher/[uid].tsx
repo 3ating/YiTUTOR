@@ -669,7 +669,7 @@ const TeacherDetails = () => {
                                         teacher.price.map((priceObj: { qty: number; price: number }, idx: number) => {
                                             return (
                                                 <PriceButton key={idx} onClick={() => handlePurchaseClick(priceObj)}>
-                                                    {priceObj.qty} 堂課: NT$ {priceObj.price} 元
+                                                    {priceObj.qty} 堂課 NT${priceObj.price} 元
                                                 </PriceButton>
                                             );
                                         })}

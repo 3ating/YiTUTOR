@@ -190,7 +190,8 @@ const HangUpButton = styled.button<ButtonProps>`
     display: inline-block;
     font-size: 14px;
     margin: 4px 2px;
-    padding: 10px 19px 8px 19px;
+    /* padding: 10px 19px 8px 19px; */
+    padding: 10px 13px 8px 13px;
     text-align: center;
     text-decoration: none;
     &:hover {
@@ -788,7 +789,7 @@ const VideoChat: React.FC = () => {
             });
         }
         setShowRatingModal(false);
-        router.push('/');
+        router.push(`/teacher/${classUrlId}`);
     };
 
     useEffect(() => {
@@ -796,20 +797,37 @@ const VideoChat: React.FC = () => {
             setShowRatingModal(true);
         }
         if (prevBothUsersJoined.current && !bothUsersJoined && userInfo?.userType === 'teacher') {
-            router.push('/');
+            router.push(`/teacher/${userUid}`);
         }
         prevBothUsersJoined.current = bothUsersJoined;
     }, [bothUsersJoined, userInfo]);
 
     useEffect(() => {
         if (!bothUsersJoined) return;
-        message.success('線上上課開始');
+        setTimeout(() => {
+            message.info('線上上課開始');
+        }, 500);
 
         const timer = setInterval(() => {
             setTimeRemaining((prevTime) => prevTime - 1);
         }, 1000);
 
         return () => clearInterval(timer);
+    }, [bothUsersJoined]);
+
+    useEffect(() => {
+        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+            if (bothUsersJoined) {
+                event.preventDefault();
+                event.returnValue = '您確定要離開視訊通話嗎？未保存的更改可能會丟失。';
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
     }, [bothUsersJoined]);
 
     const minutes = Math.floor(timeRemaining / 60);
@@ -881,74 +899,97 @@ const VideoChat: React.FC = () => {
                     </ClassContainer>
 
                     <ButtonsContainer>
-                        <Tooltip title='開啟鏡頭 / 進入教室'>
-                            <CreateButton onClick={openUserMedia} primary={roomId == null} disabled={roomId !== null}>
-                                <RiVideoAddFill size={ICON_SIZE} />
-                            </CreateButton>
-                        </Tooltip>
+                        {!roomId ? (
+                            <Tooltip title='開啟鏡頭 / 進入教室'>
+                                <CreateButton
+                                    onClick={openUserMedia}
+                                    primary={roomId == null}
+                                    disabled={roomId !== null}
+                                >
+                                    <RiVideoAddFill size={ICON_SIZE} />
+                                </CreateButton>
+                            </Tooltip>
+                        ) : (
+                            <>
+                                <Tooltip title='切換視訊'>
+                                    <VideoScreenButton
+                                        active={showLocalVideo}
+                                        onClick={toggleVideoScreen}
+                                        disabled={!localStream || !roomId}
+                                    >
+                                        <AiFillSwitcher size={ICON_SIZE} />
+                                    </VideoScreenButton>
+                                </Tooltip>
 
-                        <Tooltip title='切換視訊'>
-                            <VideoScreenButton
-                                active={showLocalVideo}
-                                onClick={toggleVideoScreen}
-                                disabled={!localStream || !roomId}
-                            >
-                                <AiFillSwitcher size={ICON_SIZE} />
-                            </VideoScreenButton>
-                        </Tooltip>
+                                {/* <Tooltip title='螢幕分享'> */}
+                                <ScreenSharing
+                                    localStream={localStream.current}
+                                    peerConnection={peerConnection}
+                                    isScreenSharing={isScreenSharing}
+                                    setIsScreenSharing={setIsScreenSharing}
+                                    roomId={roomId}
+                                />
+                                {/* </Tooltip> */}
 
-                        {/* <Tooltip title='螢幕分享'> */}
-                        <ScreenSharing
-                            localStream={localStream.current}
-                            peerConnection={peerConnection}
-                            isScreenSharing={isScreenSharing}
-                            setIsScreenSharing={setIsScreenSharing}
-                            roomId={roomId}
-                        />
-                        {/* </Tooltip> */}
+                                <Tooltip title='聊天室'>
+                                    <ChatButton
+                                        active={!showChatroom}
+                                        onClick={toggleChat}
+                                        disabled={!remoteStream || !roomId}
+                                    >
+                                        <TbMessageCircle2Filled size={ICON_SIZE} />
+                                    </ChatButton>
+                                </Tooltip>
 
-                        <Tooltip title='聊天室'>
-                            <ChatButton active={!showChatroom} onClick={toggleChat} disabled={!remoteStream || !roomId}>
-                                <TbMessageCircle2Filled size={ICON_SIZE} />
-                            </ChatButton>
-                        </Tooltip>
+                                <Tooltip title='視訊開關'>
+                                    <ControlButton
+                                        active={isVideoEnabled}
+                                        onClick={toggleVideo}
+                                        disabled={!localStream || !roomId}
+                                    >
+                                        {isVideoEnabled ? (
+                                            <BsFillCameraVideoFill size={ICON_SIZE} />
+                                        ) : (
+                                            <BsFillCameraVideoOffFill size={ICON_SIZE} />
+                                        )}
+                                    </ControlButton>
+                                </Tooltip>
 
-                        <Tooltip title='視訊開關'>
-                            <ControlButton
-                                active={isVideoEnabled}
-                                onClick={toggleVideo}
-                                disabled={!localStream || !roomId}
-                            >
-                                {isVideoEnabled ? (
-                                    <BsFillCameraVideoFill size={ICON_SIZE} />
-                                ) : (
-                                    <BsFillCameraVideoOffFill size={ICON_SIZE} />
-                                )}
-                            </ControlButton>
-                        </Tooltip>
+                                <Tooltip title='音訊開關'>
+                                    <ControlButton
+                                        active={!isMicMuted}
+                                        onClick={toggleMic}
+                                        disabled={!localStream || !roomId}
+                                    >
+                                        {isMicMuted ? (
+                                            <BsMicMuteFill size={ICON_SIZE} />
+                                        ) : (
+                                            <BsMicFill size={ICON_SIZE} />
+                                        )}
+                                    </ControlButton>
+                                </Tooltip>
 
-                        <Tooltip title='音訊開關'>
-                            <ControlButton active={!isMicMuted} onClick={toggleMic} disabled={!localStream || !roomId}>
-                                {isMicMuted ? <BsMicMuteFill size={ICON_SIZE} /> : <BsMicFill size={ICON_SIZE} />}
-                            </ControlButton>
-                        </Tooltip>
+                                <Tooltip title='音量開關'>
+                                    <ControlButton
+                                        active={isAudioMuted}
+                                        onClick={toggleAudio}
+                                        disabled={!remoteStream || !roomId}
+                                    >
+                                        {isAudioMuted ? (
+                                            <FaVolumeDown size={ICON_SIZE} />
+                                        ) : (
+                                            <FaVolumeMute size={ICON_SIZE} />
+                                        )}
+                                    </ControlButton>
+                                </Tooltip>
 
-                        <Tooltip title='音量開關'>
-                            <ControlButton
-                                active={isAudioMuted}
-                                onClick={toggleAudio}
-                                disabled={!remoteStream || !roomId}
-                            >
-                                {isAudioMuted ? <FaVolumeDown size={ICON_SIZE} /> : <FaVolumeMute size={ICON_SIZE} />}
-                            </ControlButton>
-                        </Tooltip>
-
-                        <Tooltip title='離開教室'>
-                            <HangUpButton onClick={hangUp} disabled={!localStream || !roomId}>
-                                <ImPhoneHangUp size={ICON_SIZE} />
-                            </HangUpButton>
-                        </Tooltip>
-
+                                <Tooltip title='離開教室'>
+                                    <HangUpButton onClick={hangUp} disabled={!localStream || !roomId}>
+                                        <ImPhoneHangUp size={ICON_SIZE} />
+                                    </HangUpButton>
+                                </Tooltip>
+                            </>
+                        )}
                         <Modal
                             title='為老師評分'
                             open={showRatingModal}

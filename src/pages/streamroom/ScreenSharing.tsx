@@ -274,21 +274,20 @@ const ScreenSharing: React.FC<ScreenSharingProps> = ({
 
     return (
         <>
-            <Tooltip title='螢幕分享'>
-                {!isScreenSharing ? (
-                    <ShareScreenButton
-                        active={isScreenSharing}
-                        onClick={openScreenShare}
-                        disabled={!localStream || !roomId}
-                    >
-                        <TbScreenShare size={ICON_SIZE} />
-                    </ShareScreenButton>
-                ) : (
-                    <ShareScreenButton active={isScreenSharing} onClick={stopScreenShare}>
-                        <TbScreenShare size={ICON_SIZE} />
-                    </ShareScreenButton>
-                )}
-            </Tooltip>
+            <Tooltip title='螢幕分享'></Tooltip>
+            {!isScreenSharing ? (
+                <ShareScreenButton
+                    active={isScreenSharing}
+                    onClick={openScreenShare}
+                    disabled={!localStream || !roomId}
+                >
+                    <TbScreenShare size={ICON_SIZE} />
+                </ShareScreenButton>
+            ) : (
+                <ShareScreenButton active={isScreenSharing} onClick={stopScreenShare}>
+                    <TbScreenShare size={ICON_SIZE} />
+                </ShareScreenButton>
+            )}
             <RemoteScreen ref={remoteScreenRef} show={!!remoteScreen} autoPlay muted />
         </>
 

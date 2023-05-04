@@ -6,6 +6,7 @@ import mainImg from './mainImg.png';
 import online from './onlne.png';
 import ai from './ai.png';
 import board from './board.png';
+// import teacherImg from './teacherimg.png';
 import AIChat from '../AIChatBtn';
 import Link from 'next/link';
 import firebase from 'firebase/compat/app';
@@ -161,7 +162,7 @@ const TeachersInfoContainer = styled.div`
 
 const TeachersContainer = styled.div`
     display: flex;
-    justify-content: center;
+    /* justify-content: center; */
     gap: 26px;
     margin-bottom: 143px;
     overflow-x: scroll;
@@ -255,25 +256,23 @@ export default function Main() {
     const { isLoading } = useAuth();
     const [teachers, setTeachers] = useState<Teacher[]>([]);
     const containerRef = useRef<HTMLDivElement>(null);
+
     const scrollTo = (direction: string) => {
         if (containerRef.current) {
             const container = containerRef.current;
-            const width = container.clientWidth;
+            const cardWidth = 350;
+            const padding = 10;
+            const totalCardWidth = cardWidth + 2 * padding;
+
             const currentScroll = container.scrollLeft;
-            const maxScroll = container.scrollWidth - width;
+            const maxScroll = container.scrollWidth - container.clientWidth;
 
             if (direction === 'right') {
-                if (currentScroll < maxScroll) {
-                    container.scrollLeft += width;
-                } else {
-                    container.scrollLeft = 0;
-                }
+                const nextScroll = currentScroll + totalCardWidth;
+                container.scrollLeft = nextScroll > maxScroll ? maxScroll : nextScroll;
             } else {
-                if (currentScroll > 0) {
-                    container.scrollLeft -= width;
-                } else {
-                    container.scrollLeft = maxScroll;
-                }
+                const prevScroll = currentScroll - totalCardWidth;
+                container.scrollLeft = prevScroll < 0 ? 0 : prevScroll;
             }
         }
     };
