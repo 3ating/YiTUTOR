@@ -6,7 +6,6 @@ import mainImg from './mainImg.png';
 import online from './onlne.png';
 import ai from './ai.png';
 import board from './board.png';
-// import teacherImg from './teacherimg.png';
 import AIChat from '../AIChatBtn';
 import Link from 'next/link';
 import firebase from 'firebase/compat/app';
@@ -165,11 +164,12 @@ const TeachersContainer = styled.div`
     justify-content: center;
     gap: 26px;
     margin-bottom: 143px;
-    overflow-x: hidden;
+    overflow-x: scroll;
+    scroll-behavior: smooth;
     position: relative;
     width: 100%;
-    transition: transform 0.5s ease;
     flex-wrap: nowrap;
+    overflow-x: hidden;
 `;
 
 const Mask = styled.div`
@@ -253,30 +253,37 @@ const db = firebase.firestore();
 
 export default function Main() {
     const { isLoading } = useAuth();
-    const [scrollIndex, setScrollIndex] = useState(0);
     const [teachers, setTeachers] = useState<Teacher[]>([]);
     const containerRef = useRef<HTMLDivElement>(null);
+    const scrollTo = (direction: string) => {
+        if (containerRef.current) {
+            const container = containerRef.current;
+            const width = container.clientWidth;
+            const currentScroll = container.scrollLeft;
+            const maxScroll = container.scrollWidth - width;
+
+            if (direction === 'right') {
+                if (currentScroll < maxScroll) {
+                    container.scrollLeft += width;
+                } else {
+                    container.scrollLeft = 0;
+                }
+            } else {
+                if (currentScroll > 0) {
+                    container.scrollLeft -= width;
+                } else {
+                    container.scrollLeft = maxScroll;
+                }
+            }
+        }
+    };
 
     const handleScrollLeft = () => {
-        if (scrollIndex === 0) {
-            setScrollIndex(teachers.length - 3);
-        } else {
-            setScrollIndex(scrollIndex - 3);
-        }
+        scrollTo('left');
     };
 
     const handleScrollRight = () => {
-        if (scrollIndex === teachers.length - 3) {
-            setScrollIndex(0);
-        } else {
-            setScrollIndex(scrollIndex + 3);
-        }
-    };
-
-    const renderTeacherCards = (cards: string | any[], index: number, cardsToShow = 3) => {
-        const start = index * cardsToShow;
-        const end = start + cardsToShow;
-        return cards.slice(start, end);
+        scrollTo('right');
     };
 
     useEffect(() => {
@@ -297,12 +304,6 @@ export default function Main() {
             unsubscribe();
         };
     }, []);
-
-    useEffect(() => {
-        if (containerRef.current) {
-            containerRef.current.style.transform = `translateX(-${(scrollIndex * 100) / 3}%)`;
-        }
-    }, [scrollIndex]);
 
     console.log('teachers', teachers.length);
 
@@ -369,12 +370,7 @@ export default function Main() {
 
                 <ScrollButtonContainer>
                     <ScrollButton onClick={handleScrollLeft}>&lt;</ScrollButton>
-                    <TeachersContainer
-                        ref={containerRef}
-                        style={{
-                            transform: `translateX(-${(scrollIndex * 100) / 3}%)`,
-                        }}
-                    >
+                    <TeachersContainer ref={containerRef}>
                         {teachers &&
                             teachers.map((teacher, index) => (
                                 <TeacherCardWrapper key={index}>

@@ -8,8 +8,6 @@ const ScheduleContainer = styled.div`
     width: 100%;
     margin: 0;
     align-items: flex-start;
-
-    /* margin-top: 2rem; */
 `;
 
 const DayRow = styled.div`
@@ -33,13 +31,14 @@ const DayLabel = styled.div`
     font-weight: bold;
 `;
 
-const TimeSlot = styled.div<{ selected: boolean }>`
+const TimeSlot = styled.div<{ selected: boolean; active: boolean }>`
     width: 100px;
     height: 35px;
     border: 2px solid #ccc;
     border-radius: 4px;
-    background-color: ${(props) => (props.selected ? 'white' : '#f0f0f0')};
-    color: ${(props) => (props.selected ? '#333' : '#666')};
+    background-color: ${(props) => (props.active ? '#ffab34' : props.selected ? 'white' : '#f0f0f0')};
+    color: ${(props) => (props.active ? '#fff' : props.selected ? '#333' : '#666')};
+
     display: flex;
     justify-content: center;
     align-items: center;
@@ -97,69 +96,81 @@ const Schedule: React.FC<ScheduleProps> = ({
     setSelectedTime,
     selectedTime,
 }) => {
-    const currentWeekday = selectedDate.getDay();
     const dayMapping = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const currentDate = selectedDate.getDay();
 
-    const hasAvailableTimeInThreeDays = () => {
-        for (let i = 0; i < 3; i++) {
-            const dayIndex = (currentWeekday + i) % 7;
-            const hours = getSelectedTimesForDay(dayIndex);
-            if (hours.length > 0) {
-                return true;
-            }
-        }
-        return false;
+    const getToday = () => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return today;
     };
 
-    const renderTimeSlots = (hours: number[], day: string) => {
-        const timeSlots = [];
-        for (let i = 9; i <= 21; i++) {
-            const isSelected = hours.includes(i);
-            if (isSelected) {
-                timeSlots.push(
-                    <TimeSlot key={`${day}-${i}`} selected={isSelected} onClick={() => handleTimeSlotClick(`${i}:00`)}>
-                        {i}:00
-                    </TimeSlot>
-                );
-            }
-        }
-        return timeSlots;
+    const isDateInPast = (date: Date) => {
+        return date < getToday();
     };
 
-    const renderWeekdays = () => {
-        const weekdays = [];
-        for (let i = 0; i < 3; i++) {
+    const getWeekdays = () => {
+        return Array.from({ length: 3 }, (_, i) => {
             const day = new Date(selectedDate);
             day.setDate(selectedDate.getDate() + i);
-            weekdays.push(day.toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' }));
-        }
-        return weekdays;
+            return day;
+        });
     };
 
     const getSelectedTimesForDay = (dayIndex: number) => {
-        if (!selectedTimes) {
-            return [];
-        }
-
         const dayName = dayMapping[dayIndex];
-        const dayData = selectedTimes.find((item) => item.day === dayName);
+        const dayData = selectedTimes?.find((item) => item.day === dayName);
         return dayData ? dayData.hours : [];
     };
 
-    const weekdays = renderWeekdays();
+    const renderTimeSlots = (hours: number[], day: string) => {
+        return hours
+            .filter((hour) => hour >= 9 && hour <= 21)
+            .map((hour) => (
+                <TimeSlot
+                    key={`${day}-${hour}`}
+                    selected
+                    active={selectedTime === `${hour}:00`}
+                    onClick={() => handleTimeSlotClick(`${hour}:00`)}
+                >
+                    {hour}:00
+                </TimeSlot>
+            ));
+    };
 
     const handleTimeSlotClick = (time: string) => {
         onTimeSlotClick();
-        setSelectedTime(time);
+        setSelectedTime(selectedTime === time ? '' : time);
     };
+
+    const availability = getWeekdays().reduce(
+        (acc, date, index) => {
+            const dayIndex = (currentDate + index) % 7;
+            const hours = getSelectedTimesForDay(dayIndex);
+
+            if (isDateInPast(date)) {
+                acc.pastDate = true;
+            } else if (hours.length > 0) {
+                acc.available = true;
+            }
+
+            return acc;
+        },
+        { available: false, pastDate: false }
+    );
 
     return (
         <ScheduleContainer>
-            {weekdays.map((dateLabel, index) => {
-                const dayIndex = (currentWeekday + index) % 7;
+            {getWeekdays().map((date, index) => {
+                if (isDateInPast(date)) {
+                    return null;
+                }
+
+                const dayIndex = (currentDate + index) % 7;
                 const hours = getSelectedTimesForDay(dayIndex);
 
                 if (hours.length > 0) {
+                    const dateLabel = date.toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' });
                     return (
                         <TimeContainer key={index}>
                             <DayLabel>{dateLabel}</DayLabel>
@@ -170,9 +181,17 @@ const Schedule: React.FC<ScheduleProps> = ({
                     return null;
                 }
             })}
-            {!hasAvailableTimeInThreeDays() && (
+            {!availability.available && (
                 <NoTimeContent>
-                    近三日無可預約時段 <br /> 請選擇其他日期
+                    {availability.pastDate ? (
+                        <>
+                            日期已過 <br /> 請選擇其他日期
+                        </>
+                    ) : (
+                        <>
+                            近三日無可預約時段 <br /> 請選擇其他日期
+                        </>
+                    )}
                 </NoTimeContent>
             )}
         </ScheduleContainer>

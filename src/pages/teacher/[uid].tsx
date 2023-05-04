@@ -14,15 +14,10 @@ import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
 import { AiFillStar, AiOutlineMail, AiOutlinePhone, AiOutlineStar } from 'react-icons/ai';
 import { BsStarHalf } from 'react-icons/bs';
-import { VscDebugBreakpointFunction } from 'react-icons/vsc';
 import Button from '@/components/Button';
-import { notification } from 'antd';
 import Loader from '@/components/Loader';
-
-interface StyledDialogProps {
-    open: boolean;
-}
-
+import { Modal, notification } from 'antd';
+import ReservationNotice from './ReservationNotice';
 interface Teacher {
     selectedTimes: { day: string; hours: number[] }[];
     uid: string;
@@ -100,16 +95,6 @@ const AvailableTimeContainer = styled.div`
     margin: 0;
 `;
 
-// const TeacherRightContainer = styled.div`
-//     width: 30%;
-//     display: flex;
-//     justify-content: flex-start;
-//     flex-direction: column;
-//     align-items: center;
-//     padding-left: 25px;
-//     /* overflow-y: auto; */
-// `;
-
 const TeacherRightContainer = styled.div`
     width: 30%;
     display: flex;
@@ -139,13 +124,6 @@ const CoursePriceContainer = styled.div`
     padding: 25px;
 `;
 
-const Container = styled.div`
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 2rem;
-    font-family: 'Arial', sans-serif;
-`;
-
 const TeacherNameContainer = styled.div`
     display: flex;
     align-items: flex-end;
@@ -170,8 +148,6 @@ const TeacherSubjectContainer = styled.div`
 `;
 
 const TeacherSubject = styled.p`
-    /* width: 45px;
-    height: 20px; */
     background: #fee690;
     border-radius: 9px;
     font-weight: 500;
@@ -206,12 +182,6 @@ const HalfStarIcon = styled(BsStarHalf)`
     color: #f5c518;
 `;
 
-const SubHeading = styled.h2`
-    font-size: 1.5rem;
-    color: #333;
-    margin-bottom: 0.5rem;
-`;
-
 const Description = styled.p`
     font-size: 16px;
     color: gray;
@@ -223,12 +193,6 @@ const Introduction = styled.p`
     font-size: 18px;
     margin: 0;
     letter-spacing: 0.5px;
-`;
-
-const Text = styled.p`
-    font-size: 1rem;
-    color: #333;
-    margin-bottom: 10px;
 `;
 
 const NameTopContainer = styled.div`
@@ -283,33 +247,6 @@ const Section = styled.div`
     width: 100%;
 `;
 
-const DirectLink = styled(Link)`
-    text-decoration: none;
-    color: black;
-`;
-
-const StyledDialog = styled.div<StyledDialogProps>`
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: ${(props) => (props.open ? 'flex' : 'none')};
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 2;
-`;
-
-const StyledDialogContent = styled.div`
-    background-color: #fff;
-    border-radius: 4px;
-    padding: 2rem;
-    max-width: 800px;
-    width: 100%;
-    box-sizing: border-box;
-`;
-
 const PriceButton = styled.button`
     background-color: #ffffff;
     border-radius: 4px;
@@ -328,29 +265,6 @@ const PriceButton = styled.button`
         color: white;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     }
-`;
-
-const ConfirmationDialog = styled.div<StyledDialogProps>`
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: ${(props) => (props.open ? 'flex' : 'none')};
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 2;
-`;
-
-const ConfirmationDialogContent = styled.div`
-    background-color: #fff;
-    border-radius: 4px;
-    padding: 2rem;
-    max-width: 400px;
-    width: 100%;
-    box-sizing: border-box;
-    text-align: center;
 `;
 
 const CalendarAndSchedule = styled.div`
@@ -400,8 +314,6 @@ const CourseContainer = styled.div`
     flex-direction: column;
     align-items: center;
     width: 100%;
-    /* margin-top: 10px; */
-    /* width: 40%; */
 `;
 
 const CoursePriceSubHeading = styled.p`
@@ -410,7 +322,6 @@ const CoursePriceSubHeading = styled.p`
     align-items: center;
     text-align: left;
     width: fit-content;
-    /* background-color: #ffab34; */
     color: #000;
     margin: 0;
     height: 50px;
@@ -418,26 +329,6 @@ const CoursePriceSubHeading = styled.p`
     letter-spacing: 3px;
     font-size: 24px;
     margin: 0;
-`;
-
-const OnlineClassImageContainer = styled.div`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    padding-top: 30px;
-    padding-bottom: 30px;
-`;
-
-const OnlineClassImage = styled(Image)`
-    width: 95%;
-    height: auto;
-    border-radius: 9px;
-`;
-
-const ConfirmTitle = styled.h3`
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
 `;
 
 const ConfirmText = styled.p`
@@ -450,20 +341,16 @@ const ConfirmBuyButton = styled.button`
     padding: 0.5rem 1rem;
     border-radius: 4px;
     cursor: pointer;
-    /* margin-right: 1rem; */
-
     &:first-of-type {
         background-color: #ffab34;
         color: #ffffff;
         border: 1px solid #ffab34;
     }
-
     &:last-of-type {
         background-color: #000;
         color: #ffffff;
         border: 1px solid #000;
     }
-
     &:hover {
         opacity: 0.9;
     }
@@ -473,57 +360,6 @@ const TitleLine = styled.div`
     width: 100%;
     height: 1px;
     background: gray;
-`;
-
-const PurchaseNotesContainer = styled.div`
-    display: flex;
-    width: 95%;
-    height: 60px;
-    background-color: #fff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    box-sizing: border-box;
-    flex-direction: row;
-    letter-spacing: 1px;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    border-radius: 9px;
-    margin: 0 0 10px 5px;
-    padding: 0 25px;
-`;
-
-const PurchaseNotes = styled.p`
-    font-size: 16px;
-    color: gray;
-    margin-left: 10px;
-`;
-
-const CalendarHintContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    width: fit-content;
-    /* margin-top: 20px; */
-    width: 100%;
-`;
-
-const CalendarHintTitle = styled.p`
-    font-size: 30px;
-    letter-spacing: 2px;
-    margin: 30px 0 0 0;
-`;
-
-const CalendarHintContentContainer = styled.div`
-    display: flex;
-    align-items: center;
-    margin-top: 10px;
-`;
-
-const CalendarHintContent = styled.p`
-    font-size: 22px;
-    margin: 0;
-    margin-left: 5px;
-    color: gray;
-    letter-spacing: 1px;
 `;
 
 const BookButtonContainer = styled.div`
@@ -553,18 +389,12 @@ const db = firebase.firestore();
 
 const TeacherDetails = () => {
     const ICON_SIZE = 20;
-
-    const { userInfo, isLoading, userUid } = useAuth();
     const router = useRouter();
     const { uid } = router.query;
-
+    const { userInfo, isLoading, userUid } = useAuth();
     const [teacher, setTeacher] = useState<Teacher | null>(null);
-    const [openChat, setOpenChat] = useState(false);
-    const [currentUser, setCurrentUser] = useState('');
-
     const [confirmPurchase, setConfirmPurchase] = useState(false);
     const [selectedPrice, setSelectedPrice] = useState({ qty: 0, price: 0 });
-
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [selectedTime, setSelectedTime] = useState('');
     const [showBookButtons, setShowBookButtons] = useState(false);
@@ -572,14 +402,6 @@ const TeacherDetails = () => {
     const handleSelectDate = (date: Date) => {
         setSelectedDate(date);
     };
-
-    // const handleOpenChat = () => {
-    //     setOpenChat(true);
-    // };
-
-    // const handleCloseChat = () => {
-    //     setOpenChat(false);
-    // };
 
     const handlePurchaseClick = (priceObj: { qty: number; price: number }) => {
         if (userInfo?.userType !== 'student' || !isLoading) {
@@ -595,8 +417,6 @@ const TeacherDetails = () => {
     };
 
     const handleConfirmPurchase = async () => {
-        console.log(`User confirmed the purchase of ${selectedPrice.qty} classes for ${selectedPrice.price} dollars.`);
-
         if (userUid) {
             try {
                 const studentDocRef = db.collection('users').doc(userUid);
@@ -611,9 +431,15 @@ const TeacherDetails = () => {
                     }),
                 });
 
-                console.log('Purchase successfully saved to Firestore');
+                notification.success({
+                    message: '購買成功',
+                    description: `您已成功購買 ${selectedPrice.qty} 堂課，價格為 ${selectedPrice.price} 元。`,
+                });
             } catch (error) {
-                console.error('Error updating the student document:', error);
+                notification.error({
+                    message: '購買失敗',
+                    description: '很抱歉，無法完成購買。請稍後再試。',
+                });
             }
         }
         setConfirmPurchase(false);
@@ -664,8 +490,11 @@ const TeacherDetails = () => {
             const matchingCourseIndex = courses.findIndex((course: any) => course.teacherid === uid);
 
             if (matchingCourseIndex === -1) {
-                alert('請先購買課程！');
-                console.error('No matching course found for the given teacherId');
+                notification.error({
+                    message: '預約時間失敗',
+                    description: '請先購買課程',
+                    placement: 'topRight',
+                });
                 return;
             }
 
@@ -685,7 +514,6 @@ const TeacherDetails = () => {
                 courses,
             });
 
-            // Update the teacher's document with the student's booking information
             const teacherDocRef = db.collection('users').doc(uid as string);
             await teacherDocRef.update({
                 bookings: firebase.firestore.FieldValue.arrayUnion({
@@ -699,10 +527,16 @@ const TeacherDetails = () => {
             const formattedDate = `${selectedDate.getFullYear()}/${
                 selectedDate.getMonth() + 1
             }/${selectedDate.getDate()}`;
-            alert(`預約成功！預約時間：${formattedDate} ${selectedTime}`);
+            notification.success({
+                message: '預約成功',
+                description: `預約時間：${formattedDate} ${selectedTime}`,
+            });
         } catch (error) {
-            alert('預約失敗');
-            console.error('Error updating the student document:', error);
+            notification.error({
+                message: '預約時間失敗',
+                description: '請確認是否有購買課程',
+                placement: 'topRight',
+            });
         }
         setShowBookButtons(false);
     };
@@ -717,19 +551,15 @@ const TeacherDetails = () => {
         const hasHalfStar = rating % 1 !== 0;
         const stars = [];
         const totalStars = 5;
-
         for (let i = 0; i < fullStars; i++) {
             stars.push(<StarIcon key={i} />);
         }
-
         if (hasHalfStar) {
             stars.push(<HalfStarIcon key={fullStars} />);
         }
-
         for (let i = stars.length; i < totalStars; i++) {
             stars.push(<EmptyStarIcon key={i} />);
         }
-
         return stars;
     };
 
@@ -760,9 +590,6 @@ const TeacherDetails = () => {
     return (
         <MainWrapper>
             <Header />
-            {/* <ToastContainer position={toast.POSITION.TOP_CENTER} autoClose={1000} /> */}
-
-            {/* <Container> */}
             <TeacherContainer>
                 <TeacherLeftContainer>
                     <TeacherIntroContainer>
@@ -810,7 +637,7 @@ const TeacherDetails = () => {
                                         selectedTime={selectedTime}
                                     />
                                 </div>
-                                {showBookButtons && (
+                                {showBookButtons && selectedTime && (
                                     <BookButtonContainer>
                                         <ConfirmButton onClick={handleConfirmBook}>確認</ConfirmButton>
                                         <RejectButton onClick={handleRejectBook}>拒絕</RejectButton>
@@ -819,59 +646,12 @@ const TeacherDetails = () => {
                             </ScheduleContainer>
                         </CalendarAndSchedule>
                         <TitleLine />
-                        <CalendarHintContainer>
-                            <CalendarHintTitle>購買課程須知</CalendarHintTitle>
-                            <CalendarHintContentContainer>
-                                <VscDebugBreakpointFunction />
-                                <CalendarHintContent>
-                                    先選擇日曆中預上課的日期，右側會出現近三天老師能上課的時段
-                                </CalendarHintContent>
-                            </CalendarHintContentContainer>
-                            <CalendarHintContentContainer>
-                                <VscDebugBreakpointFunction />
-                                <CalendarHintContent>
-                                    若無出現時間， 表示近幾日無可預約時段，請重新選擇日期
-                                </CalendarHintContent>
-                            </CalendarHintContentContainer>
-                            <CalendarHintContentContainer>
-                                <VscDebugBreakpointFunction />
-                                <CalendarHintContent>選定日期與時間後按下確認，課程排定成功 🎉</CalendarHintContent>
-                            </CalendarHintContentContainer>
-                            <CalendarHintTitle>YiTUTOR 線上課程須知</CalendarHintTitle>
-
-                            <CalendarHintContentContainer>
-                                <VscDebugBreakpointFunction />
-                                <CalendarHintContent>
-                                    排定課程前請先確認有剩餘堂數。若無剩餘堂數，請先購買
-                                </CalendarHintContent>
-                            </CalendarHintContentContainer>
-                            <CalendarHintContentContainer>
-                                <VscDebugBreakpointFunction />
-                                <CalendarHintContent>
-                                    一次購買 5 堂或 10 堂通常有額外折扣（以老師訂定之價錢為主）
-                                </CalendarHintContent>
-                            </CalendarHintContentContainer>
-                            <CalendarHintContentContainer>
-                                <VscDebugBreakpointFunction />
-                                <CalendarHintContent>使用 YiTUTOR 線上上課不需額外下載通訊軟體</CalendarHintContent>
-                            </CalendarHintContentContainer>
-                            <CalendarHintContentContainer>
-                                <VscDebugBreakpointFunction />
-                                <CalendarHintContent>
-                                    課程時間為 50 分鐘，時間從老師與學生皆進線上教室後開始計算
-                                </CalendarHintContent>
-                            </CalendarHintContentContainer>
-                        </CalendarHintContainer>
+                        <ReservationNotice />
                     </AvailableTimeContainer>
                 </TeacherLeftContainer>
 
                 <TeacherRightContainer>
                     <CourseContainer>
-                        {/* <PurchaseNotesContainer>
-                            <FiAlertTriangle size={23} />
-                            <PurchaseNotes>購買前請確認堂數是否正確</PurchaseNotes>
-                        </PurchaseNotesContainer> */}
-                        {/* <OnlineClassImage src={onlineclass} alt='Online class' /> */}
                         <CoursePriceContainer>
                             <Section>
                                 <CoursePriceSubHeading>課程價格</CoursePriceSubHeading>
@@ -901,18 +681,27 @@ const TeacherDetails = () => {
                             </Section>
 
                             {userInfo?.userType !== 'teacher' && (
-                                <ConfirmationDialog open={confirmPurchase} onClick={handleCancelPurchase}>
-                                    <ConfirmationDialogContent onClick={(e) => e.stopPropagation()}>
-                                        <ConfirmTitle>確認購買</ConfirmTitle>
-                                        <ConfirmText>
-                                            您確定要購買 {selectedPrice.qty} 堂課，價格為 {selectedPrice.price} 元嗎？
-                                        </ConfirmText>
-                                        <ConfirmBuyButton onClick={handleConfirmPurchase}>確認</ConfirmBuyButton>
-                                        <ConfirmBuyButton style={{ marginLeft: '10px' }} onClick={handleCancelPurchase}>
+                                <Modal
+                                    title='確認購買'
+                                    open={confirmPurchase}
+                                    onCancel={handleCancelPurchase}
+                                    footer={[
+                                        <ConfirmBuyButton key='confirm' onClick={handleConfirmPurchase}>
+                                            確認
+                                        </ConfirmBuyButton>,
+                                        <ConfirmBuyButton
+                                            key='cancel'
+                                            style={{ marginLeft: '10px' }}
+                                            onClick={handleCancelPurchase}
+                                        >
                                             取消
-                                        </ConfirmBuyButton>
-                                    </ConfirmationDialogContent>
-                                </ConfirmationDialog>
+                                        </ConfirmBuyButton>,
+                                    ]}
+                                >
+                                    <ConfirmText>
+                                        您確定要購買 {selectedPrice.qty} 堂課，價格為 {selectedPrice.price} 元嗎？
+                                    </ConfirmText>
+                                </Modal>
                             )}
                         </CoursePriceContainer>
                     </CourseContainer>

@@ -8,7 +8,7 @@ const CalendarContainer = styled.div`
     border: 1px solid #ccc;
     border-radius: 8px;
     box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-    margin: 0 auto;
+    /* margin: 0 auto; */
 `;
 
 const CalendarHeader = styled.div`
