@@ -62,6 +62,7 @@ const Avatar = styled.img`
     border-radius: 50%;
     margin: 20px auto;
     aspect-ratio: 1/1;
+    object-fit: cover;
 `;
 
 const UserInfoContainer = styled.div`
@@ -303,6 +304,7 @@ const BookingAvatar = styled.img`
     border-radius: 50%;
     margin-right: 1rem;
     aspect-ratio: 1/1;
+    object-fit: cover;
 `;
 
 const BookingInfo = styled.div`
@@ -477,8 +479,8 @@ interface UserInfo {
 interface Booking {
     date: firebase.firestore.Timestamp;
     teacherId: string;
-    studentId?: string; // Add this line to include the studentId property
-    time: string;
+    studentId?: string;
+    courseTime: { dayLabel: string; time: string };
 }
 
 interface BookingWithTeacherInfo extends Booking {
@@ -733,7 +735,7 @@ const UserProfile = () => {
                                                 <BookingSubject>{booking.teacherInfo.subject}</BookingSubject>
                                             </BookingTitleContainer>
                                             <BookingInfoTime>
-                                                {booking.date.toDate().toLocaleDateString()} {booking.time}
+                                                {booking.courseTime.dayLabel} {booking.courseTime.time}
                                             </BookingInfoTime>
                                         </BookingInfo>
                                     </BookingCard>

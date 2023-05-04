@@ -72,11 +72,10 @@ const CalendarDaysGrid = styled.div`
     background-color: #fff;
     border-radius: 0 0 8px 8px;
 `;
-
 interface CalendarProps {
     handleSelectDate: (date: Date) => void;
+    setSelectedTime: (selectedTime: { dayLabel: string; time: string } | null) => void;
     setShowBookButtons: (show: boolean) => void;
-    setSelectedTime: (time: string) => void;
 }
 
 export default function Calendar({ handleSelectDate, setShowBookButtons, setSelectedTime }: CalendarProps) {
@@ -133,7 +132,7 @@ export default function Calendar({ handleSelectDate, setShowBookButtons, setSele
                             handleSelectDate(date);
                             setSelectedDate(date);
                             setShowBookButtons(false);
-                            setSelectedTime('');
+                            setSelectedTime(null);
                         };
                         days.push(
                             <CalendarDay

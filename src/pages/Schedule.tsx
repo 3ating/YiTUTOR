@@ -85,8 +85,8 @@ interface ScheduleProps {
     userInfo?: UserInfo;
     selectedDate: Date;
     onTimeSlotClick: () => void;
-    setSelectedTime: (time: string) => void;
-    selectedTime: string;
+    setSelectedTime: (selectedTime: { dayLabel: string; time: string } | null) => void;
+    selectedTime: { dayLabel: string; time: string } | null;
 }
 
 const Schedule: React.FC<ScheduleProps> = ({
@@ -123,37 +123,36 @@ const Schedule: React.FC<ScheduleProps> = ({
         return dayData ? dayData.hours : [];
     };
 
-    const renderTimeSlots = (hours: number[], day: string) => {
+    const renderTimeSlots = (hours: number[], day: string, dayLabel: string) => {
         return hours
             .filter((hour) => hour >= 9 && hour <= 21)
             .map((hour) => (
                 <TimeSlot
                     key={`${day}-${hour}`}
                     selected
-                    active={selectedTime === `${hour}:00`}
-                    onClick={() => handleTimeSlotClick(`${hour}:00`)}
+                    active={selectedTime?.dayLabel === dayLabel && selectedTime?.time === `${hour}:00`}
+                    onClick={() => handleTimeSlotClick(`${hour}:00`, dayLabel)}
                 >
                     {hour}:00
                 </TimeSlot>
             ));
     };
 
-    const handleTimeSlotClick = (time: string) => {
+    const handleTimeSlotClick = (time: string, dayLabel: string) => {
+        console.log(`Clicked TimeSlot: ${time} on DayLabel: ${dayLabel}`);
         onTimeSlotClick();
-        setSelectedTime(selectedTime === time ? '' : time);
+        setSelectedTime(selectedTime?.time === time && selectedTime.dayLabel === dayLabel ? null : { dayLabel, time });
     };
 
     const availability = getWeekdays().reduce(
         (acc, date, index) => {
             const dayIndex = (currentDate + index) % 7;
             const hours = getSelectedTimesForDay(dayIndex);
-
             if (isDateInPast(date)) {
                 acc.pastDate = true;
             } else if (hours.length > 0) {
                 acc.available = true;
             }
-
             return acc;
         },
         { available: false, pastDate: false }
@@ -165,16 +164,14 @@ const Schedule: React.FC<ScheduleProps> = ({
                 if (isDateInPast(date)) {
                     return null;
                 }
-
                 const dayIndex = (currentDate + index) % 7;
                 const hours = getSelectedTimesForDay(dayIndex);
-
                 if (hours.length > 0) {
                     const dateLabel = date.toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' });
                     return (
                         <TimeContainer key={index}>
                             <DayLabel>{dateLabel}</DayLabel>
-                            <DayRow>{renderTimeSlots(hours, dayMapping[dayIndex])}</DayRow>
+                            <DayRow>{renderTimeSlots(hours, dayMapping[dayIndex], dateLabel)}</DayRow>
                         </TimeContainer>
                     );
                 } else {

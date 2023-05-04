@@ -396,7 +396,7 @@ const TeacherDetails = () => {
     const [confirmPurchase, setConfirmPurchase] = useState(false);
     const [selectedPrice, setSelectedPrice] = useState({ qty: 0, price: 0 });
     const [selectedDate, setSelectedDate] = useState(new Date());
-    const [selectedTime, setSelectedTime] = useState('');
+    const [selectedTime, setSelectedTime] = useState<{ dayLabel: string; time: string } | null>(null);
     const [showBookButtons, setShowBookButtons] = useState(false);
 
     const handleSelectDate = (date: Date) => {
@@ -479,8 +479,18 @@ const TeacherDetails = () => {
         }
     };
 
+    const getSelectedDate = (dayLabel: string) => {
+        const [month, day] = dayLabel.split('/').map(Number);
+        const date = new Date(selectedDate);
+        date.setMonth(month - 1);
+        date.setDate(day);
+        date.setHours(0, 0, 0, 0);
+        return date;
+    };
+
     const handleConfirmBook = async () => {
-        if (!userUid) return;
+        if (!userUid || !selectedTime) return;
+        setShowBookButtons(false);
 
         try {
             const studentDocRef = db.collection('users').doc(userUid as string);
@@ -505,11 +515,14 @@ const TeacherDetails = () => {
                 courses.splice(matchingCourseIndex, 1);
             }
 
+            const bookingDate = getSelectedDate(selectedTime.dayLabel);
+            bookingDate.setHours(parseInt(selectedTime.time.split(':')[0]));
+
             await studentDocRef.update({
                 bookings: firebase.firestore.FieldValue.arrayUnion({
                     teacherId: uid,
-                    date: selectedDate,
-                    time: selectedTime,
+                    date: bookingDate,
+                    courseTime: selectedTime,
                 }),
                 courses,
             });
@@ -518,18 +531,14 @@ const TeacherDetails = () => {
             await teacherDocRef.update({
                 bookings: firebase.firestore.FieldValue.arrayUnion({
                     studentId: userUid,
-                    date: selectedDate,
-                    time: selectedTime,
+                    date: bookingDate,
+                    courseTime: selectedTime,
                 }),
             });
-
-            console.log('Booking and courses updated successfully in Firestore');
-            const formattedDate = `${selectedDate.getFullYear()}/${
-                selectedDate.getMonth() + 1
-            }/${selectedDate.getDate()}`;
+            const formattedDate = `${bookingDate.getFullYear()}/${bookingDate.getMonth() + 1}/${bookingDate.getDate()}`;
             notification.success({
                 message: '預約成功',
-                description: `預約時間：${formattedDate} ${selectedTime}`,
+                description: `預約時間：${formattedDate} ${selectedTime.time}`,
             });
         } catch (error) {
             notification.error({
@@ -538,12 +547,11 @@ const TeacherDetails = () => {
                 placement: 'topRight',
             });
         }
-        setShowBookButtons(false);
     };
 
     const handleRejectBook = () => {
         setShowBookButtons(false);
-        setSelectedTime('');
+        setSelectedTime(null);
     };
 
     const renderStars = (rating: number) => {
@@ -640,7 +648,7 @@ const TeacherDetails = () => {
                                 {showBookButtons && selectedTime && (
                                     <BookButtonContainer>
                                         <ConfirmButton onClick={handleConfirmBook}>確認</ConfirmButton>
-                                        <RejectButton onClick={handleRejectBook}>拒絕</RejectButton>
+                                        <RejectButton onClick={handleRejectBook}>取消</RejectButton>
                                     </BookButtonContainer>
                                 )}
                             </ScheduleContainer>
