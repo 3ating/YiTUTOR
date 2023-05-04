@@ -3,8 +3,7 @@ import { User, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut 
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import { useRouter } from 'next/router';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { Result, Modal, message } from 'antd';
 
 interface UserInfo {
     name: string;
@@ -62,6 +61,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [userUid, setUserUid] = useState<string | null>(null);
+    const [showLoginSuccess, setShowLoginSuccess] = useState(false);
+    const [showLogoutSuccess, setShowLogoutSuccess] = useState(false);
+
     const router = useRouter();
 
     useEffect(() => {
@@ -102,34 +104,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         };
     }, [user]);
 
-    // const handleLoginWithEmail = async (email: string, password: string) => {
-    //     const auth = getAuth();
-    //     try {
-    //         const result = await signInWithEmailAndPassword(auth, email, password);
-    //         setUser(result.user);
-    //         setIsLoading(true);
-    //         router.push('/');
-    //     } catch (error) {
-    //         console.log(error);
-    //         setIsLoading(false);
-    //     }
-    // };
-
     const handleLoginWithEmail = async (email: string, password: string) => {
         const auth = getAuth();
         try {
             const result = await signInWithEmailAndPassword(auth, email, password);
             setUser(result.user);
             setIsLoading(true);
-            toast.success('登入成功！', {
-                position: toast.POSITION.TOP_CENTER,
-                autoClose: 2000,
-            });
+            setShowLoginSuccess(true);
             setTimeout(() => {
+                setShowLoginSuccess(false);
                 router.push('/');
             }, 2000);
         } catch (error) {
-            console.log(error);
+            message.error('帳號或密碼錯誤');
             setIsLoading(false);
         }
     };
@@ -140,6 +127,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             await signOut(auth);
             setUser(null);
             setIsLoading(false);
+            setShowLogoutSuccess(true);
+            setTimeout(() => {
+                setShowLogoutSuccess(false);
+            }, 2000);
         } catch (error) {
             console.log(error);
         }
@@ -154,5 +145,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         handleLogout,
     };
 
-    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+    return (
+        <AuthContext.Provider value={value}>
+            {children}
+            <Modal
+                open={showLoginSuccess}
+                footer={null}
+                closable={false}
+                centered
+                onCancel={() => setShowLoginSuccess(false)}
+            >
+                <Result status='success' title='登入成功！' />
+            </Modal>
+            <Modal
+                open={showLogoutSuccess}
+                footer={null}
+                closable={false}
+                centered
+                onCancel={() => setShowLogoutSuccess(false)}
+            >
+                <Result status='success' title='登出成功！' />
+            </Modal>
+        </AuthContext.Provider>
+    );
 };

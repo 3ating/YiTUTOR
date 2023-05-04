@@ -258,30 +258,18 @@ export default function Main() {
     const containerRef = useRef<HTMLDivElement>(null);
 
     const handleScrollLeft = () => {
-        const container = containerRef.current;
-        if (container) {
-            const cardWidth = container.clientWidth / 3;
-            const cardsToMove = 3;
-            const totalScroll = cardWidth * cardsToMove;
-            if (container.scrollLeft === 0) {
-                container.scrollLeft = cardWidth * (teachers.length - cardsToMove);
-            } else {
-                container.scrollLeft -= totalScroll;
-            }
+        if (scrollIndex === 0) {
+            setScrollIndex(teachers.length - 3);
+        } else {
+            setScrollIndex(scrollIndex - 3);
         }
     };
 
     const handleScrollRight = () => {
-        const container = containerRef.current;
-        if (container) {
-            const cardWidth = container.clientWidth / 3;
-            const cardsToMove = 3;
-            const totalScroll = cardWidth * cardsToMove;
-            if (container.scrollLeft === cardWidth * (teachers.length - cardsToMove)) {
-                container.scrollLeft = 0;
-            } else {
-                container.scrollLeft += totalScroll;
-            }
+        if (scrollIndex === teachers.length - 3) {
+            setScrollIndex(0);
+        } else {
+            setScrollIndex(scrollIndex + 3);
         }
     };
 
@@ -309,6 +297,12 @@ export default function Main() {
             unsubscribe();
         };
     }, []);
+
+    useEffect(() => {
+        if (containerRef.current) {
+            containerRef.current.style.transform = `translateX(-${(scrollIndex * 100) / 3}%)`;
+        }
+    }, [scrollIndex]);
 
     console.log('teachers', teachers.length);
 
@@ -378,7 +372,7 @@ export default function Main() {
                     <TeachersContainer
                         ref={containerRef}
                         style={{
-                            transform: `translateX(-${scrollIndex * 100}%)`,
+                            transform: `translateX(-${(scrollIndex * 100) / 3}%)`,
                         }}
                     >
                         {teachers &&
@@ -416,7 +410,7 @@ export default function Main() {
                                     </TeacherCard>
                                 </TeacherCardWrapper>
                             ))}
-                        <Mask />
+                        {/* <Mask /> */}
                     </TeachersContainer>
                     <ScrollButton onClick={handleScrollRight}>&gt;</ScrollButton>
                 </ScrollButtonContainer>

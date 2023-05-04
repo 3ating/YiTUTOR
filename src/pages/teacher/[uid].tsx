@@ -6,20 +6,17 @@ import styled from 'styled-components';
 import Link from 'next/link';
 import Image from 'next/image';
 import ChatRoom from '../chat/ChatRoom';
-import { useAuth } from '../../../public/AuthContext';
 import ChatIcon from '../chat/ChatIcon';
+import { useAuth } from '../../../public/AuthContext';
 import Schedule from '../Schedule';
 import Calendar from '../Calendar';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
 import { AiFillStar, AiOutlineMail, AiOutlinePhone, AiOutlineStar } from 'react-icons/ai';
-import { FaStar } from 'react-icons/fa';
 import { BsStarHalf } from 'react-icons/bs';
-import { FiAlertTriangle } from 'react-icons/fi';
 import { VscDebugBreakpointFunction } from 'react-icons/vsc';
 import Button from '@/components/Button';
-import { toast } from 'react-toastify';
-import { ToastContainer } from 'react-toastify';
+import { notification } from 'antd';
 import 'react-toastify/dist/ReactToastify.css';
 import Loader from '@/components/Loader';
 
@@ -587,7 +584,11 @@ const TeacherDetails = () => {
 
     const handlePurchaseClick = (priceObj: { qty: number; price: number }) => {
         if (userInfo?.userType !== 'student' || !isLoading) {
-            toast.error('請確認是否登入 / 為學生身份');
+            notification.error({
+                message: '購買課程失敗',
+                description: '請確認是否登入 / 是否為學生身份',
+                placement: 'topRight',
+            });
         } else {
             setSelectedPrice(priceObj);
             setConfirmPurchase(true);
@@ -643,7 +644,11 @@ const TeacherDetails = () => {
 
     const handleTimeSlotClick = () => {
         if (userInfo?.userType === 'teacher' || !isLoading) {
-            toast.error('請確認是否登入 / 為學生身份');
+            notification.error({
+                message: '預約時間失敗',
+                description: '請確認是否登入 / 是否為學生身份',
+                placement: 'topRight',
+            });
         } else {
             setShowBookButtons(true);
         }
@@ -756,7 +761,7 @@ const TeacherDetails = () => {
     return (
         <MainWrapper>
             <Header />
-            <ToastContainer position={toast.POSITION.TOP_CENTER} autoClose={1000} />
+            {/* <ToastContainer position={toast.POSITION.TOP_CENTER} autoClose={1000} /> */}
 
             {/* <Container> */}
             <TeacherContainer>

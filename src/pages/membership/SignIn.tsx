@@ -7,7 +7,6 @@ import Footer from '@/components/Footer/Footer';
 import Button from '../../components/Button';
 import SignInImg from './signin.png';
 import Image from 'next/image';
-import { ToastContainer } from 'react-toastify';
 
 const LoginContainer = styled.div`
     display: flex;
@@ -36,7 +35,8 @@ const LoginFormWrapper = styled.div`
     padding: 100px 35px 90px;
     border-radius: 9px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    width: 400px;
+    /* width: 400px; */
+    width: 28%;
     max-width: 90%;
     /* height: 300px; */
 `;
@@ -169,7 +169,6 @@ const SignIn = () => {
         <>
             <Header />
             <LoginContainer>
-                <ToastContainer />
                 {isLoading ? (
                     user ? (
                         <>

@@ -7,14 +7,7 @@ import { useAuth } from '../../../public/AuthContext';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
 import TeacherCardComponents from '../../components/TeacherCard';
-// import Select, { OptionProps, ControlProps, StylesConfig } from 'react-select';
-// import ReactSelect from 'react-select';
 import ReactSelect, { StylesConfig, OptionProps, CSSObjectWithLabel, GroupBase } from 'react-select';
-import Loader from '@/components/Loader';
-
-// import { CSSObject } from '@emotion/react';
-// import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
-// import { BsStarHalf } from 'react-icons/bs';
 
 type OptionType = {
     label: string;
@@ -40,30 +33,6 @@ const {
     calculateAverage,
     renderStars,
 } = TeacherCardComponents;
-
-// const RatingContainer = styled.div`
-//     display: flex;
-//     align-items: center;
-//     margin: 5px 0 0;
-// `;
-
-// const RatingNumber = styled.p`
-//     font-size: 18px;
-//     font-weight: 550;
-//     margin: 0;
-// `;
-
-// const StarIcon = styled(AiFillStar)`
-//     color: #f5c518;
-// `;
-
-// const EmptyStarIcon = styled(AiOutlineStar)`
-//     color: #f5c518;
-// `;
-
-// const HalfStarIcon = styled(BsStarHalf)`
-//     color: #f5c518;
-// `;
 
 const PageContainer = styled.div`
     display: flex;
@@ -405,11 +374,11 @@ const Teachers = () => {
                                         {renderStars(parseFloat(calculateAverage(teacher.evaluation).toFixed(1)))}
                                     </RatingContainer>
                                     <TeacherDescription>{teacher.description}</TeacherDescription>
-                                    <div>
-                                        <DirectLink href={`/teacher/${teacher.uid}`} key={teacher.uid}>
-                                            <TeacherBtn>購買課程</TeacherBtn>
-                                        </DirectLink>
-                                    </div>
+                                    {/* <div> */}
+                                    <DirectLink href={`/teacher/${teacher.uid}`} key={teacher.uid}>
+                                        <TeacherBtn>購買課程</TeacherBtn>
+                                    </DirectLink>
+                                    {/* </div> */}
                                 </TeacherInfoContainer>
                             </TeacherCard>
                         </TeacherCardWrapper>
