@@ -17,7 +17,6 @@ import { BsStarHalf } from 'react-icons/bs';
 import { VscDebugBreakpointFunction } from 'react-icons/vsc';
 import Button from '@/components/Button';
 import { notification } from 'antd';
-import 'react-toastify/dist/ReactToastify.css';
 import Loader from '@/components/Loader';
 
 interface StyledDialogProps {
