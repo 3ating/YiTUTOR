@@ -47,6 +47,7 @@ const UserInfoBox = styled.div`
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
     width: 100%;
+    padding: 0 50px;
 `;
 
 const InfoContainer = styled.div`
@@ -58,7 +59,8 @@ const InfoContainer = styled.div`
 `;
 
 const Avatar = styled.img`
-    width: 182px;
+    /* width: 182px; */
+    width: 60%;
     border-radius: 50%;
     margin: 20px auto;
     aspect-ratio: 1/1;
@@ -69,6 +71,7 @@ const UserInfoContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
     /* margin-bottom: 30px; */
     /* margin-left: 24px; */
 `;
@@ -77,7 +80,8 @@ const UserNameContainer = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 240px;
+    /* width: 240px; */
+    width: 100%;
     margin: 20px 0 30px;
 `;
 
@@ -110,6 +114,7 @@ const UserInformationContainer = styled.div`
     display: flex;
     flex-direction: column;
     margin-bottom: 15px;
+    width: 100%;
 `;
 
 const UserInformation = styled.p`
@@ -126,7 +131,8 @@ const UserInforContent = styled.div`
 `;
 
 const UserInformationLine = styled.div`
-    width: 240px;
+    /* width: 240px; */
+    width: 100%;
     height: 1px;
     background: #000000;
 `;
@@ -367,9 +373,13 @@ const ProfileMiddleContainer = styled.div<BookedCoursesContainerProps>`
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: ${(props) => (props.isBookedCourseEmpty ? '75%' : '40%')};
+    width: ${(props) => (props.isBookedCourseEmpty ? '70%' : '35%')};
     height: 100%;
     /* border: 1px solid black; */
+
+    @media (max-width: 815px) {
+        width: 60%;
+    }
 `;
 
 const CourseTitle = styled.p`
@@ -392,10 +402,13 @@ const BookedCoursesContainer = styled.div<BookedCoursesContainerProps>`
     justify-items: center;
     align-items: center;
     grid-gap: 1rem;
-    width: 518.4px;
+    /* width: 518.4px; */
     padding: 30px 0;
     box-sizing: border-box;
     justify-content: center;
+    @media screen and (max-width: 815px) {
+        grid-template-columns: 1fr;
+    }
 `;
 
 const ProfilRightContainer = styled.div<ProfilRightContainerProps>`
@@ -438,8 +451,12 @@ const ModifiedInput = styled.input`
 const ProfileLeftContainer = styled.div`
     display: flex;
     /* border: 1px solid red; */
-    width: 25%;
+    width: 30%;
     background: white;
+
+    @media (max-width: 815px) {
+        width: 40%;
+    }
 `;
 
 const EditContainer = styled.div`
@@ -732,7 +749,9 @@ const UserProfile = () => {
                                         <BookingInfo>
                                             <BookingTitleContainer>
                                                 <BookingInfoTitle>{booking.teacherInfo.name}</BookingInfoTitle>
-                                                <BookingSubject>{booking.teacherInfo.subject}</BookingSubject>
+                                                {userInfo.userType === 'student' && (
+                                                    <BookingSubject>{booking.teacherInfo.subject}</BookingSubject>
+                                                )}
                                             </BookingTitleContainer>
                                             <BookingInfoTime>
                                                 {booking.courseTime.dayLabel} {booking.courseTime.time}

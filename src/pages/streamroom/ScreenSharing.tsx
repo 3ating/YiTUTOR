@@ -1,4 +1,12 @@
-import React, { useRef, useState, useEffect, ButtonHTMLAttributes } from 'react';
+import React, {
+    useRef,
+    useState,
+    useEffect,
+    ButtonHTMLAttributes,
+    Dispatch,
+    SetStateAction,
+    MutableRefObject,
+} from 'react';
 // import { Button } from '@material-ui/core';
 // import { ScreenShare } from '@material-ui/icons';
 import firebase from 'firebase/compat/app';
@@ -6,7 +14,7 @@ import 'firebase/compat/firestore';
 import styled from 'styled-components';
 import { useAuth } from '../../../public/AuthContext';
 import { TbScreenShare } from 'react-icons/tb';
-import { Tooltip } from 'antd';
+import { Tooltip, message } from 'antd';
 
 // import { db } from '../../firebase';
 
@@ -26,12 +34,23 @@ if (!firebase.apps.length) {
 
 const db = firebase.firestore();
 
+// interface ScreenSharingProps {
+//     localStream: MediaStream | null;
+//     peerConnection: RTCPeerConnection | null;
+//     isScreenSharing: boolean;
+//     setIsScreenSharing: React.Dispatch<React.SetStateAction<boolean>>;
+//     roomId: string | null;
+// }
+
 interface ScreenSharingProps {
     localStream: MediaStream | null;
     peerConnection: RTCPeerConnection | null;
     isScreenSharing: boolean;
-    setIsScreenSharing: React.Dispatch<React.SetStateAction<boolean>>;
-    roomId: string | null;
+    setIsScreenSharing: Dispatch<SetStateAction<boolean>>;
+    remoteScreenRef: MutableRefObject<HTMLVideoElement | null>;
+    roomId: string;
+    remoteScreen: MediaStream | null;
+    setRemoteScreen: Dispatch<SetStateAction<MediaStream | null>>;
 }
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -101,12 +120,16 @@ const ScreenSharing: React.FC<ScreenSharingProps> = ({
     peerConnection,
     isScreenSharing,
     setIsScreenSharing,
+    remoteScreenRef,
     roomId,
+    remoteScreen,
+    setRemoteScreen,
 }) => {
     const ICON_SIZE = 22;
     const { userUid } = useAuth();
-    const remoteScreenRef = useRef<HTMLVideoElement | null>(null);
-    const [remoteScreen, setRemoteScreen] = useState<MediaStream | null>(null);
+    const [screenSharingStream, setScreenSharingStream] = useState<MediaStream | null>(null);
+    // const remoteScreenRef = useRef<HTMLVideoElement | null>(null);
+    // const [remoteScreen, setRemoteScreen] = useState<MediaStream | null>(null);
 
     const sendSignalData = async (data: any) => {
         await db
@@ -187,7 +210,7 @@ const ScreenSharing: React.FC<ScreenSharingProps> = ({
             });
 
             const newVideoTrack = stream.getVideoTracks()[0];
-
+            setScreenSharingStream(stream);
             if (peerConnection && localStream) {
                 const sender = peerConnection
                     .getSenders()
@@ -197,25 +220,30 @@ const ScreenSharing: React.FC<ScreenSharingProps> = ({
                 }
             }
 
-            // Set the new remote stream for screen sharing video
             const newRemoteStream = new MediaStream([newVideoTrack]);
             setRemoteScreen(newRemoteStream);
 
-            // Set the video srcObject for the screen sharing video element
             if (remoteScreenRef.current) {
                 remoteScreenRef.current.srcObject = newRemoteStream;
             }
+
+            setIsScreenSharing(true);
         } catch (err) {
             console.error('Error: ' + err);
         }
-        setIsScreenSharing(true);
     };
 
     const stopScreenShare = async () => {
         if (remoteScreen && localStream) {
             const screenVideoTrack = remoteScreen
                 .getVideoTracks()
-                .find((track) => track.kind === 'video' && track.label.includes('screen'));
+                .find(
+                    (track: { kind: string; label: string | string[] }) =>
+                        track.kind === 'video' && track.label.includes('screen')
+                );
+            if (screenSharingStream) {
+                screenSharingStream.getTracks().forEach((track) => track.stop());
+            }
             const originalVideoTrack = localStream.getVideoTracks().find((track) => track.kind === 'video');
             if (screenVideoTrack && originalVideoTrack) {
                 if (peerConnection) {
@@ -274,21 +302,24 @@ const ScreenSharing: React.FC<ScreenSharingProps> = ({
 
     return (
         <>
-            <Tooltip title='螢幕分享'></Tooltip>
             {!isScreenSharing ? (
-                <ShareScreenButton
-                    active={isScreenSharing}
-                    onClick={openScreenShare}
-                    disabled={!localStream || !roomId}
-                >
-                    <TbScreenShare size={ICON_SIZE} />
-                </ShareScreenButton>
+                <Tooltip title='螢幕分享'>
+                    <ShareScreenButton
+                        active={isScreenSharing}
+                        onClick={openScreenShare}
+                        disabled={!localStream || !roomId}
+                    >
+                        <TbScreenShare size={ICON_SIZE} />
+                    </ShareScreenButton>
+                </Tooltip>
             ) : (
-                <ShareScreenButton active={isScreenSharing} onClick={stopScreenShare}>
-                    <TbScreenShare size={ICON_SIZE} />
-                </ShareScreenButton>
+                <Tooltip title='螢幕分享'>
+                    <ShareScreenButton active={isScreenSharing} onClick={stopScreenShare}>
+                        <TbScreenShare size={ICON_SIZE} />
+                    </ShareScreenButton>
+                </Tooltip>
             )}
-            <RemoteScreen ref={remoteScreenRef} show={!!remoteScreen} autoPlay muted />
+            {/* <RemoteScreen ref={remoteScreenRef} show={!!remoteScreen} autoPlay muted /> */}
         </>
 
         // <>

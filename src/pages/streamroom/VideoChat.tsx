@@ -384,6 +384,18 @@ const ClassSubject = styled.p`
     margin: 0;
 `;
 
+const RemoteScreen = styled.video`
+    width: 40%;
+    /* height: 500px; */
+    display: ${({ show }: { show: boolean }) => (show ? 'block' : 'none')};
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    border-radius: 9px;
+    object-fit: cover;
+    max-height: 500px;
+    /* margin-top: 8px; */
+`;
+
 const configuration = {
     iceServers: [
         {
@@ -401,6 +413,10 @@ const VideoChat: React.FC = () => {
     const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
     const localStream = useRef<MediaStream | null>(null);
     const remoteStream = useRef<MediaStream | null>(null);
+
+    const remoteScreenRef = useRef<HTMLVideoElement | null>(null);
+    const [remoteScreen, setRemoteScreen] = useState<MediaStream | null>(null);
+
     const prevBothUsersJoined = useRef(false);
 
     const [peerConnection, setPeerConnection] = useState<RTCPeerConnection | null>(null);
@@ -838,6 +854,7 @@ const VideoChat: React.FC = () => {
     // console.log('isLoading', isLoading);
     // console.log('classSubject', classSubject);
     // console.log(userInfo);
+    // console.log('remoteScreen', remoteScreen);
 
     return (
         <MainWrapper>
@@ -891,6 +908,8 @@ const VideoChat: React.FC = () => {
                                 <LiveText>{classUrlId ? '上課中' : '試用中'}</LiveText>{' '}
                             </LiveTextContainer>
                         </VideoContainer>
+                        <RemoteScreen ref={remoteScreenRef} show={!!remoteScreen} autoPlay muted />
+
                         {showChatroom && (
                             <ChatRoomContainer>
                                 <ClassChatroom roomId={roomId} toggleChat={toggleChat} />
@@ -927,7 +946,10 @@ const VideoChat: React.FC = () => {
                                     peerConnection={peerConnection}
                                     isScreenSharing={isScreenSharing}
                                     setIsScreenSharing={setIsScreenSharing}
+                                    remoteScreenRef={remoteScreenRef}
                                     roomId={roomId}
+                                    remoteScreen={remoteScreen}
+                                    setRemoteScreen={setRemoteScreen}
                                 />
                                 {/* </Tooltip> */}
 

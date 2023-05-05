@@ -18,11 +18,12 @@ const LoginContainer = styled.div`
     /* justify-content: space-between; */
     height: calc(100vh - 130px);
     background-color: antiquewhite;
-    /* padding: 0 10%; */
+    /* padding: 0 5%; */
 `;
 
 const SignInImage = styled(Image)`
-    width: 450px;
+    /* width: 450px; */
+    width: 30%;
     height: auto;
 `;
 
@@ -32,7 +33,7 @@ const LoginFormWrapper = styled.div`
     flex-direction: column;
     align-items: center;
     background-color: white;
-    padding: 100px 35px 90px;
+    padding: 60px 35px;
     border-radius: 9px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     /* width: 400px; */
@@ -113,7 +114,7 @@ const UserContent = styled.p`
 `;
 
 const Avatar = styled.img`
-    width: 130px;
+    width: 40%;
     border-radius: 50%;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     margin-bottom: 10px;
