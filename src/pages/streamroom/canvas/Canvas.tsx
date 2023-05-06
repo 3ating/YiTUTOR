@@ -153,6 +153,8 @@ const Canvas = ({ roomId }: ChatroomProps) => {
     const [selectedItem, setSelectedItem] = useState<{ type: string; index: number } | null>(null);
     const [selectedItemColor, setSelectedItemColor] = useState('');
     const [clipboardItem, setClipboardItem] = useState<{ type: string; data: object } | null>(null);
+    const [isMoving, setIsMoving] = useState(false);
+    const [isScaling, setIsScaling] = useState(false);
 
     const updateCursor: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
         const rect = canvasRef.current?.getBoundingClientRect();
@@ -164,7 +166,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         const shapeIndex = findShape(x, y);
         const lineIndex = findLine(x, y);
 
-        if (shapeIndex !== null || lineIndex !== null) {
+        if (isMoving || shapeIndex !== null || lineIndex !== null) {
             setCursorStyle('move');
             setMoveEnabled(true);
         } else {
@@ -195,20 +197,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
             window.removeEventListener('keyup', handleKeyUp);
         };
     }, []);
-
-    const handleMoveCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setMoveEnabled(e.target.checked);
-        if (e.target.checked) {
-            setSelectedItem(null);
-        }
-    };
-
-    const handleScaleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setScaleEnabled(e.target.checked);
-        if (e.target.checked) {
-            setSelectedItem(null);
-        }
-    };
 
     const handleCanvasClick = (e: { clientX: number; clientY: number }) => {
         const canvas = canvasRef.current;
@@ -310,10 +298,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         }
     };
 
-    const toggleEraser = () => {
-        setEraserEnabled(!eraserEnabled);
-    };
-
     const findShape = (x: number, y: number) => {
         for (let i = shapes.length - 1; i >= 0; i--) {
             const shapeData = shapes[i];
@@ -410,12 +394,14 @@ const Canvas = ({ roomId }: ChatroomProps) => {
 
         setSelectedShapeIndex(shapeIndex);
         setSelectedLineIndex(lineIndex);
-
+        setIsMoving(true);
         setMoveStartX(x);
         setMoveStartY(y);
     };
 
     const move: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
+        if (!isMoving) return;
+        if (isScaling) return;
         if (selectedShapeIndex === null && selectedLineIndex === null) return;
 
         const canvas = canvasRef.current;
@@ -511,6 +497,8 @@ const Canvas = ({ roomId }: ChatroomProps) => {
 
         setMoveStartX(0);
         setMoveStartY(0);
+        setIsMoving(false);
+        setIsScaling(false);
     };
 
     useEffect(() => {
@@ -962,8 +950,11 @@ const Canvas = ({ roomId }: ChatroomProps) => {
 
         switch (selectedShape.type) {
             case 'rectangle':
-                selectedShape.endX = x;
-                selectedShape.endY = y;
+                const newWidth = x - selectedShape.startX;
+                const newHeight = y - selectedShape.startY;
+
+                selectedShape.endX = selectedShape.startX + newWidth;
+                selectedShape.endY = selectedShape.startY + newHeight;
                 break;
             case 'circle':
                 const radius = Math.sqrt(Math.pow(x - selectedShape.startX, 2) + Math.pow(y - selectedShape.startY, 2));
@@ -976,7 +967,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                     y: selectedShape.endY,
                 };
                 const scaleX = (x - selectedShape.startX) / (selectedShape.endX - selectedShape.startX);
-                const scaleY = (y - selectedShape.startY) / (selectedShape.endY - selectedShape.startY);
+                const scaleY = (y - selectedShape.startY) / (topVertex.y - selectedShape.startY);
 
                 const scaledTopVertex = {
                     x: selectedShape.startX + (topVertex.x - selectedShape.startX) * scaleX,
@@ -1013,6 +1004,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         }
         setIsDrawing(false);
         setSelectedShape(null);
+        setIsMoving(false);
     };
 
     // console.log('eraserEnabled', eraserEnabled);
@@ -1070,11 +1062,11 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                 />
                 <StyledToolbar>
                     <RelativeDiv>
-                        <Tooltip title='畫筆顏色' placement='right'>
-                            <ToolIcon onClick={handleColorLineClick}>
-                                <MdOutlineColorLens />
-                            </ToolIcon>
-                        </Tooltip>
+                        {/* <Tooltip title='畫筆顏色' placement='right'> */}
+                        <ToolIcon onClick={handleColorLineClick}>
+                            <MdOutlineColorLens />
+                        </ToolIcon>
+                        {/* </Tooltip> */}
                         <StyledInput
                             type='color'
                             value={color}
@@ -1084,20 +1076,12 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                         />
                     </RelativeDiv>
                     <RelativeDiv>
-                        <Tooltip title='畫筆粗細' placement='right'>
-                            <ToolIcon onClick={handleLineWidthPickerClick}>
-                                <RxBorderWidth />
-                            </ToolIcon>
-                        </Tooltip>
+                        {/* <Tooltip title='畫筆粗細' placement='right'> */}
+                        <ToolIcon onClick={handleLineWidthPickerClick}>
+                            <RxBorderWidth />
+                        </ToolIcon>
+                        {/* </Tooltip> */}
                         {showLineWidthPicker && (
-                            // <StyledInput
-                            //     type='range'
-                            //     min='1'
-                            //     max='20'
-                            //     value={lineWidth}
-                            //     onChange={(e) => setLineWidth(Number(e.target.value))}
-                            //     style={{ top: '10px', left: '30px' }}
-                            // />
                             <StyledInput
                                 type='range'
                                 min='1'
@@ -1110,11 +1094,11 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                         )}
                     </RelativeDiv>
                     <RelativeDiv>
-                        <Tooltip title='圖案' placement='right'>
-                            <ToolIcon onClick={handleShapeIconClick}>
-                                <IoShapesOutline />
-                            </ToolIcon>
-                        </Tooltip>
+                        {/* <Tooltip title='圖案' placement='right'> */}
+                        <ToolIcon onClick={handleShapeIconClick}>
+                            <IoShapesOutline />
+                        </ToolIcon>
+                        {/* </Tooltip> */}
                         <StyledSelect
                             value={shape || ''}
                             onChange={(e) => setShape(e.target.value)}
@@ -1128,11 +1112,11 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                         </StyledSelect>
                     </RelativeDiv>
                     <RelativeDiv>
-                        <Tooltip title='框線顏色' placement='right'>
-                            <ToolIcon onClick={handleColorWandClick}>
-                                <MdOutlineBorderColor />
-                            </ToolIcon>
-                        </Tooltip>
+                        {/* <Tooltip title='框線顏色' placement='right'> */}
+                        <ToolIcon onClick={handleColorWandClick}>
+                            <MdOutlineBorderColor />
+                        </ToolIcon>
+                        {/* </Tooltip> */}
                         <StyledInput
                             type='color'
                             value={selectedItemColor}
@@ -1144,18 +1128,18 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                             isVisible={colorPickerVisible}
                         />
                     </RelativeDiv>
-                    <Tooltip title='複製' placement='right'>
-                        <ToolIconAno as={MdContentCopy} onClick={copySelectedItem} />
-                    </Tooltip>
-                    <Tooltip title='貼上' placement='right'>
-                        <ToolIconAno as={MdContentPaste} onClick={pasteClipboardItem} />
-                    </Tooltip>
-                    <Tooltip title='刪除' placement='right'>
-                        <ToolIconAno as={MdOutlineDelete} onClick={deleteSelectedItem} />
-                    </Tooltip>
-                    <Tooltip title='清空' placement='right'>
-                        <ToolIconAno as={AiOutlineClear} onClick={handleClearCanvas} />
-                    </Tooltip>
+                    {/* <Tooltip title='複製' placement='right'> */}
+                    <ToolIconAno as={MdContentCopy} onClick={copySelectedItem} />
+                    {/* </Tooltip> */}
+                    {/* <Tooltip title='貼上' placement='right'> */}
+                    <ToolIconAno as={MdContentPaste} onClick={pasteClipboardItem} />
+                    {/* </Tooltip> */}
+                    {/* <Tooltip title='刪除' placement='right'> */}
+                    <ToolIconAno as={MdOutlineDelete} onClick={deleteSelectedItem} />
+                    {/* </Tooltip> */}
+                    {/* <Tooltip title='清空' placement='right'> */}
+                    <ToolIconAno as={AiOutlineClear} onClick={handleClearCanvas} />
+                    {/* </Tooltip> */}
                 </StyledToolbar>
             </StyledCanvasContainer>
         </BoardContainer>
