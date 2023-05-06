@@ -8,8 +8,6 @@ import Canvas from './canvas/Canvas';
 import styled from 'styled-components';
 import { useAuth } from '../../../public/AuthContext';
 import Link from 'next/link';
-import Header from '@/components/Header/Header';
-import Footer from '@/components/Footer/Footer';
 import { AiFillSwitcher } from 'react-icons/ai';
 import { BsFillCameraVideoFill, BsFillCameraVideoOffFill, BsMicFill, BsMicMuteFill } from 'react-icons/bs';
 import { ImPhoneHangUp } from 'react-icons/im';
@@ -60,7 +58,9 @@ interface TheOtherAvatarProps {
 const MainWrapper = styled.div`
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    min-height: 100vh;
+    padding: 50px 0;
+    box-sizing: border-box;
     background-color: antiquewhite;
 `;
 
@@ -676,7 +676,11 @@ const VideoChat: React.FC = () => {
             const pc = new RTCPeerConnection(configuration);
 
             pc.ontrack = (event) => {
+                // console.log('event', event);
+
                 event.streams[0].getTracks().forEach((track) => {
+                    // console.log('track',track);
+
                     remoteStream.current?.addTrack(track);
                 });
                 if (remoteVideoRef.current) {
@@ -854,12 +858,10 @@ const VideoChat: React.FC = () => {
     // console.log('isLoading', isLoading);
     // console.log('classSubject', classSubject);
     // console.log(userInfo);
-    // console.log('remoteScreen', remoteScreen);
+    console.log('remoteScreen', remoteScreen);
 
     return (
         <MainWrapper>
-            <Header />
-
             {userUid ? (
                 <OnlineClassContainer>
                     {roomId && (
@@ -1037,7 +1039,6 @@ const VideoChat: React.FC = () => {
                     <DirectLink href='/membership/SignIn'>點我登入</DirectLink>
                 </CenteredContainer>
             )}
-            <Footer />
         </MainWrapper>
     );
 };

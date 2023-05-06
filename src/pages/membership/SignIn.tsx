@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { useAuth } from '../../../public/AuthContext';
 import Link from 'next/link';
 import styled, { keyframes } from 'styled-components';
-import Header from '@/components/Header/Header';
-import Footer from '@/components/Footer/Footer';
 import Button from '../../components/Button';
 import SignInImg from './signin.png';
 import Image from 'next/image';
@@ -16,8 +14,10 @@ const LoginContainer = styled.div`
     justify-content: center;
     gap: 50px;
     /* justify-content: space-between; */
-    height: calc(100vh - 130px);
+    min-height: 100vh;
     background-color: antiquewhite;
+    padding: 8% 0;
+    box-sizing: border-box;
     /* padding: 0 5%; */
 `;
 
@@ -33,12 +33,13 @@ const LoginFormWrapper = styled.div`
     flex-direction: column;
     align-items: center;
     background-color: white;
-    padding: 60px 35px;
+    padding: 5% 35px;
     border-radius: 9px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     /* width: 400px; */
-    width: 28%;
+    /* width: 28%; */
     max-width: 90%;
+    width: 25%;
     /* height: 300px; */
 `;
 
@@ -167,58 +168,52 @@ const SignIn = () => {
     // console.log('uid:', userUid);
 
     return (
-        <>
-            <Header />
-            <LoginContainer>
-                {isLoading ? (
-                    user ? (
-                        <>
-                            <LoginFormWrapper>
-                                <UserInfo>
-                                    {userInfo?.avatar && (
-                                        <Avatar src={userInfo.avatar} alt={`${userInfo.name} 的大頭照`} />
-                                    )}
-                                    <UserContent>{userInfo?.name}</UserContent>
-                                    <UserContent>{userInfo?.email}</UserContent>
-
-                                    <LogoutButton onClick={handleLogout}>登出</LogoutButton>
-                                    <DirectLink href={`/profile/${user.uid}`} passHref>
-                                        <ProfileButton>查看個人資料</ProfileButton>
-                                    </DirectLink>
-                                </UserInfo>
-                            </LoginFormWrapper>
-                            <SignInImage src={SignInImg} alt='Sign In' />
-                        </>
-                    ) : (
-                        <LoadingSpinner />
-                    )
-                ) : (
+        <LoginContainer>
+            {isLoading ? (
+                user ? (
                     <>
                         <LoginFormWrapper>
-                            <form onSubmit={handleFormSubmit}>
-                                <Title>會員登入</Title>
-                                <InputField
-                                    type='email'
-                                    placeholder='輸入信箱'
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                />
-                                <InputField
-                                    type='password'
-                                    placeholder='輸入密碼'
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                />
-                                <LoginButton type='submit'>登入</LoginButton>
-                            </form>
-                            <DirectLink href='SignUp'>還沒有帳號，前往註冊</DirectLink>
+                            <UserInfo>
+                                {userInfo?.avatar && <Avatar src={userInfo.avatar} alt={`${userInfo.name} 的大頭照`} />}
+                                <UserContent>{userInfo?.name}</UserContent>
+                                <UserContent>{userInfo?.email}</UserContent>
+
+                                <LogoutButton onClick={handleLogout}>登出</LogoutButton>
+                                <DirectLink href={`/profile/${user.uid}`} passHref>
+                                    <ProfileButton>查看個人資料</ProfileButton>
+                                </DirectLink>
+                            </UserInfo>
                         </LoginFormWrapper>
                         <SignInImage src={SignInImg} alt='Sign In' />
                     </>
-                )}
-            </LoginContainer>
-            <Footer />
-        </>
+                ) : (
+                    <LoadingSpinner />
+                )
+            ) : (
+                <>
+                    <LoginFormWrapper>
+                        <form onSubmit={handleFormSubmit}>
+                            <Title>會員登入</Title>
+                            <InputField
+                                type='email'
+                                placeholder='輸入信箱'
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
+                            <InputField
+                                type='password'
+                                placeholder='輸入密碼'
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
+                            <LoginButton type='submit'>登入</LoginButton>
+                        </form>
+                        <DirectLink href='SignUp'>還沒有帳號，前往註冊</DirectLink>
+                    </LoginFormWrapper>
+                    <SignInImage src={SignInImg} alt='Sign In' />
+                </>
+            )}
+        </LoginContainer>
     );
 };
 

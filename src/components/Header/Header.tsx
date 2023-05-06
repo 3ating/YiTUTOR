@@ -2,7 +2,6 @@ import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
 import { useAuth } from '../../../public/AuthContext';
-import { FaUserCircle } from 'react-icons/fa';
 
 const HeaderWrapper = styled.header`
     display: flex;
@@ -11,10 +10,11 @@ const HeaderWrapper = styled.header`
     background-color: #ffd335;
     height: 65px;
     padding: 0 40px;
-    /* position: absolute;
+    box-sizing: border-box;
+    z-index: 2;
+    position: fixed;
     top: 0;
     width: 100%;
-    box-sizing: border-box; */
 `;
 
 const Logo = styled.h1`
@@ -72,19 +72,10 @@ const SignInBtn = styled(Link)`
     justify-content: center;
     font-weight: 500;
     border-radius: 9px;
-
-    /* line-height: 19px; */
-    /* letter-spacing: 0.42em; */
     text-align: center;
     color: #f5f5f5;
     background: #000000;
-    /* opacity: 0.7; */
     text-decoration: none;
-
-    /* &:hover {
-        color: #f5f5f5;
-        background: #000000;
-    } */
 `;
 
 const SignUpBtn = styled(Link)`
@@ -100,11 +91,6 @@ const SignUpBtn = styled(Link)`
     background: #f5f5f5;
     opacity: 0.7;
     text-decoration: none;
-
-    /* &:hover {
-        color: #f5f5f5;
-        background: #000000;
-    } */
 `;
 
 const UserAvatar = styled.img`
@@ -126,9 +112,7 @@ const AvatarLink = styled(Link)`
 `;
 
 const Header: React.FC = () => {
-    const { userInfo, userUid, isLoading } = useAuth();
-    console.log(userInfo);
-
+    const { userInfo, isLoading } = useAuth();
     return (
         <HeaderWrapper>
             <LogoLink href={'/'}>
@@ -137,7 +121,6 @@ const Header: React.FC = () => {
             <NavContainer>
                 <MenuContainer>
                     <Menu href='/teacher/Teachers'>尋找老師</Menu>
-                    {/* <Menu href='/gpt/AISols'>智慧解題</Menu> */}
                     <Menu href='/streamroom/VideoChat'>線上教室</Menu>
                 </MenuContainer>
                 <SignBtnContainer>

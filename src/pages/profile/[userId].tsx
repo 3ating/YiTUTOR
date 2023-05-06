@@ -47,7 +47,12 @@ const UserInfoBox = styled.div`
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
     width: 100%;
-    padding: 0 50px;
+    padding: 65px 50px 0;
+    height: 100vh;
+    box-sizing: border-box;
+    @media (max-width: 815px) {
+        padding: 65px 20px 0;
+    }
 `;
 
 const InfoContainer = styled.div`
@@ -217,10 +222,10 @@ const CourseCard = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
+    /* width: 100%; */
     max-width: 800px;
     background-color: #ffffff;
-    padding: 1.5rem;
+    padding: 15px 10px;
     margin-bottom: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
@@ -230,11 +235,17 @@ const CourseCard = styled.div`
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
         transform: translateY(-4px);
     } */
+
+    @media screen and (max-width: 850px) {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 `;
 
 const CourseInfo = styled.div`
     display: flex;
     align-items: center;
+    font-size: 16px;
     /* margin-right: 1.5rem; */
 `;
 
@@ -365,7 +376,7 @@ const TeacherLink = styled(Link)`
 
 const ProfileWrapper = styled.div`
     display: flex;
-    height: calc(100vh - 130px);
+    /* height: calc(100vh - 130px); */
     /* border: 1px solid red; */
 `;
 
@@ -374,9 +385,9 @@ const ProfileMiddleContainer = styled.div<BookedCoursesContainerProps>`
     flex-direction: column;
     align-items: center;
     width: ${(props) => (props.isBookedCourseEmpty ? '70%' : '35%')};
-    height: 100%;
-    /* border: 1px solid black; */
-
+    /* height: 100%; */
+    padding: 65px 0 0 0;
+    box-sizing: border-box;
     @media (max-width: 815px) {
         width: 60%;
     }
@@ -402,11 +413,17 @@ const BookedCoursesContainer = styled.div<BookedCoursesContainerProps>`
     justify-items: center;
     align-items: center;
     grid-gap: 1rem;
-    /* width: 518.4px; */
     padding: 30px 0;
     box-sizing: border-box;
     justify-content: center;
-    @media screen and (max-width: 815px) {
+    overflow: auto;
+    max-height: calc(100vh - 230px);
+    &::-webkit-scrollbar {
+        display: none;
+    }
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    @media screen and (max-width: 1500px) {
         grid-template-columns: 1fr;
     }
 `;
@@ -416,7 +433,9 @@ const ProfilRightContainer = styled.div<ProfilRightContainerProps>`
     flex-direction: column;
     align-items: center;
     width: ${(props) => (props.isTeacher ? '0' : '35%')};
-    height: 100%;
+    /* height: 100%; */
+    padding: 65px 0 0 0;
+    box-sizing: border-box;
 `;
 
 const PurchasedContainer = styled.div`
@@ -426,9 +445,12 @@ const PurchasedContainer = styled.div`
     grid-gap: 1rem;
     width: 90%;
     height: 100%;
-    padding: 30px 25px;
+    padding: 30px 0;
     box-sizing: border-box;
-    /* border: 1px solid red; */
+    overflow: auto;
+    max-height: calc(100vh - 230px);
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 `;
 
 const ModifiedInput = styled.input`
@@ -637,7 +659,7 @@ const UserProfile = () => {
 
     return (
         <MainWrapper>
-            <Header />
+            {/* <Header /> */}
             <ProfileWrapper>
                 <ProfileLeftContainer>
                     <UserInfoBox>
@@ -775,29 +797,28 @@ const UserProfile = () => {
                                             <DirectLink key={courseId} href={`../teacher/${courseData.teacherid}`}>
                                                 <CourseCard>
                                                     <CourseInfo>
-                                                        <CourseLabel>科目:</CourseLabel>
-                                                        <CourseValue>{courseData.subject}</CourseValue>
+                                                        {/* <CourseLabel>科目:</CourseLabel> */}
+                                                        <CourseValue>{courseData.subject} &nbsp;</CourseValue>
                                                     </CourseInfo>
                                                     <CourseInfo>
-                                                        <CourseLabel>家教:</CourseLabel>
-                                                        <CourseValue>{courseData.teachername}</CourseValue>
+                                                        <CourseLabel>老師:</CourseLabel>
+                                                        <CourseValue>{courseData.teachername} &nbsp;</CourseValue>
                                                     </CourseInfo>
                                                     <CourseInfo>
-                                                        <CourseLabel>剩餘堂數:</CourseLabel>
+                                                        <CourseLabel> 剩餘堂數:</CourseLabel>
                                                         <CourseValue>{courseData.quantity}</CourseValue>
                                                     </CourseInfo>
-                                                    <CourseInfo>
+                                                    {/* <CourseInfo>
                                                         <CourseLabel>價格:</CourseLabel>
                                                         <CourseValue>{courseData.price}</CourseValue>
-                                                    </CourseInfo>
+                                                    </CourseInfo> */}
                                                 </CourseCard>
                                             </DirectLink>
                                         ))}
                                     </CourseCardContainer>
                                 ) : (
                                     <NoBookedCourse>
-                                        無已購買課程，快去<TeacherLink href={'/teacher/Teachers'}>尋找老師</TeacherLink>
-                                        吧！
+                                        <TeacherLink href={'/teacher/Teachers'}>尋找老師</TeacherLink>
                                     </NoBookedCourse>
                                 )}
                             </PurchasedContainer>
@@ -805,7 +826,7 @@ const UserProfile = () => {
                     )}
                 </ProfilRightContainer>
             </ProfileWrapper>
-            <Footer />
+            {/* <Footer /> */}
         </MainWrapper>
     );
 };

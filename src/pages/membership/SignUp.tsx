@@ -5,8 +5,6 @@ import 'firebase/compat/auth';
 import 'firebase/compat/storage';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import Header from '@/components/Header/Header';
-import Footer from '@/components/Footer/Footer';
 import styled from 'styled-components';
 import Image from 'next/image';
 import SignUpImg from './signup.png';
@@ -16,6 +14,7 @@ import Select, { OptionProps, ControlProps, StylesConfig } from 'react-select';
 import ReactSelect from 'react-select';
 import { CSSObject } from '@emotion/react';
 import { useAuth } from '../../../public/AuthContext';
+import defaultAvatar from './defaultAvatar.png';
 
 const firebaseConfig = {
     apiKey: 'AIzaSyDrG9uBznJyP7Fe_4JRwVG7pvR7SjScQsg',
@@ -46,15 +45,13 @@ type SubjectButtonProps = {
 const PageContainer = styled.div`
     display: flex;
     flex-direction: column;
-    /* justify-content: space-between; */
-    min-height: 100vh;
+    margin: 65px 0;
 `;
 
 const SignupContainer = styled.div`
     width: 100%;
-    height: 100%;
     display: flex;
-    height: calc(100vh - 130px);
+    min-height: 100vh;
 `;
 
 const WelcomeContainer = styled.div`
@@ -63,10 +60,7 @@ const WelcomeContainer = styled.div`
     flex-direction: column;
     align-items: center;
     width: 40%;
-    height: 100%;
-    /* border: 1px solid black; */
     background: antiquewhite;
-    height: calc(100vh - 130px);
 `;
 
 const WelcomeTextContainer = styled.div`
@@ -110,7 +104,6 @@ const SignupInputContainer = styled.div`
 const SignupFormContainer = styled.div`
     display: flex;
     flex-direction: column;
-    /* border: 1px solid red; */
     width: 650px;
 `;
 
@@ -140,13 +133,11 @@ const UserInfoForm = styled.form`
 
 const UserInfoInput = styled.input`
     padding: 8px;
-    /* width: 298px; */
     height: 28px;
     font-size: 16px;
     border: 1px solid #ccc;
     border-radius: 4px;
     margin-top: 8px;
-    /* letter-spacing: 1px;  */
 `;
 
 const UserInfoContainer = styled.div`
@@ -162,7 +153,6 @@ const UserInfoLabel = styled.label`
     flex-direction: column;
     font-size: 16px;
     letter-spacing: 1px;
-    /* width: 100%; */
 `;
 
 const UserInfoSelect = styled.select`
@@ -178,12 +168,6 @@ const UserInfoSelect = styled.select`
     margin-top: 8px;
 `;
 
-const TextArea = styled.textarea`
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-`;
-
 const SubmitButton = styled(Button)`
     border-radius: 9px;
     letter-spacing: 2px;
@@ -193,10 +177,6 @@ const SubmitButton = styled(Button)`
         background-color: ${(props) =>
             props.children === '下一步' || props.children === '最後一步' ? '#333' : '#f9b352'};
     }
-`;
-
-const AvatarLabel = styled(UserInfoLabel)`
-    position: relative;
 `;
 
 const AvatarContainer = styled.div`
@@ -241,7 +221,6 @@ const DirectLink = styled(Link)`
     color: gray;
     width: fit-content;
     display: inline-block;
-    /* text-align: center; */
     margin-top: 10px;
     &:hover {
         color: #333333;
@@ -257,7 +236,6 @@ const ButtonContainer = styled.div`
     width: 100%;
     flex-direction: column;
     align-items: center;
-    /* margin-top: 20px; */
 `;
 
 const TeacherInfoLabel = styled.label`
@@ -347,17 +325,10 @@ const PriceInput = styled.input`
         font-size: 0.75rem;
         transform: translateY(-1rem);
     }
-
-    /* -webkit-appearance: none;
-    -moz-appearance: textfield; */
     &::-webkit-inner-spin-button {
         -webkit-appearance: none;
         margin: 0;
     }
-`;
-
-const TimeContainer = styled.div`
-    display: flex;
 `;
 
 const TimeButtonContainer = styled.div`
@@ -366,11 +337,6 @@ const TimeButtonContainer = styled.div`
     gap: 10px;
     justify-content: center;
     margin-top: 5px;
-`;
-
-const TimeSelectedTitle = styled.p`
-    font-size: 18px;
-    margin: 0 0 20px;
 `;
 
 const TimeDayContainer = styled.div`
@@ -430,6 +396,7 @@ const userTypeOptions = [
 
 const RegistrationForm = () => {
     const { isLoading } = useAuth();
+    const defaultAvatarUrl = defaultAvatar.src;
     const availableSubjects = ['國文', '英文', '數學', '物理', '化學'];
     const avatarInputRef = useRef<HTMLInputElement>(null);
     const [name, setName] = useState('');
@@ -442,11 +409,8 @@ const RegistrationForm = () => {
     const [description, setDescription] = useState('');
     const [subject, setSubject] = useState('');
     const [price, setPrice] = useState<{ [key: number]: number | undefined }>({});
-    // const [document, setDocument] = useState('');
-
     const [subjects, setSubjects] = useState(['']);
     const [documentFile, setDocumentFile] = useState<File | null>(null);
-    // const [certification, setCertification] = useState(false);
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [avatarPreview, setAvatarPreview] = useState('');
     const [intro, setIntro] = useState('');
@@ -459,7 +423,6 @@ const RegistrationForm = () => {
         // Saturday: new Set(),
         // Sunday: new Set(),
     });
-
     const [evaluation, setEvaluation] = useState([]);
     const [showTeacherDetails, setShowTeacherDetails] = useState(false);
     const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
@@ -479,11 +442,6 @@ const RegistrationForm = () => {
 
         return dayMap[day] || day;
     };
-
-    const addSubject = () => {
-        setSubjects([...subjects, '']);
-    };
-
     const selectedTimesArray = Object.entries(selectedTimes).map(([day, hours]) => {
         return { day, hours: Array.from(hours) };
     });
@@ -500,12 +458,6 @@ const RegistrationForm = () => {
             setAvatarPreview(URL.createObjectURL(e.target.files[0]));
         } else {
             setAvatarPreview('');
-        }
-    };
-
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files.length > 0) {
-            setDocumentFile(e.target.files[0]);
         }
     };
 
@@ -549,6 +501,8 @@ const RegistrationForm = () => {
             const avatarRef = storageRef.child(`avatars/${avatarFile.name}`);
             const snapshot = await avatarRef.put(avatarFile);
             avatarUrl = await snapshot.ref.getDownloadURL();
+        } else {
+            avatarUrl = defaultAvatarUrl;
         }
 
         const priceArray = Object.entries(price).map(([key, value]) => {
@@ -571,7 +525,6 @@ const RegistrationForm = () => {
                                 description,
                                 subject: selectedSubjects,
                                 price: priceArray,
-                                // evaluation,
                                 evaluation: [randomRating],
                                 intro,
                                 selectedTimes: selectedTimesArray,
@@ -588,7 +541,6 @@ const RegistrationForm = () => {
                             setDescription('');
                             setSubject('');
                             setPrice({});
-                            // setDocument('');
                             setSubjects(['']);
                             setAvatarFile(null);
                         })
@@ -629,14 +581,6 @@ const RegistrationForm = () => {
         setSelectedTimes(newSelectedTimes);
     };
 
-    // const handleSubjectSelection = (subject: string) => {
-    //     if (selectedSubjects.includes(subject)) {
-    //         setSelectedSubjects(selectedSubjects.filter((s) => s !== subject));
-    //     } else {
-    //         setSelectedSubjects([...selectedSubjects, subject]);
-    //     }
-    // };
-
     const handleSubjectSelection = (subject: string) => {
         if (selectedSubjects.includes(subject)) {
             setSelectedSubjects([]);
@@ -651,8 +595,7 @@ const RegistrationForm = () => {
     }
 
     return (
-        <PageContainer>
-            <Header />
+        <>
             <SignupContainer>
                 <WelcomeContainer>
                     <WelcomeTextContainer>
@@ -676,7 +619,7 @@ const RegistrationForm = () => {
                                 <>
                                     <AvatarContainer>
                                         <AvatarInput
-                                            required
+                                            // required
                                             ref={avatarInputRef}
                                             type='file'
                                             accept='image/*'
@@ -831,7 +774,6 @@ const RegistrationForm = () => {
                             )}
                             {userType === 'teacher' && showTeacherDetails && finalStep && (
                                 <div>
-                                    {/* <TimeSelectedTitle>選擇可以上課的時間 ⏰</TimeSelectedTitle> */}
                                     {Object.keys(selectedTimes).map((day) => (
                                         <TimeDayContainer key={day}>
                                             <WeekDay>{convertDayToChinese(day)}</WeekDay>
@@ -864,7 +806,6 @@ const RegistrationForm = () => {
                                         ? '提交'
                                         : '提交'}
                                 </SubmitButton>
-
                                 {message && <p>{message}</p>}
                                 {!showTeacherDetails && <DirectLink href='SignIn'>已經有帳號，前往登入</DirectLink>}
                             </ButtonContainer>
@@ -872,9 +813,7 @@ const RegistrationForm = () => {
                     </SignupFormContainer>
                 </SignupInputContainer>
             </SignupContainer>
-
-            <Footer />
-        </PageContainer>
+        </>
     );
 };
 

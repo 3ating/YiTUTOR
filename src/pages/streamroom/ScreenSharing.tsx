@@ -152,7 +152,7 @@ const ScreenSharing: React.FC<ScreenSharingProps> = ({
 
     //         const newVideoTrack = stream.getVideoTracks()[0];
     //         const newVideoTrackId = newVideoTrack.id;
-    //         sendSignalData({ screenSharingTrackId: newVideoTrackId });
+    //         // sendSignalData({ screenSharingTrackId: newVideoTrackId });
 
     //         if (peerConnection) {
     //             const sender = peerConnection.addTrack(newVideoTrack, stream);
@@ -265,11 +265,11 @@ const ScreenSharing: React.FC<ScreenSharingProps> = ({
         }
 
         const handleScreenSharing = async (trackId: string) => {
-            console.log('108 trackID:', trackId);
-            console.log('109 getReceivers:', peerConnection.getReceivers());
+            // console.log('108 trackID:', trackId);
+            // console.log('109 getReceivers:', peerConnection.getReceivers());
 
             const track = peerConnection.getReceivers().find((receiver) => receiver.track?.id === trackId)?.track;
-            console.log('track:', track);
+            // console.log('track:', track);
 
             if (track) {
                 const newRemoteStream = new MediaStream([track]);
@@ -298,7 +298,7 @@ const ScreenSharing: React.FC<ScreenSharingProps> = ({
         };
     }, [roomId, peerConnection]);
 
-    console.log('remoteScreenRef', remoteScreenRef);
+    // console.log('remoteScreenRef', remoteScreenRef);
 
     return (
         <>

@@ -6,7 +6,6 @@ import mainImg from './mainImg.png';
 import online from './onlne.png';
 import ai from './ai.png';
 import board from './board.png';
-// import teacherImg from './teacherimg.png';
 import AIChat from '../AIChatBtn';
 import Link from 'next/link';
 import firebase from 'firebase/compat/app';
@@ -28,6 +27,10 @@ const {
     calculateAverage,
     renderStars,
 } = TeacherCardComponents;
+
+const MainWrapper = styled.div`
+    margin: 65px 0;
+`;
 
 const TeacherCardWrapper = styled.div`
     width: 100%;
@@ -199,6 +202,7 @@ const ScrollButtonContainer = styled.div`
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    position: relative;
 `;
 
 const ScrollButton = styled.button`
@@ -217,10 +221,20 @@ const ScrollButton = styled.button`
     transition: background-color 0.3s ease;
     padding: 0 12px;
     margin: 0 8px 100px;
-
+    position: absolute;
     &:hover {
         background-color: #000;
     }
+`;
+
+const ScrollButtonLeft = styled(ScrollButton)`
+    left: 15px;
+    z-index: 1;
+`;
+
+const ScrollButtonRight = styled(ScrollButton)`
+    right: 15px;
+    z-index: 1;
 `;
 
 interface Teacher {
@@ -260,7 +274,7 @@ export default function Main() {
     const scrollTo = (direction: string) => {
         if (containerRef.current) {
             const container = containerRef.current;
-            const cardWidth = 350;
+            const cardWidth = 400;
             const padding = 10;
             const totalCardWidth = cardWidth + 2 * padding;
 
@@ -307,7 +321,7 @@ export default function Main() {
     console.log('teachers', teachers.length);
 
     return (
-        <>
+        <MainWrapper>
             <BannerContainer>
                 <BannerTextContainer>
                     <BannerText>
@@ -368,7 +382,7 @@ export default function Main() {
                 </MainDescriptionContainer>
 
                 <ScrollButtonContainer>
-                    <ScrollButton onClick={handleScrollLeft}>&lt;</ScrollButton>
+                    <ScrollButtonLeft onClick={handleScrollLeft}>&lt;</ScrollButtonLeft>
                     <TeachersContainer ref={containerRef}>
                         {teachers &&
                             teachers.map((teacher, index) => (
@@ -405,12 +419,12 @@ export default function Main() {
                                     </TeacherCard>
                                 </TeacherCardWrapper>
                             ))}
-                        {/* <Mask /> */}
                     </TeachersContainer>
-                    <ScrollButton onClick={handleScrollRight}>&gt;</ScrollButton>
+                    <Mask />
+                    <ScrollButtonRight onClick={handleScrollRight}>&gt;</ScrollButtonRight>
                 </ScrollButtonContainer>
             </TeachersInfoContainer>
             <AIChat />
-        </>
+        </MainWrapper>
     );
 }

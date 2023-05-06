@@ -39,6 +39,7 @@ const PageContainer = styled.div`
     flex-direction: column;
     min-height: 100vh;
     background-color: antiquewhite;
+    margin: 65px 0;
 `;
 
 const TeachersPageContainer = styled.div`
@@ -50,16 +51,17 @@ const TeachersPageContainer = styled.div`
 
 const TeacherContainer = styled.div`
     display: grid;
-    /* grid-gap: 6px; */
     grid-template-columns: repeat(4, 345px);
-    grid-template-areas:
-        'search search search search'
-        'subject subject subject subject'
-        'teacher teacher teacher teacher';
-    /* padding: 60px 0 80px; */
-    flex: 1;
     justify-content: center;
     margin-top: 30px;
+
+    @media (max-width: 1380px) and (min-width: 901px) {
+        grid-template-columns: repeat(3, 345px);
+    }
+
+    @media (max-width: 1000px) {
+        grid-template-columns: repeat(2, 345px);
+    }
 `;
 
 const TeacherCardWrapper = styled.div`
@@ -94,6 +96,9 @@ const SearchInput = styled.input`
     max-width: 300px;
     margin-right: 10px;
     letter-spacing: 1px;
+    @media (max-width: 1000px) {
+        width: unset;
+    }
 `;
 
 const SubjectSelect = styled.select`
@@ -304,7 +309,7 @@ const Teachers = () => {
 
     return (
         <PageContainer>
-            <Header />
+            {/* <Header /> */}
             <TeachersPageContainer>
                 <SearchForm
                     onSubmit={(e) => {
@@ -386,7 +391,7 @@ const Teachers = () => {
                 </TeacherContainer>
             </TeachersPageContainer>
 
-            <Footer />
+            {/* <Footer /> */}
         </PageContainer>
     );
 };

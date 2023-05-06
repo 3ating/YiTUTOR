@@ -95,7 +95,7 @@ const MessageBubble = styled.div`
     background-color: ${({ ownMessage }: { ownMessage: boolean }) => (ownMessage ? 'white' : '#e9e8e8')};
     color: ${({ ownMessage }: { ownMessage: boolean }) => (ownMessage ? '#333' : '#333')};
     border-radius: 8px;
-    max-width: 70%;
+    /* max-width: 70%; */
     display: inline-block;
     word-wrap: break-word;
 `;
