@@ -137,28 +137,6 @@ const ControlButton = styled.button<ButtonProps>`
     }
 `;
 
-const ShareScreenButton = styled.button<ButtonProps>`
-    background-color: ${({ active }) => (active ? '#ffd335' : 'gray')};
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    display: inline-block;
-    font-size: 14px;
-    margin: 4px 2px;
-    padding: 10px 13px 8px 13px;
-    text-align: center;
-    text-decoration: none;
-    &:hover {
-        background-color: ${({ active }) => (active ? '#ffab34' : 'darkgray')};
-    }
-    &:disabled {
-        background-color: lightgray;
-        color: gray;
-        cursor: not-allowed;
-    }
-`;
-
 const VideoScreenButton = styled.button<ButtonProps>`
     background-color: ${({ active }) => (active ? 'gray' : '#ffd335')};
     color: white;
@@ -226,53 +204,6 @@ const ChatButton = styled(VideoScreenButton)`
     } */
 `;
 
-const Dialog = styled.div<DialogProps>`
-    display: ${({ open }) => (open ? 'block' : 'none')};
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.4);
-`;
-
-const DialogActions = styled.div`
-    display: flex;
-    justify-content: flex-end;
-    padding: 8px;
-    gap: 8px;
-`;
-
-const DialogContent = styled.div`
-    background-color: white;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-`;
-
-const DialogTitle = styled.h2`
-    margin: 0;
-    padding-bottom: 10px;
-`;
-
-const TextField = styled.input`
-    display: block;
-    width: 100%;
-    padding: 6px 12px;
-    font-size: 14px;
-    line-height: 1.42857143;
-    color: #555;
-    background-color: #fff;
-    background-image: none;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-    margin-bottom: 10px;
-`;
-
 const TimeAvatarContainer = styled.div`
     display: flex;
     justify-content: space-between;
@@ -284,9 +215,6 @@ const RoomTitle = styled.p<TypographyProps>`
     align-items: flex-end;
     font-size: 20px;
     margin: 0;
-    /* position: absolute;
-    top: 6px;
-    left: 20px; */
     z-index: 1;
 `;
 
@@ -379,11 +307,6 @@ const TheOtherAvatar = styled.img<TheOtherAvatarProps>`
     opacity: ${(props) => (props.TheOtherUserJoined ? '1' : '0.5')};
 `;
 
-const ClassSubject = styled.p`
-    font-size: 25px;
-    margin: 0;
-`;
-
 const RemoteScreen = styled.video`
     width: 40%;
     /* height: 500px; */
@@ -436,14 +359,9 @@ const VideoChat: React.FC = () => {
     const [anotheruserAvatar, setAnotherUserAvatar] = useState('');
     // const [classSubject, setClassSubject] = useState(null);
 
-    const [isBackgroundBlurred, setIsBackgroundBlurred] = useState(false);
     const [classUrlId, setClassUrlId] = useState<string | null>(null);
     const [showRatingModal, setShowRatingModal] = useState(false);
     const [teacherRating, setTeacherRating] = useState<number | null>(null);
-
-    const toggleBackgroundBlur = () => {
-        setIsBackgroundBlurred(!isBackgroundBlurred);
-    };
 
     const toggleVideoScreen = () => {
         setShowLocalVideo(!showLocalVideo);
@@ -571,9 +489,25 @@ const VideoChat: React.FC = () => {
             await roomRef.delete();
         }
         setBothUsersJoined(false);
-        // if (userInfo?.userType === 'student') {
-        //     setShowRatingModal(true);
-        // }
+
+        if (classUrlId) {
+            const db = firebase.firestore();
+            const usersRef = db.collection('users');
+            const usersSnapshot = await usersRef.get();
+
+            usersSnapshot.forEach(async (userDoc) => {
+                const userData = userDoc.data();
+                const userBookings = userData.bookings || [];
+
+                const updatedBookings = userBookings.filter((booking: any) => {
+                    return booking.studentId !== classUrlId && booking.teacherId !== classUrlId;
+                });
+
+                if (userBookings.length !== updatedBookings.length) {
+                    await userDoc.ref.update({ bookings: updatedBookings });
+                }
+            });
+        }
     };
 
     const createRoom = async () => {
@@ -744,10 +678,6 @@ const VideoChat: React.FC = () => {
         } else {
             alert('Room not found');
         }
-    };
-
-    const handleRoomIdInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setRoomIdInput(event.target.value);
     };
 
     useEffect(() => {

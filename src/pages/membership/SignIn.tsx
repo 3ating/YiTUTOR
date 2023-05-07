@@ -121,6 +121,7 @@ const Avatar = styled.img`
     margin-bottom: 10px;
     border: 2px solid gray;
     aspect-ratio: 1/1;
+    object-fit: cover;
 `;
 
 const spin = keyframes`

@@ -58,6 +58,7 @@ const ChatRoomTitle = styled.p`
     border-top-right-radius: 9px;
     font-size: 18px;
     margin-bottom: 14px;
+    letter-spacing: 1px;
 `;
 
 const StyledMainContainer = styled.div`

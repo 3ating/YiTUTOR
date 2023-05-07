@@ -322,6 +322,9 @@ const BookingAvatar = styled.img`
     margin-right: 1rem;
     aspect-ratio: 1/1;
     object-fit: cover;
+    @media screen and (max-width: 850px) {
+        width: 60px;
+    }
 `;
 
 const BookingInfo = styled.div`
@@ -340,13 +343,16 @@ const BookingInfoTitle = styled.h3`
     font-weight: 500;
     margin: 0;
     letter-spacing: 0.1em;
+    @media screen and (max-width: 850px) {
+        font-size: 18px;
+    }
 `;
 
 const BookingSubject = styled.p`
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 45px;
+    width: fit-content;
     height: 20px;
     background: #fee690;
     border-radius: 9px;
@@ -356,6 +362,9 @@ const BookingSubject = styled.p`
     text-align: center;
     letter-spacing: 0.09em;
     margin: 0;
+    @media screen and (max-width: 850px) {
+        font-size: 10px;
+    }
 `;
 
 const BookingInfoTime = styled.p`
@@ -389,7 +398,9 @@ const ProfileMiddleContainer = styled.div<BookedCoursesContainerProps>`
     padding: 65px 0 0 0;
     box-sizing: border-box;
     @media (max-width: 815px) {
-        width: 60%;
+        width: ${(props) => (props.isBookedCourseEmpty ? '60%' : '30%')};
+
+        /* width: 60%; */
     }
 `;
 
@@ -433,9 +444,11 @@ const ProfilRightContainer = styled.div<ProfilRightContainerProps>`
     flex-direction: column;
     align-items: center;
     width: ${(props) => (props.isTeacher ? '0' : '35%')};
-    /* height: 100%; */
     padding: 65px 0 0 0;
     box-sizing: border-box;
+    @media (max-width: 815px) {
+        width: ${(props) => (props.isTeacher ? '0' : '30%')};
+    }
 `;
 
 const PurchasedContainer = styled.div`
@@ -444,7 +457,6 @@ const PurchasedContainer = styled.div`
     justify-content: center;
     grid-gap: 1rem;
     width: 90%;
-    height: 100%;
     padding: 30px 0;
     box-sizing: border-box;
     overflow: auto;
@@ -461,9 +473,6 @@ const ModifiedInput = styled.input`
     outline: none;
     transition: border-color 0.2s ease-in-out;
     width: 100%;
-    /* &:focus {
-        border-color: #ffab34;
-    } */
     &::-webkit-inner-spin-button {
         -webkit-appearance: none;
         margin: 0;
@@ -472,7 +481,6 @@ const ModifiedInput = styled.input`
 
 const ProfileLeftContainer = styled.div`
     display: flex;
-    /* border: 1px solid red; */
     width: 30%;
     background: white;
 
@@ -560,24 +568,12 @@ const UserProfile = () => {
     const [isEditingPhone, setIsEditingPhone] = useState(false);
     const [bookingsInfo, setBookingsInfo] = useState<BookingWithTeacherInfo[]>([]);
 
-    // const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    //     const { name, value } = event.target;
-    //     if (editedUserInfo) {
-    //         setEditedUserInfo({ ...editedUserInfo, [name]: value });
-    //     }
-    // };
-
     const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, fieldName: string) => {
         const { value } = event.target;
         if (editedUserInfo) {
             setEditedUserInfo({ ...editedUserInfo, [fieldName]: value });
         }
     };
-
-    // const handleEdit = () => {
-    //     setIsEditing(true);
-    //     setEditedUserInfo(userInfo);
-    // };
 
     const handleEdit = (fieldName: string) => {
         if (fieldName === 'email') {

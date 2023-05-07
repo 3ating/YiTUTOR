@@ -668,6 +668,7 @@ const RegistrationForm = () => {
                                                 value={email}
                                                 onChange={(e) => setEmail(e.target.value)}
                                             />
+                                            <InputHint>同時為您的帳號</InputHint>
                                         </UserInfoLabel>
                                         <UserInfoLabel>
                                             密碼：
