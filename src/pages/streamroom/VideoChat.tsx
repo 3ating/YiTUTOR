@@ -62,6 +62,7 @@ const MainWrapper = styled.div`
     padding: 50px 0;
     box-sizing: border-box;
     background-color: antiquewhite;
+    justify-content: center;
 `;
 
 const OnlineClassContainer = styled.div`
@@ -376,7 +377,6 @@ const VideoChat: React.FC = () => {
     const [isMicMuted, setIsMicMuted] = useState(false);
     const [isAudioMuted, setIsAudioMuted] = useState(false);
     const [isVideoEnabled, setIsVideoEnabled] = useState(true);
-    const [isRemoteVideoEnabled, setIsRemoteVideoEnabled] = useState(true);
     const [showChatroom, setShowChatroom] = useState(false);
 
     const [timeRemaining, setTimeRemaining] = useState(50 * 60);

@@ -655,7 +655,6 @@ const UserProfile = () => {
 
     return (
         <MainWrapper>
-            {/* <Header /> */}
             <ProfileWrapper>
                 <ProfileLeftContainer>
                     <UserInfoBox>
@@ -822,7 +821,6 @@ const UserProfile = () => {
                     )}
                 </ProfilRightContainer>
             </ProfileWrapper>
-            {/* <Footer /> */}
         </MainWrapper>
     );
 };
