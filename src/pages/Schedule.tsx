@@ -38,7 +38,7 @@ const TimeSlot = styled.div<{ selected: boolean; active: boolean }>`
     border-radius: 4px;
     background-color: ${(props) => (props.active ? '#ffab34' : props.selected ? 'white' : '#f0f0f0')};
     color: ${(props) => (props.active ? '#fff' : props.selected ? '#333' : '#666')};
-
+    font-size: 20px;
     display: flex;
     justify-content: center;
     align-items: center;

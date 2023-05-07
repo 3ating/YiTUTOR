@@ -80,6 +80,30 @@ const ClassContainer = styled.div`
     gap: 10px;
 `;
 
+const VideoWrapper = styled.div`
+    position: absolute;
+    bottom: 3.2%;
+    right: 1.2%;
+    width: 247px;
+    height: 185px;
+`;
+
+const UsernameLabel = styled.div`
+    position: absolute;
+    left: 5px;
+    bottom: 5px;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: all 0.3s ease-in-out;
+
+    &.visible {
+        opacity: 1;
+    }
+`;
+
 const VideoContainer = styled.div`
     width: 100%;
     position: relative;
@@ -240,11 +264,11 @@ const DirectLink = styled(Link)`
 `;
 
 const VideoScreen = styled.video`
-    position: absolute;
+    /* position: absolute;
     bottom: 3.5%;
-    right: 2%;
-    /* width: 25%; */
-    height: 40%;
+    right: 2%; */
+    width: 100%;
+    height: 100%;
     border-radius: 7px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
     z-index: 1;
@@ -352,11 +376,13 @@ const VideoChat: React.FC = () => {
     const [isMicMuted, setIsMicMuted] = useState(false);
     const [isAudioMuted, setIsAudioMuted] = useState(false);
     const [isVideoEnabled, setIsVideoEnabled] = useState(true);
+    const [isRemoteVideoEnabled, setIsRemoteVideoEnabled] = useState(true);
     const [showChatroom, setShowChatroom] = useState(false);
 
     const [timeRemaining, setTimeRemaining] = useState(50 * 60);
     const [bothUsersJoined, setBothUsersJoined] = useState(false);
     const [anotheruserAvatar, setAnotherUserAvatar] = useState('');
+    const [anotherUserName, setAnotherUserName] = useState('');
     // const [classSubject, setClassSubject] = useState(null);
 
     const [classUrlId, setClassUrlId] = useState<string | null>(null);
@@ -409,6 +435,20 @@ const VideoChat: React.FC = () => {
         }
     };
 
+    const getUserName = async (userId: string | null | undefined) => {
+        if (!userId) return '';
+
+        const db = firebase.firestore();
+        const userRef = db.collection('users').doc(userId);
+        const userSnapshot = await userRef.get();
+
+        if (userSnapshot.exists) {
+            return userSnapshot.data()?.name || '';
+        } else {
+            return '';
+        }
+    };
+
     // const getSubject = async (userId: string | undefined, userType: string | undefined) => {
     //     if (userType === 'teacher') {
     //         return userInfo?.subject?.[0];
@@ -431,11 +471,11 @@ const VideoChat: React.FC = () => {
             localVideoRef.current.srcObject = localStream.current;
         }
 
-        // const urlParams = new URLSearchParams(window.location.search);
-        // const userId = urlParams.get('id');
-        // setClassUrlId(userId);
         const userAvatar = await getUserAvatar(classUrlId);
         setAnotherUserAvatar(userAvatar);
+
+        const userName = await getUserName(classUrlId);
+        setAnotherUserName(userName);
         // const subject = await getSubject(userId ?? undefined, userInfo?.userType);
         // setClassSubject(subject);
 
@@ -444,15 +484,14 @@ const VideoChat: React.FC = () => {
         if (existingRoomId) {
             setRoomIdInput(existingRoomId);
             await joinRoomById(existingRoomId);
-            // console.log('有人開房間：', existingRoomId);
             message.success(`Hello！您已成功進入線上教室`);
         } else {
             await createRoom();
             message.success(`Hello！您已成功進入線上教室`);
-            // console.log('沒人開房間');
         }
         setCameraEnabled(true);
     };
+    console.log('anotherUserName', anotherUserName);
 
     const hangUp = async () => {
         if (localStream.current) {
@@ -820,21 +859,29 @@ const VideoChat: React.FC = () => {
                         <VideoContainer>
                             <div style={{ position: 'relative' }}>
                                 <Canvas roomId={roomId} />
-                                <VideoScreen
-                                    ref={localVideoRef}
-                                    autoPlay
-                                    muted
-                                    playsInline
-                                    className={showLocalVideo ? 'visible' : ''}
-                                ></VideoScreen>
-                                <VideoScreen
-                                    ref={remoteVideoRef}
-                                    autoPlay
-                                    muted
-                                    playsInline
-                                    className={!showLocalVideo ? 'visible' : ''}
-                                    style={{ backgroundColor: 'white' }}
-                                ></VideoScreen>
+                                <VideoWrapper>
+                                    <VideoScreen
+                                        ref={localVideoRef}
+                                        autoPlay
+                                        muted
+                                        playsInline
+                                        className={showLocalVideo ? 'visible' : ''}
+                                    ></VideoScreen>
+                                    <UsernameLabel className={showLocalVideo ? 'visible' : ''}>你</UsernameLabel>
+                                </VideoWrapper>
+                                <VideoWrapper>
+                                    <VideoScreen
+                                        ref={remoteVideoRef}
+                                        autoPlay
+                                        muted
+                                        playsInline
+                                        className={!showLocalVideo ? 'visible' : ''}
+                                        style={{ backgroundColor: 'white' }}
+                                    ></VideoScreen>
+                                    <UsernameLabel className={!showLocalVideo ? 'visible' : ''}>
+                                        {anotherUserName}
+                                    </UsernameLabel>
+                                </VideoWrapper>
                             </div>
                             <LiveTextContainer bothUsersJoined={bothUsersJoined}>
                                 <LiveText>{classUrlId ? '上課中' : '試用中'}</LiveText>{' '}

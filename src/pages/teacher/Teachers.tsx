@@ -4,8 +4,6 @@ import 'firebase/compat/firestore';
 import styled from 'styled-components';
 import Link from 'next/link';
 import { useAuth } from '../../../public/AuthContext';
-import Header from '@/components/Header/Header';
-import Footer from '@/components/Footer/Footer';
 import TeacherCardComponents from '../../components/TeacherCard';
 import ReactSelect, { StylesConfig, OptionProps, CSSObjectWithLabel, GroupBase } from 'react-select';
 

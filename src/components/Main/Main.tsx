@@ -166,7 +166,7 @@ const TeachersInfoContainer = styled.div`
 const TeachersContainer = styled.div`
     display: flex;
     /* justify-content: center; */
-    gap: 26px;
+    gap: 10px;
     margin-bottom: 143px;
     overflow-x: scroll;
     scroll-behavior: smooth;

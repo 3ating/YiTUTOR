@@ -13,7 +13,7 @@ import {
 import { RxBorderWidth } from 'react-icons/rx';
 import { AiOutlineClear } from 'react-icons/ai';
 import { IoShapesOutline } from 'react-icons/io5';
-import { Tooltip } from 'antd';
+import { Tooltip, message } from 'antd';
 
 interface ChatroomProps {
     roomId: string | null;
@@ -228,9 +228,11 @@ const Canvas = ({ roomId }: ChatroomProps) => {
             if (selectedItem.type === 'line') {
                 const copiedLine = { ...lines[selectedItem.index] };
                 setClipboardItem({ type: 'line', data: copiedLine });
+                message.info('已複製線條');
             } else if (selectedItem.type === 'shape') {
                 const copiedShape = { ...shapes[selectedItem.index] };
                 setClipboardItem({ type: 'shape', data: copiedShape });
+                message.info('已複製圖形');
             }
         }
     };
@@ -240,9 +242,11 @@ const Canvas = ({ roomId }: ChatroomProps) => {
             if (clipboardItem.type === 'line') {
                 const newLines = [...lines, clipboardItem.data];
                 setLines(newLines);
+                message.info('已貼上線條');
             } else if (clipboardItem.type === 'shape') {
                 const newShapes = [...shapes, clipboardItem.data];
                 setShapes(newShapes);
+                message.info('已貼上圖形');
             }
         }
     };
@@ -266,6 +270,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
             }
             setSelectedItem(null);
         }
+        message.info('已刪除');
     };
 
     const changeColor = async (newColor: string) => {
@@ -397,6 +402,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         setIsMoving(true);
         setMoveStartX(x);
         setMoveStartY(y);
+        message.loading({ content: '移動中...', key: 'movingMessage', duration: 0 });
     };
 
     const move: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
@@ -499,6 +505,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         setMoveStartY(0);
         setIsMoving(false);
         setIsScaling(false);
+        message.destroy('movingMessage');
     };
 
     useEffect(() => {
@@ -802,6 +809,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         db.collection('rooms')
             .doc(roomId || '')
             .update({ lines: [], shapes: [] });
+        message.info('已清空白板');
     };
 
     useEffect(() => {

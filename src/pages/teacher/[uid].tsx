@@ -10,8 +10,6 @@ import ChatIcon from '../chat/ChatIcon';
 import { useAuth } from '../../../public/AuthContext';
 import Schedule from '../Schedule';
 import Calendar from '../Calendar';
-import Header from '@/components/Header/Header';
-import Footer from '@/components/Footer/Footer';
 import { AiFillStar, AiOutlineMail, AiOutlinePhone, AiOutlineStar } from 'react-icons/ai';
 import { BsStarHalf } from 'react-icons/bs';
 import Button from '@/components/Button';
@@ -40,6 +38,7 @@ const MainWrapper = styled.div`
     display: flex;
     flex-direction: column;
     background-color: antiquewhite;
+    margin: 65px 0;
 `;
 
 const TeacherContainer = styled.div`
@@ -255,7 +254,7 @@ const PriceButton = styled.button`
     cursor: pointer;
     font-size: 18px;
     font-weight: 500;
-    /* padding: 20px; */
+    font-size: 20px;
     margin: 0.5rem 0;
     border: 2px solid gray;
     transition: all 0.2s;
@@ -597,7 +596,6 @@ const TeacherDetails = () => {
 
     return (
         <MainWrapper>
-            <Header />
             <TeacherContainer>
                 <TeacherLeftContainer>
                     <TeacherIntroContainer>
@@ -715,7 +713,6 @@ const TeacherDetails = () => {
                     </CourseContainer>
                 </TeacherRightContainer>
             </TeacherContainer>
-            <Footer />
         </MainWrapper>
     );
 };
