@@ -263,6 +263,7 @@ const AIChatRoom = () => {
                         message: '請確認問題是否與學習有關',
                         description: '重新整理後再發問一次',
                         placement: 'topRight',
+                        duration: 0,
                     });
                     throw new Error('Status 504');
                 }

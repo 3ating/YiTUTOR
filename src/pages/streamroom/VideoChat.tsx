@@ -66,7 +66,6 @@ const MainWrapper = styled.div`
 `;
 
 const OnlineClassContainer = styled.div`
-    /* position: relative; */
     padding: 0 30px;
     height: calc(100vh - 130px);
     display: flex;
@@ -108,7 +107,6 @@ const UsernameLabel = styled.div`
 const VideoContainer = styled.div`
     width: 100%;
     position: relative;
-    /* display: flex; */
 `;
 
 const ButtonsContainer = styled.div`
@@ -207,27 +205,7 @@ const HangUpButton = styled.button<ButtonProps>`
     }
 `;
 
-const ChatButton = styled(VideoScreenButton)`
-    /* background-color: ${({ active }) => (active ? 'gray' : 'red')};
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    display: inline-block;
-    font-size: 14px;
-    margin: 4px 2px;
-    padding: 8px 16px 6px 16px;
-    text-align: center;
-    text-decoration: none;
-    &:hover {
-        background-color: ${({ active }) => (active ? 'darkgray' : 'darkred')};
-    }
-    &:disabled {
-        background-color: lightgray;
-        color: gray;
-        cursor: not-allowed;
-    } */
-`;
+const ChatButton = styled(VideoScreenButton)``;
 
 const TimeAvatarContainer = styled.div`
     display: flex;
@@ -265,9 +243,6 @@ const DirectLink = styled(Link)`
 `;
 
 const VideoScreen = styled.video`
-    /* position: absolute;
-    bottom: 3.5%;
-    right: 2%; */
     width: 100%;
     height: 100%;
     border-radius: 7px;
@@ -277,7 +252,6 @@ const VideoScreen = styled.video`
     opacity: 0;
     transform: scale(0.9);
     transition: all 0.3s ease-in-out;
-
     &.visible {
         opacity: 1;
         transform: scale(1);
