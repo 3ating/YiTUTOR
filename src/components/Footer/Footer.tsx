@@ -14,10 +14,6 @@ const FooterWrapper = styled.footer`
     position: absolute;
     bottom: 0;
     width: 100%;
-    /* position: absolute;
-    bottom: 0;
-    width: 100%;
-    box-sizing: border-box; */
 `;
 
 const Logo = styled.h1`
@@ -59,13 +55,13 @@ const Footer: React.FC = () => {
             {/* <Logo>YiTUTOR</Logo> */}
             <FooterText>© 2023 YiTUTOR All rights reserved.</FooterText>
             <SocialLinks>
-                <SocialLink href='https://www.facebook.com/'>
+                <SocialLink href='https://www.facebook.com/kevin.lin.50115/'>
                     <FaFacebookSquare />
                 </SocialLink>
-                <SocialLink href='https://github.com/'>
+                <SocialLink href='https://github.com/3ating?tab=repositories'>
                     <FaGithub />
                 </SocialLink>
-                <SocialLink href='https://www.linkedin.com/'>
+                <SocialLink href='https://www.linkedin.com/in/yiting-lin-082265233/'>
                     <FaLinkedin />
                 </SocialLink>
             </SocialLinks>

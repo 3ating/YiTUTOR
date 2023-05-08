@@ -3,10 +3,6 @@ import { useEffect, useState } from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import styled from 'styled-components';
-import Link from 'next/link';
-import Image from 'next/image';
-import ChatRoom from '../chat/ChatRoom';
-import ChatIcon from '../chat/ChatIcon';
 import { useAuth } from '../../../public/AuthContext';
 import Schedule from '../Schedule';
 import Calendar from '../Calendar';
@@ -16,6 +12,8 @@ import Button from '@/components/Button';
 import Loader from '@/components/Loader';
 import { Modal, notification } from 'antd';
 import ReservationNotice from './ReservationNotice';
+import AIChat from '../../components/AIChatBtn';
+
 interface Teacher {
     selectedTimes: { day: string; hours: number[] }[];
     uid: string;
@@ -713,6 +711,7 @@ const TeacherDetails = () => {
                     </CourseContainer>
                 </TeacherRightContainer>
             </TeacherContainer>
+            <AIChat />
         </MainWrapper>
     );
 };

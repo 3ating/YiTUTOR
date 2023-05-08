@@ -17,16 +17,19 @@ const DayRow = styled.div`
     width: 100%;
     max-width: 500px;
     flex-wrap: wrap;
-    margin-bottom: 1rem;
+    gap: 5px;
+    margin-left: 5px;
 `;
 
 const TimeContainer = styled.div`
     display: flex;
     margin-top: 20px;
+    align-items: center;
 `;
 
 const DayLabel = styled.div`
     width: 40px;
+    font-size: 18px;
     /* text-align: center; */
     font-weight: bold;
 `;
@@ -44,7 +47,7 @@ const TimeSlot = styled.div<{ selected: boolean; active: boolean }>`
     align-items: center;
     cursor: ${(props) => (props.selected ? 'pointer' : 'not-allowed')};
     transition: all 0.2s ease-in-out;
-    margin: 0 10px 8px 0;
+    margin: 0;
 
     ${(props) =>
         props.selected &&

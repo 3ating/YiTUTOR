@@ -8,7 +8,7 @@ import { useAuth } from '../../public/AuthContext';
 import Link from 'next/link';
 import { BsFillSendFill } from 'react-icons/bs';
 import { AiFillDelete } from 'react-icons/ai';
-import { Spin } from 'antd';
+import { Spin, notification } from 'antd';
 
 const firebaseConfig = {
     apiKey: process.env.FIRESTORE_API_KEY,
@@ -125,6 +125,7 @@ const MessageInput = styled.input`
     padding: 16px;
     border: none;
     outline: none;
+    border-radius: 9px;
     &::placeholder {
         letter-spacing: 1.5px;
         color: #ccc;
@@ -256,15 +257,15 @@ const AIChatRoom = () => {
             },
             body: JSON.stringify(apiRequestBody),
         })
-            //  await fetch('/api/gpt/AISols', {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //         'Authorization': `Bearer ${OPENAI_API_KEY}`,
-            //     },
-            //     body: JSON.stringify(apiRequestBody),
-            // })
             .then((data) => {
+                if (data.status === 504) {
+                    notification.warning({
+                        message: '請確認問題是否與學習有關',
+                        description: '重新整理後再發問一次',
+                        placement: 'topRight',
+                    });
+                    throw new Error('Status 504');
+                }
                 console.log('API response:', data);
                 return data.json();
             })

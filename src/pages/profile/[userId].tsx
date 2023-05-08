@@ -12,6 +12,7 @@ import Schedule from '../Schedule';
 import Button from '@/components/Button';
 import { AiFillEdit } from 'react-icons/ai';
 import Loader from '@/components/Loader';
+import AIChat from '../../components/AIChatBtn';
 
 type BookedCoursesContainerProps = {
     isBookedCourseEmpty: boolean;
@@ -821,6 +822,7 @@ const UserProfile = () => {
                     )}
                 </ProfilRightContainer>
             </ProfileWrapper>
+            <AIChat />
         </MainWrapper>
     );
 };

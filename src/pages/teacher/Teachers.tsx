@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useAuth } from '../../../public/AuthContext';
 import TeacherCardComponents from '../../components/TeacherCard';
 import ReactSelect, { StylesConfig, OptionProps, CSSObjectWithLabel, GroupBase } from 'react-select';
+import AIChat from '../../components/AIChatBtn';
 
 type OptionType = {
     label: string;
@@ -303,11 +304,8 @@ const Teachers = () => {
         };
     }, []);
 
-    console.log(teachers);
-
     return (
         <PageContainer>
-            {/* <Header /> */}
             <TeachersPageContainer>
                 <SearchForm
                     onSubmit={(e) => {
@@ -388,8 +386,7 @@ const Teachers = () => {
                     ))}
                 </TeacherContainer>
             </TeachersPageContainer>
-
-            {/* <Footer /> */}
+            <AIChat />
         </PageContainer>
     );
 };
