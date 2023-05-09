@@ -2,6 +2,8 @@ import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
 import { useAuth } from '../../../public/AuthContext';
+import logo from './yitutor_logo.png';
+import Image from 'next/image';
 
 const HeaderWrapper = styled.header`
     display: flex;
@@ -111,12 +113,17 @@ const AvatarLink = styled(Link)`
     color: #000;
 `;
 
+const LogoImg = styled.img`
+    max-height: 100%;
+    object-fit: contain;
+`;
+
 const Header: React.FC = () => {
     const { userInfo, isLoading } = useAuth();
     return (
         <HeaderWrapper>
             <LogoLink href={'/'}>
-                <Logo>YiTUTOR</Logo>
+                <Image src={logo} alt='YiTUTOR Logo' />
             </LogoLink>
             <NavContainer>
                 <MenuContainer>

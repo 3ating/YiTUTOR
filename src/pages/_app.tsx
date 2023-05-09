@@ -32,6 +32,7 @@ function App({ Component, pageProps }: AppProps) {
             <AuthProvider>
                 <GlobalStyle />
                 <Header />
+                <title>YiTUTOR</title>
                 {/* <StyleSheetManager disableVendorPrefixes> */}
                 {/* <ThemeProvider theme={theme}> */}
                 <Component {...pageProps} />
