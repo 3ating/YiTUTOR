@@ -473,7 +473,7 @@ const SignUp = () => {
                                 </UserInfoContainer>
                             </>
                         )}
-                        {userType === 'teacher' && showTeacherDetails && !finalStep && (
+                        {userType === 'teacher' && showTeacherDetails && !finalStep && availableSubjects && (
                             <TeacherDetailsForm
                                 description={description}
                                 setDescription={setDescription}
@@ -486,7 +486,7 @@ const SignUp = () => {
                                 availableSubjects={availableSubjects}
                             />
                         )}
-                        {userType === 'teacher' && showTeacherDetails && finalStep && (
+                        {userType === 'teacher' && showTeacherDetails && finalStep && selectedTimes && (
                             <TeacherTimeSelection
                                 selectedTimes={selectedTimes}
                                 handleTimeButtonClick={handleTimeButtonClick}
