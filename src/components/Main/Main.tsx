@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import styled from 'styled-components';
 import Image from 'next/image';
 import PrimaryButton from '../Button';
@@ -10,7 +10,6 @@ import AIChat from '../GPT/AIChatBtn';
 import Link from 'next/link';
 import 'firebase/compat/firestore';
 import TeacherCardComponents from '../TeacherCard';
-import { db } from '@/utils/firebase';
 import { useAuth } from '../../context/AuthContext';
 import { useTeachers } from '@/context/TeacherContext';
 
@@ -238,18 +237,9 @@ const ScrollButtonRight = styled(ScrollButton)`
     z-index: 1;
 `;
 
-interface Teacher {
-    uid: string;
-    evaluation: number[];
-    subject: any;
-    name: string;
-    email: string;
-    phone: string;
-    userType: string;
-    description?: string;
-    price?: { qty: number; price: number }[];
-    avatar?: string;
-}
+const PADDING = 10;
+const CARD_WIDTH = 400;
+const TOTALCARD_WIDTH = CARD_WIDTH + 2 * PADDING;
 
 export default function Main() {
     const { isLoading } = useAuth();
@@ -259,20 +249,11 @@ export default function Main() {
     const scrollTo = (direction: string) => {
         if (containerRef.current) {
             const container = containerRef.current;
-            const cardWidth = 400;
-            const padding = 10;
-            const totalCardWidth = cardWidth + 2 * padding;
-
             const currentScroll = container.scrollLeft;
             const maxScroll = container.scrollWidth - container.clientWidth;
-
-            if (direction === 'right') {
-                const nextScroll = currentScroll + totalCardWidth;
-                container.scrollLeft = nextScroll > maxScroll ? maxScroll : nextScroll;
-            } else {
-                const prevScroll = currentScroll - totalCardWidth;
-                container.scrollLeft = prevScroll < 0 ? 0 : prevScroll;
-            }
+            const nextScroll =
+                direction === 'right' ? currentScroll + TOTALCARD_WIDTH : currentScroll - TOTALCARD_WIDTH;
+            container.scrollLeft = Math.min(maxScroll, Math.max(nextScroll, 0));
         }
     };
 

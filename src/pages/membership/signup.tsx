@@ -1,11 +1,9 @@
-import React, { CSSProperties, useContext, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import 'firebase/compat/firestore';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import Image from 'next/image';
 import SignUpImg from './images/signup.png';
-import Button from '../../components/Button';
 import { AiOutlineCamera } from 'react-icons/ai';
 import Select, { OptionProps, ControlProps, StylesConfig } from 'react-select';
 import ReactSelect from 'react-select';
@@ -13,21 +11,14 @@ import { CSSObject } from '@emotion/react';
 import { useAuth } from '../../context/AuthContext';
 import defaultAvatar from './images/defaultAvatar.png';
 import { db, auth, storage } from '@/utils/firebase';
+import TeacherDetailsForm from './TeacherDetailsForm';
+import TeacherTimeSelection from './TeacherTimeSelection';
+import SignUpButton from './SignUpButton';
 
 interface UserTypeOption {
     value: string;
     label: string;
 }
-
-type SubjectButtonProps = {
-    selected: boolean;
-};
-
-const PageContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    margin: 65px 0;
-`;
 
 const SignupContainer = styled.div`
     width: 100%;
@@ -81,7 +72,6 @@ const SignupInputContainer = styled.div`
     align-items: center;
     width: 60%;
     margin: 65px 0;
-    /* border: 1px solid black; */
 `;
 
 const SignupFormContainer = styled.div`
@@ -136,17 +126,6 @@ const UserInfoLabel = styled.label`
     letter-spacing: 1px;
 `;
 
-const SubmitButton = styled(Button)`
-    border-radius: 9px;
-    letter-spacing: 2px;
-    background-color: ${(props) =>
-        props.children === '下一步' || props.children === '最後一步' ? 'black' : '#ffab34'};
-    &:hover {
-        background-color: ${(props) =>
-            props.children === '下一步' || props.children === '最後一步' ? '#333' : '#f9b352'};
-    }
-`;
-
 const AvatarContainer = styled.div`
     display: flex;
     align-items: center;
@@ -182,154 +161,6 @@ const AvatarPreviewImage = styled.img`
     height: 100%;
     object-fit: cover;
     border-radius: 50%;
-`;
-
-const DirectLink = styled(Link)`
-    text-decoration: none;
-    color: gray;
-    width: fit-content;
-    display: inline-block;
-    margin-top: 10px;
-    &:hover {
-        color: #333333;
-    }
-`;
-
-const TeacherSubjectContainer = styled.div`
-    width: 100%;
-`;
-
-const ButtonContainer = styled.div`
-    display: flex;
-    width: 100%;
-    flex-direction: column;
-    align-items: center;
-`;
-
-const TeacherInfoLabel = styled.label`
-    display: flex;
-    flex-direction: column;
-    font-size: 16px;
-    letter-spacing: 1px;
-    width: 100%;
-`;
-
-const TeacherTextArea = styled.textarea`
-    padding: 8px;
-    display: block;
-    padding: 0.5rem;
-    margin-top: 8px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    resize: none;
-`;
-
-const SubjectContainer = styled.div`
-    margin-top: 8px;
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-gap: 0.5rem;
-`;
-
-const SubjectButton = styled.button<SubjectButtonProps>`
-    width: 100%;
-    padding: 0.5rem 1rem;
-    background-color: ${(props) => (props.selected ? '#ffab34' : '#ccc')};
-    color: ${(props) => (props.selected ? 'white' : 'black')};
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    letter-spacing: 2px;
-    &:hover {
-        background-color: #ffab34;
-        color: white;
-    }
-`;
-
-const PriceContainer = styled.div`
-    display: flex;
-    justify-content: space-between;
-    position: relative;
-    margin-bottom: 1.5rem;
-    margin: 20px 0 10px;
-    gap: 50px;
-`;
-
-const PriceItem = styled.div`
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    position: relative;
-`;
-
-const PriceLabel = styled.label`
-    position: absolute;
-    top: 0.45rem;
-    left: 0.5rem;
-    font-size: 14px;
-    transition: all 0.2s;
-    pointer-events: none;
-    color: #ccc;
-`;
-
-const PriceInput = styled.input`
-    /* width: 100%; */
-    max-width: 200px;
-    padding: 10px 8px 5px;
-    font-size: 1rem;
-    border: none;
-    border-bottom: 1px solid #ccc;
-    border-radius: 0;
-    outline: none;
-    background: transparent;
-    &:focus {
-        outline: none;
-        border-bottom-color: #000000;
-    }
-
-    &:focus-within ~ ${PriceLabel}, &:not(:placeholder-shown) ~ ${PriceLabel} {
-        font-size: 0.75rem;
-        transform: translateY(-1rem);
-    }
-    &::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-`;
-
-const TimeButtonContainer = styled.div`
-    display: grid;
-    grid-template-columns: repeat(6, auto);
-    gap: 10px;
-    justify-content: center;
-    margin-top: 5px;
-`;
-
-const TimeDayContainer = styled.div`
-    margin-bottom: 10px;
-`;
-
-const WeekDay = styled.p`
-    font-size: 14px;
-    margin: 0;
-`;
-
-const TimeButton = styled.button<{ selected: boolean }>`
-    background-color: ${(props) => (props.selected ? '#000' : '#ccc')};
-    color: ${(props) => (props.selected ? 'white' : 'black')};
-    padding: 5px 10px;
-    /* margin: 5px; */
-    border-radius: 5px;
-    cursor: pointer;
-    border: none;
-    width: 100px;
-    letter-spacing: 1px;
-    &:hover {
-        background-color: #000;
-        color: white;
-    }
 `;
 
 const InputHint = styled.span`
@@ -371,13 +202,13 @@ const SignUp = () => {
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
-    const [message, setMessage] = useState('');
     const [userType, setUserType] = useState('');
+    const [message, setMessage] = useState('');
     const [courses, setCourses] = useState({});
     const [description, setDescription] = useState('');
-    const [subject, setSubject] = useState('');
+    // const [subject, setSubject] = useState('');
     const [price, setPrice] = useState<{ [key: number]: number | undefined }>({});
-    const [subjects, setSubjects] = useState(['']);
+    // const [subjects, setSubjects] = useState(['']);
     const [documentFile, setDocumentFile] = useState<File | null>(null);
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [avatarPreview, setAvatarPreview] = useState('');
@@ -389,7 +220,6 @@ const SignUp = () => {
         Thursday: new Set(),
         Friday: new Set(),
     });
-    const [evaluation, setEvaluation] = useState([]);
     const [showTeacherDetails, setShowTeacherDetails] = useState(false);
     const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
     const [finalStep, setFinalStep] = useState(false);
@@ -411,12 +241,6 @@ const SignUp = () => {
     const selectedTimesArray = Object.entries(selectedTimes).map(([day, hours]) => {
         return { day, hours: Array.from(hours) };
     });
-
-    const handleSubjectChange = (index: number, value: string) => {
-        const newSubjects = [...subjects];
-        newSubjects[index] = value;
-        setSubjects(newSubjects);
-    };
 
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
@@ -505,9 +329,9 @@ const SignUp = () => {
                             setPassword('');
                             setUserType('');
                             setDescription('');
-                            setSubject('');
+                            // setSubject('');
                             setPrice({});
-                            setSubjects(['']);
+                            // setSubjects(['']);
                             setAvatarFile(null);
                         })
                         .catch((error) => {
@@ -551,226 +375,134 @@ const SignUp = () => {
     }
 
     return (
-        <>
-            <SignupContainer>
-                <WelcomeContainer>
-                    <WelcomeTextContainer>
-                        <WelcomeTitle>
-                            Welcome to <br /> YiTUTOR
-                        </WelcomeTitle>
-                        <WelcomeText>
-                            填寫右邊的註冊資訊，選擇老師或學生
-                            <br />
-                            成為 YiTUTOR 的一員，與我們一同成長吧！
-                        </WelcomeText>
-                    </WelcomeTextContainer>
-                    <SignUpImage src={SignUpImg} alt='Sign Up' />
-                </WelcomeContainer>
-                <SignupInputContainer>
-                    <SignupFormContainer>
-                        <SignupTitle>註冊</SignupTitle>
-                        <SignupTitleLine />
-                        <UserInfoForm onSubmit={handleSubmit}>
-                            {!showTeacherDetails && (
-                                <>
-                                    <AvatarContainer>
-                                        <AvatarInput
-                                            // required
-                                            ref={avatarInputRef}
-                                            type='file'
-                                            accept='image/*'
-                                            onChange={(e) => handleAvatarChange(e)}
-                                        />
-                                        <AvatarPreviewContainer onClick={() => avatarInputRef.current?.click()}>
-                                            {avatarPreview ? (
-                                                <AvatarPreviewImage src={avatarPreview} alt='Avatar Preview' />
-                                            ) : (
-                                                <AiOutlineCamera size={35} color='#818181' />
-                                            )}
-                                        </AvatarPreviewContainer>
-                                        <AvatarText>
-                                            點擊左側的相機圖示
-                                            <br />
-                                            並選一張照片作為你的大頭貼吧！
-                                        </AvatarText>
-                                    </AvatarContainer>
-                                    <UserInfoContainer>
-                                        <UserInfoLabel>
-                                            姓名：
-                                            <UserInfoInput
-                                                required
-                                                type='text'
-                                                value={name}
-                                                onChange={(e) => setName(e.target.value)}
-                                                pattern='[\u4e00-\u9fa5]+'
-                                            />
-                                            <InputHint>請輸入中文姓名</InputHint>
-                                        </UserInfoLabel>
-
-                                        <UserInfoLabel>
-                                            手機：
-                                            <UserInfoInput
-                                                required
-                                                type='tel'
-                                                value={phone}
-                                                onChange={(e) => setPhone(e.target.value)}
-                                            />
-                                        </UserInfoLabel>
-                                        <UserInfoLabel>
-                                            信箱：
-                                            <UserInfoInput
-                                                required
-                                                type='email'
-                                                value={email}
-                                                onChange={(e) => setEmail(e.target.value)}
-                                            />
-                                            <InputHint>同時為您的帳號</InputHint>
-                                        </UserInfoLabel>
-                                        <UserInfoLabel>
-                                            密碼：
-                                            <UserInfoInput
-                                                required
-                                                type='password'
-                                                value={password}
-                                                onChange={(e) => setPassword(e.target.value)}
-                                            />
-                                            <InputHint>{passwordError || '至少由8個數字或英文組成'}</InputHint>
-                                        </UserInfoLabel>
-                                        <UserInfoLabel>
-                                            身份：
-                                            <ReactSelect
-                                                styles={customStyles}
-                                                options={userTypeOptions}
-                                                value={userTypeOptions.find((option) => option.value === userType)}
-                                                onChange={(selectedOption) => {
-                                                    if (selectedOption !== null) {
-                                                        setUserType(selectedOption.value);
-                                                    }
-                                                }}
-                                            />
-                                        </UserInfoLabel>
-                                    </UserInfoContainer>
-                                </>
-                            )}
-
-                            {userType === 'teacher' && showTeacherDetails && !finalStep && (
-                                <>
-                                    <TeacherInfoLabel>
-                                        簡述：
-                                        <TeacherTextArea
+        <SignupContainer>
+            <WelcomeContainer>
+                <WelcomeTextContainer>
+                    <WelcomeTitle>
+                        Welcome to <br /> YiTUTOR
+                    </WelcomeTitle>
+                    <WelcomeText>
+                        填寫右邊的註冊資訊，選擇老師或學生
+                        <br />
+                        成為 YiTUTOR 的一員，與我們一同成長吧！
+                    </WelcomeText>
+                </WelcomeTextContainer>
+                <SignUpImage src={SignUpImg} alt='Sign Up' />
+            </WelcomeContainer>
+            <SignupInputContainer>
+                <SignupFormContainer>
+                    <SignupTitle>註冊</SignupTitle>
+                    <SignupTitleLine />
+                    <UserInfoForm onSubmit={handleSubmit}>
+                        {!showTeacherDetails && (
+                            <>
+                                <AvatarContainer>
+                                    <AvatarInput
+                                        ref={avatarInputRef}
+                                        type='file'
+                                        accept='image/*'
+                                        onChange={(e) => handleAvatarChange(e)}
+                                    />
+                                    <AvatarPreviewContainer onClick={() => avatarInputRef.current?.click()}>
+                                        {avatarPreview ? (
+                                            <AvatarPreviewImage src={avatarPreview} alt='Avatar Preview' />
+                                        ) : (
+                                            <AiOutlineCamera size={35} color='#818181' />
+                                        )}
+                                    </AvatarPreviewContainer>
+                                    <AvatarText>
+                                        點擊左側的相機圖示
+                                        <br />
+                                        並選一張照片作為你的大頭貼吧！
+                                    </AvatarText>
+                                </AvatarContainer>
+                                <UserInfoContainer>
+                                    <UserInfoLabel>
+                                        姓名：
+                                        <UserInfoInput
                                             required
-                                            value={description}
-                                            onChange={(e) => setDescription(e.target.value)}
-                                            rows={2}
-                                            cols={50}
-                                            maxLength={60}
+                                            type='text'
+                                            value={name}
+                                            onChange={(e) => setName(e.target.value)}
+                                            pattern='[\u4e00-\u9fa5]+'
                                         />
-                                        <InputHint>請勿超過 60 個字</InputHint>
-                                    </TeacherInfoLabel>
-                                    <TeacherInfoLabel>
-                                        自我介紹：
-                                        <TeacherTextArea
+                                        <InputHint>請輸入中文姓名</InputHint>
+                                    </UserInfoLabel>
+                                    <UserInfoLabel>
+                                        手機：
+                                        <UserInfoInput
                                             required
-                                            value={intro}
-                                            onChange={(e) => setIntro(e.target.value)}
-                                            rows={5}
-                                            cols={50}
+                                            type='tel'
+                                            value={phone}
+                                            onChange={(e) => setPhone(e.target.value)}
                                         />
-                                    </TeacherInfoLabel>
-                                    <TeacherSubjectContainer>
-                                        <TeacherInfoLabel>科目：</TeacherInfoLabel>
-                                        <SubjectContainer>
-                                            {availableSubjects.map((subject, index) => (
-                                                <SubjectButton
-                                                    key={index}
-                                                    selected={selectedSubjects.includes(subject)}
-                                                    onClick={() => handleSubjectSelection(subject)}
-                                                    type='button'
-                                                >
-                                                    {subject}
-                                                </SubjectButton>
-                                            ))}
-                                        </SubjectContainer>
-                                    </TeacherSubjectContainer>
-                                    <TeacherInfoLabel>
-                                        課程價格：
-                                        <PriceContainer>
-                                            <PriceItem>
-                                                <PriceInput
-                                                    required
-                                                    type='number'
-                                                    value={price[1] || ''}
-                                                    onChange={(e) => handlePriceChange(1, e.target.value)}
-                                                    placeholder=' '
-                                                />
-                                                <PriceLabel>一堂課</PriceLabel>
-                                            </PriceItem>
-                                            <PriceItem>
-                                                <PriceInput
-                                                    required
-                                                    type='number'
-                                                    value={price[5] || ''}
-                                                    onChange={(e) => handlePriceChange(5, e.target.value)}
-                                                    placeholder=' '
-                                                />
-                                                <PriceLabel>五堂課</PriceLabel>
-                                            </PriceItem>
-                                            <PriceItem>
-                                                <PriceInput
-                                                    required
-                                                    type='number'
-                                                    value={price[10] || ''}
-                                                    onChange={(e) => handlePriceChange(10, e.target.value)}
-                                                    placeholder=' '
-                                                />
-                                                <PriceLabel>十堂課</PriceLabel>
-                                            </PriceItem>
-                                        </PriceContainer>
-                                    </TeacherInfoLabel>
-                                </>
-                            )}
-                            {userType === 'teacher' && showTeacherDetails && finalStep && (
-                                <div>
-                                    {Object.keys(selectedTimes).map((day) => (
-                                        <TimeDayContainer key={day}>
-                                            <WeekDay>{convertDayToChinese(day)}</WeekDay>
-                                            <TimeButtonContainer>
-                                                {Array.from({ length: 12 }, (_, i) => i + 9).map((hour) => (
-                                                    <TimeButton
-                                                        key={hour}
-                                                        selected={selectedTimes[day].has(hour)}
-                                                        onClick={() => handleTimeButtonClick(day, hour)}
-                                                        type='button'
-                                                    >
-                                                        {hour}:00
-                                                    </TimeButton>
-                                                ))}
-                                            </TimeButtonContainer>
-                                        </TimeDayContainer>
-                                    ))}
-                                </div>
-                            )}
-
-                            <ButtonContainer>
-                                <SubmitButton type='submit'>
-                                    {userType === 'teacher'
-                                        ? showTeacherDetails
-                                            ? finalStep
-                                                ? '提交'
-                                                : '最後一步'
-                                            : '下一步'
-                                        : finalStep
-                                        ? '提交'
-                                        : '提交'}
-                                </SubmitButton>
-                                {message && <p>{message}</p>}
-                                {!showTeacherDetails && <DirectLink href='login'>已經有帳號，前往登入</DirectLink>}
-                            </ButtonContainer>
-                        </UserInfoForm>
-                    </SignupFormContainer>
-                </SignupInputContainer>
-            </SignupContainer>
-        </>
+                                    </UserInfoLabel>
+                                    <UserInfoLabel>
+                                        信箱：
+                                        <UserInfoInput
+                                            required
+                                            type='email'
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                        />
+                                        <InputHint>同時為您的帳號</InputHint>
+                                    </UserInfoLabel>
+                                    <UserInfoLabel>
+                                        密碼：
+                                        <UserInfoInput
+                                            required
+                                            type='password'
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                        />
+                                        <InputHint>{passwordError || '至少由8個數字或英文組成'}</InputHint>
+                                    </UserInfoLabel>
+                                    <UserInfoLabel>
+                                        身份：
+                                        <ReactSelect
+                                            styles={customStyles}
+                                            options={userTypeOptions}
+                                            value={userTypeOptions.find((option) => option.value === userType)}
+                                            onChange={(selectedOption) => {
+                                                if (selectedOption !== null) {
+                                                    setUserType(selectedOption.value);
+                                                }
+                                            }}
+                                        />
+                                    </UserInfoLabel>
+                                </UserInfoContainer>
+                            </>
+                        )}
+                        {userType === 'teacher' && showTeacherDetails && !finalStep && (
+                            <TeacherDetailsForm
+                                description={description}
+                                setDescription={setDescription}
+                                intro={intro}
+                                setIntro={setIntro}
+                                selectedSubjects={selectedSubjects}
+                                handleSubjectSelection={handleSubjectSelection}
+                                price={price}
+                                handlePriceChange={handlePriceChange}
+                                availableSubjects={availableSubjects}
+                            />
+                        )}
+                        {userType === 'teacher' && showTeacherDetails && finalStep && (
+                            <TeacherTimeSelection
+                                selectedTimes={selectedTimes}
+                                handleTimeButtonClick={handleTimeButtonClick}
+                                convertDayToChinese={convertDayToChinese}
+                            />
+                        )}
+                        <SignUpButton
+                            userType={userType}
+                            showTeacherDetails={showTeacherDetails}
+                            finalStep={finalStep}
+                            message={message}
+                        />
+                    </UserInfoForm>
+                </SignupFormContainer>
+            </SignupInputContainer>
+        </SignupContainer>
     );
 };
 
