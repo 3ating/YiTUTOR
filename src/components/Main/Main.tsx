@@ -6,7 +6,7 @@ import mainImg from './images/mainImg.png';
 import online from './images/onlne.png';
 import ai from './images/ai.png';
 import board from './images//board.png';
-import AIChat from '../gpt/AIChatBtn';
+import AIChatBtn from '../gpt/AIChatBtn';
 import Link from 'next/link';
 import 'firebase/compat/firestore';
 import TeacherCardComponents from '../common/TeacherCard';
@@ -368,7 +368,7 @@ export default function Main() {
                     <ScrollButtonRight onClick={handleScrollRight}>&gt;</ScrollButtonRight>
                 </ScrollButtonContainer>
             </TeachersInfoContainer>
-            <AIChat />
+            <AIChatBtn />
         </MainWrapper>
     );
 }
