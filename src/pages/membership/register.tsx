@@ -811,7 +811,7 @@ const RegistrationForm = () => {
                                         : '提交'}
                                 </SubmitButton>
                                 {message && <p>{message}</p>}
-                                {!showTeacherDetails && <DirectLink href='signin'>已經有帳號，前往登入</DirectLink>}
+                                {!showTeacherDetails && <DirectLink href='login'>已經有帳號，前往登入</DirectLink>}
                             </ButtonContainer>
                         </UserInfoForm>
                     </SignupFormContainer>

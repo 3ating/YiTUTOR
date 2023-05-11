@@ -127,13 +127,13 @@ const Header: React.FC = () => {
                 </MenuContainer>
                 <SignBtnContainer>
                     {isLoading ? (
-                        <AvatarLink href={`/membership/signin`} passHref>
+                        <AvatarLink href={`/membership/login`} passHref>
                             <UserAvatar src={userInfo?.avatar} alt='User Avatar' />
                         </AvatarLink>
                     ) : (
                         <>
-                            <SignUpBtn href='/membership/signup'>註 冊</SignUpBtn>
-                            <SignInBtn href='/membership/signin'>登 入</SignInBtn>
+                            <SignUpBtn href='/membership/register'>註 冊</SignUpBtn>
+                            <SignInBtn href='/membership/login'>登 入</SignInBtn>
                         </>
                     )}
                 </SignBtnContainer>

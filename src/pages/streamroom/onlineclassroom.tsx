@@ -892,7 +892,7 @@ const VideoChat: React.FC = () => {
             ) : (
                 <CenteredContainer>
                     <UnLoginText>請先登入再使用此功能</UnLoginText>
-                    <DirectLink href='/membership/SignIn'>點我登入</DirectLink>
+                    <DirectLink href='/membership/login'>點我登入</DirectLink>
                 </CenteredContainer>
             )}
         </MainWrapper>
