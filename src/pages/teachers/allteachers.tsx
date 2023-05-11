@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import Link from 'next/link';
 import TeacherCardComponents from '../../components/common/TeacherCard';
 import ReactSelect, { CSSObjectWithLabel, GroupBase, OptionProps, StylesConfig } from 'react-select';
-import AIChat from '../../components/gpt/AIChatBtn';
+import AIChat from '../../components/chat/AIChatBtn';
 import { db } from '@/utils/firebase';
 import { useTeachers } from '@/context/TeacherContext';
 

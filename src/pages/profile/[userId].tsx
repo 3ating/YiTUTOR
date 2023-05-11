@@ -8,7 +8,7 @@ import styled from 'styled-components';
 import Button from '@/components/common/Button';
 import { AiFillEdit } from 'react-icons/ai';
 import Loader from '@/components/common/Loader';
-import AIChat from '../../components/gpt/AIChatBtn';
+import AIChat from '../../components/chat/AIChatBtn';
 import { db } from '@/utils/firebase';
 // import { useTeachers } from '../../context/TeacherContext';
 

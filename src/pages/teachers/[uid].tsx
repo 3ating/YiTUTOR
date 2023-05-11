@@ -11,7 +11,7 @@ import Button from '@/components/common/Button';
 import Loader from '@/components/common/Loader';
 import { Modal, notification } from 'antd';
 import ReservationNotice from '../../components/teachers/ReservationNotice';
-import AIChat from '../../components/gpt/AIChatBtn';
+import AIChat from '../../components/chat/AIChatBtn';
 import { db } from '@/utils/firebase';
 
 interface Teacher {
