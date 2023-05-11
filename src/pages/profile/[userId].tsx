@@ -9,6 +9,7 @@ import Button from '@/components/Button';
 import { AiFillEdit } from 'react-icons/ai';
 import Loader from '@/components/Loader';
 import AIChat from '../../components/GPT/AIChatBtn';
+import { db } from '@/utils/firebase';
 
 type BookedCoursesContainerProps = {
     isBookedCourseEmpty: boolean;
@@ -539,21 +540,21 @@ interface TeacherInfo {
 
 type UserInfoKeys = 'email' | 'phone';
 
-const firebaseConfig = {
-    apiKey: process.env.FIRESTORE_API_KEY,
-    authDomain: 'board-12c3c.firebaseapp.com',
-    projectId: 'board-12c3c',
-    storageBucket: 'board-12c3c.appspot.com',
-    messagingSenderId: '662676665549',
-    appId: '1:662676665549:web:d2d23417c365f3ec666584',
-    measurementId: 'G-YY6Q81WPY9',
-};
+// const firebaseConfig = {
+//     apiKey: process.env.FIRESTORE_API_KEY,
+//     authDomain: 'board-12c3c.firebaseapp.com',
+//     projectId: 'board-12c3c',
+//     storageBucket: 'board-12c3c.appspot.com',
+//     messagingSenderId: '662676665549',
+//     appId: '1:662676665549:web:d2d23417c365f3ec666584',
+//     measurementId: 'G-YY6Q81WPY9',
+// };
 
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
+// if (!firebase.apps.length) {
+//     firebase.initializeApp(firebaseConfig);
+// }
 
-const db = firebase.firestore();
+// const db = firebase.firestore();
 
 const UserProfile = () => {
     const router = useRouter();
