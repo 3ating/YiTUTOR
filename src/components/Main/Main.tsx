@@ -11,6 +11,7 @@ import Link from 'next/link';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import TeacherCardComponents from '../TeacherCard';
+import { db } from '@/utils/firebase';
 import { useAuth } from '../../context/AuthContext';
 
 const {
@@ -250,21 +251,21 @@ interface Teacher {
     avatar?: string;
 }
 
-const firebaseConfig = {
-    apiKey: process.env.FIRESTORE_API_KEY,
-    authDomain: 'board-12c3c.firebaseapp.com',
-    projectId: 'board-12c3c',
-    storageBucket: 'board-12c3c.appspot.com',
-    messagingSenderId: '662676665549',
-    appId: '1:662676665549:web:d2d23417c365f3ec666584',
-    measurementId: 'G-YY6Q81WPY9',
-};
+// const firebaseConfig = {
+//     apiKey: process.env.FIRESTORE_API_KEY,
+//     authDomain: 'board-12c3c.firebaseapp.com',
+//     projectId: 'board-12c3c',
+//     storageBucket: 'board-12c3c.appspot.com',
+//     messagingSenderId: '662676665549',
+//     appId: '1:662676665549:web:d2d23417c365f3ec666584',
+//     measurementId: 'G-YY6Q81WPY9',
+// };
 
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
+// if (!firebase.apps.length) {
+//     firebase.initializeApp(firebaseConfig);
+// }
 
-const db = firebase.firestore();
+// const db = firebase.firestore();
 
 export default function Main() {
     const { isLoading } = useAuth();
@@ -317,8 +318,6 @@ export default function Main() {
             unsubscribe();
         };
     }, []);
-
-    console.log('teachers', teachers.length);
 
     return (
         <MainWrapper>
@@ -411,7 +410,7 @@ export default function Main() {
                                             </RatingContainer>
                                             <TeacherDescription>{teacher.description}</TeacherDescription>
                                             <div>
-                                                <DirectLink href={`/teacher/${teacher.uid}`} key={teacher.uid}>
+                                                <DirectLink href={`/teacherpage/${teacher.uid}`} key={teacher.uid}>
                                                     <TeacherBtn>購買課程</TeacherBtn>
                                                 </DirectLink>
                                             </div>

@@ -39,15 +39,16 @@ const MainWrapper = styled.div`
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    padding: 50px 0;
+    padding: 70px 0;
+    /* margin: 65px 0; */
     box-sizing: border-box;
     background-color: antiquewhite;
     justify-content: center;
 `;
 
 const OnlineClassContainer = styled.div`
+    /* height: calc(100vh - 130px); */
     padding: 0 30px;
-    height: calc(100vh - 130px);
     display: flex;
     flex-direction: column;
     justify-content: center;

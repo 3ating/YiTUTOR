@@ -10,6 +10,7 @@ import { AiFillEdit } from 'react-icons/ai';
 import Loader from '@/components/Loader';
 import AIChat from '../../components/GPT/AIChatBtn';
 import { db } from '@/utils/firebase';
+// import { useTeachers } from '../../context/TeacherContext';
 
 type BookedCoursesContainerProps = {
     isBookedCourseEmpty: boolean;
@@ -754,7 +755,7 @@ const UserProfile = () => {
                             bookingsInfo.map((booking, index) => (
                                 <DirectLink
                                     key={index}
-                                    href={`/streamroom/VideoChat?id=${booking.teacherId || booking.studentId}`}
+                                    href={`/streamroom/onlineclassroom?id=${booking.teacherId || booking.studentId}`}
                                 >
                                     <BookingCard>
                                         <BookingAvatar
@@ -787,7 +788,7 @@ const UserProfile = () => {
                                 {userInfo?.courses && Object.entries(userInfo.courses).length > 0 ? (
                                     <CourseCardContainer>
                                         {Object.entries(userInfo.courses).map(([courseId, courseData]) => (
-                                            <DirectLink key={courseId} href={`../teacher/${courseData.teacherid}`}>
+                                            <DirectLink key={courseId} href={`../teacherpage/${courseData.teacherid}`}>
                                                 <CourseCard>
                                                     <CourseInfo>
                                                         {/* <CourseLabel>科目:</CourseLabel> */}

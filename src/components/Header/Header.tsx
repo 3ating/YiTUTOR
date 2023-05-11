@@ -113,11 +113,6 @@ const AvatarLink = styled(Link)`
     color: #000;
 `;
 
-const LogoImg = styled.img`
-    max-height: 100%;
-    object-fit: contain;
-`;
-
 const Header: React.FC = () => {
     const { userInfo, isLoading } = useAuth();
     return (
