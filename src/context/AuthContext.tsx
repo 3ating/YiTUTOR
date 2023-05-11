@@ -4,7 +4,7 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import { useRouter } from 'next/router';
 import { Result, Modal, message } from 'antd';
-// import { db } from '@/utils/firebase';
+import { db } from '@/utils/firebase';
 
 interface UserInfo {
     name: string;
@@ -14,22 +14,6 @@ interface UserInfo {
     courses?: object;
     avatar?: string;
 }
-
-const firebaseConfig = {
-    apiKey: process.env.NEXT_PUBLIC_FIRESTORE_API_KEY,
-    authDomain: 'board-12c3c.firebaseapp.com',
-    projectId: 'board-12c3c',
-    storageBucket: 'board-12c3c.appspot.com',
-    messagingSenderId: '662676665549',
-    appId: '1:662676665549:web:d2d23417c365f3ec666584',
-    measurementId: 'G-YY6Q81WPY9',
-};
-
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
-
-const db = firebase.firestore();
 
 interface AuthContextValue {
     user: User | null;
@@ -156,7 +140,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 centered
                 onCancel={() => setShowLoginSuccess(false)}
             >
-                <Result status='success' title='登入成功！' />
+                <Result status='success' title='登入成功' />
             </Modal>
             <Modal
                 open={showLogoutSuccess}
@@ -165,7 +149,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 centered
                 onCancel={() => setShowLogoutSuccess(false)}
             >
-                <Result status='success' title='登出成功！' />
+                <Result status='success' title='登出成功' />
             </Modal>
         </AuthContext.Provider>
     );

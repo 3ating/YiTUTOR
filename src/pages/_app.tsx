@@ -1,9 +1,9 @@
 import React from 'react';
 import '@/styles/globals.css';
 import { AppProps } from 'next/app';
-import { createGlobalStyle, ThemeProvider, StyleSheetManager } from 'styled-components';
+import { createGlobalStyle } from 'styled-components';
 import { AuthProvider } from '../context/AuthContext';
-// import { TeacherProvider } from '../context/TeacherContext';
+import { TeachersProvider } from '../context/TeacherContext';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
 
@@ -16,8 +16,6 @@ const GlobalStyle = createGlobalStyle`
         padding: 0;
         box-sizing: border-box;
         position: relative;
-        /* height: 100vh;
-        background: antiquewhite; */
     }
 `;
 
@@ -25,13 +23,13 @@ function App({ Component, pageProps }: AppProps) {
     return (
         <>
             <AuthProvider>
-                {/* <TeacherProvider> */}
-                <GlobalStyle />
-                <Header />
-                <title>YiTUTOR</title>
-                <Component {...pageProps} />
-                <Footer />
-                {/* </TeacherProvider> */}
+                <TeachersProvider>
+                    <GlobalStyle />
+                    <Header />
+                    <title>YiTUTOR</title>
+                    <Component {...pageProps} />
+                    <Footer />
+                </TeachersProvider>
             </AuthProvider>
         </>
     );

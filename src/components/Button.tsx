@@ -2,7 +2,6 @@ import styled from 'styled-components';
 
 const PrimaryButton = styled.button`
     display: flex;
-    /* flex-direction: row; */
     justify-content: center;
     align-items: center;
     padding: 15px 25px;

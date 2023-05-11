@@ -1,8 +1,5 @@
-import React, { CSSProperties, useRef, useState } from 'react';
-import firebase from 'firebase/compat/app';
+import React, { CSSProperties, useContext, useRef, useState } from 'react';
 import 'firebase/compat/firestore';
-import 'firebase/compat/auth';
-import 'firebase/compat/storage';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
@@ -15,24 +12,7 @@ import ReactSelect from 'react-select';
 import { CSSObject } from '@emotion/react';
 import { useAuth } from '../../context/AuthContext';
 import defaultAvatar from './images/defaultAvatar.png';
-import { db } from '@/utils/firebase';
-
-// const firebaseConfig = {
-//     apiKey: 'AIzaSyDrG9uBznJyP7Fe_4JRwVG7pvR7SjScQsg',
-//     authDomain: 'board-12c3c.firebaseapp.com',
-//     projectId: 'board-12c3c',
-//     storageBucket: 'board-12c3c.appspot.com',
-//     messagingSenderId: '662676665549',
-//     appId: '1:662676665549:web:d2d23417c365f3ec666584',
-//     measurementId: 'G-YY6Q81WPY9',
-// };
-
-// if (!firebase.apps.length) {
-//     firebase.initializeApp(firebaseConfig);
-// }
-// const db = firebase.firestore();
-const auth = firebase.auth();
-const storage = firebase.storage();
+import { db, auth, storage } from '@/utils/firebase';
 
 interface UserTypeOption {
     value: string;
@@ -125,9 +105,7 @@ const SignupTitleLine = styled.div`
 
 const UserInfoForm = styled.form`
     display: flex;
-    /* align-items: flex-start; */
     flex-direction: column;
-    /* align-items: flex-start; */
     gap: 20px;
     width: 100%;
     margin-top: 20px;
@@ -156,19 +134,6 @@ const UserInfoLabel = styled.label`
     flex-direction: column;
     font-size: 16px;
     letter-spacing: 1px;
-`;
-
-const UserInfoSelect = styled.select`
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
-    font-weight: 400;
-    color: #555;
-    background-color: #f9f9f9;
-    appearance: none;
-    cursor: pointer;
-    margin-top: 8px;
 `;
 
 const SubmitButton = styled(Button)`
@@ -560,16 +525,6 @@ const SignUp = () => {
             setFinalStep(true);
             return;
         }
-    };
-
-    const handleTimeChange = (day: string, hour: number, checked: boolean) => {
-        const newSelectedTimes = { ...selectedTimes };
-        if (checked) {
-            newSelectedTimes[day].add(hour);
-        } else {
-            newSelectedTimes[day].delete(hour);
-        }
-        setSelectedTimes(newSelectedTimes);
     };
 
     const handleTimeButtonClick = (day: string, hour: number) => {

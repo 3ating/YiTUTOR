@@ -1,6 +1,7 @@
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import 'firebase/compat/auth';
+import 'firebase/compat/storage';
 
 const firebaseConfig = {
     // apiKey: process.env.NEXT_PUBLIC_FIRESTORE_API_KEY,
@@ -21,3 +22,5 @@ export const initFirebase = () => {
 
 initFirebase();
 export const db = firebase.firestore();
+export const auth = firebase.auth();
+export const storage = firebase.storage();

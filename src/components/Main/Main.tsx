@@ -8,11 +8,11 @@ import ai from './images/ai.png';
 import board from './images//board.png';
 import AIChat from '../GPT/AIChatBtn';
 import Link from 'next/link';
-import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import TeacherCardComponents from '../TeacherCard';
 import { db } from '@/utils/firebase';
 import { useAuth } from '../../context/AuthContext';
+import { useTeachers } from '@/context/TeacherContext';
 
 const {
     TeacherImg,
@@ -251,25 +251,9 @@ interface Teacher {
     avatar?: string;
 }
 
-// const firebaseConfig = {
-//     apiKey: process.env.FIRESTORE_API_KEY,
-//     authDomain: 'board-12c3c.firebaseapp.com',
-//     projectId: 'board-12c3c',
-//     storageBucket: 'board-12c3c.appspot.com',
-//     messagingSenderId: '662676665549',
-//     appId: '1:662676665549:web:d2d23417c365f3ec666584',
-//     measurementId: 'G-YY6Q81WPY9',
-// };
-
-// if (!firebase.apps.length) {
-//     firebase.initializeApp(firebaseConfig);
-// }
-
-// const db = firebase.firestore();
-
 export default function Main() {
     const { isLoading } = useAuth();
-    const [teachers, setTeachers] = useState<Teacher[]>([]);
+    const { teachers } = useTeachers();
     const containerRef = useRef<HTMLDivElement>(null);
 
     const scrollTo = (direction: string) => {
@@ -299,25 +283,6 @@ export default function Main() {
     const handleScrollRight = () => {
         scrollTo('right');
     };
-
-    useEffect(() => {
-        const unsubscribe = db
-            .collection('users')
-            .where('userType', '==', 'teacher')
-            .onSnapshot((snapshot) => {
-                const teachersData: Teacher[] = snapshot.docs.map((doc) => {
-                    return {
-                        ...doc.data(),
-                        uid: doc.id,
-                    } as unknown as Teacher;
-                });
-                setTeachers(teachersData);
-            });
-
-        return () => {
-            unsubscribe();
-        };
-    }, []);
 
     return (
         <MainWrapper>
@@ -379,7 +344,6 @@ export default function Main() {
                     <MainDescription>Discover personalized online tutoring</MainDescription>
                     <MainDescriptionHightline />
                 </MainDescriptionContainer>
-
                 <ScrollButtonContainer>
                     <ScrollButtonLeft onClick={handleScrollLeft}>&lt;</ScrollButtonLeft>
                     <TeachersContainer ref={containerRef}>

@@ -6,6 +6,7 @@ import TeacherCardComponents from '../../components/TeacherCard';
 import ReactSelect, { CSSObjectWithLabel, GroupBase, OptionProps, StylesConfig } from 'react-select';
 import AIChat from '../../components/GPT/AIChatBtn';
 import { db } from '@/utils/firebase';
+import { useTeachers } from '@/context/TeacherContext';
 
 export type OptionType = {
     label: string;
@@ -23,6 +24,13 @@ interface Teacher {
     description?: string;
     price?: { qty: number; price: number }[];
     avatar?: string;
+}
+
+interface ReactSelectProps {
+    value: string;
+    options: OptionType[];
+    placeholder: string;
+    onChange: (value: string) => void;
 }
 
 const {
@@ -159,7 +167,7 @@ const ratingSortOptions: OptionType[] = [
 ];
 
 const Teachers = () => {
-    const [teachers, setTeachers] = useState<Teacher[]>([]);
+    const { teachers, setTeachers } = useTeachers();
     const [search, setSearch] = useState('');
     const [selectedSubject, setSelectedSubject] = useState('');
     const [selectedPriceSort, setSelectedPriceSort] = useState('');
@@ -213,6 +221,18 @@ const Teachers = () => {
         return teachersList;
     };
 
+    const createReactSelect = ({ value, options, placeholder, onChange }: ReactSelectProps) => (
+        <ReactSelect
+            styles={customStyles}
+            value={value ? options.find((option) => option.value === value) : null}
+            options={options}
+            placeholder={placeholder}
+            onChange={(selectedOption) => {
+                onChange((selectedOption as OptionType)?.value || '');
+            }}
+        />
+    );
+
     useEffect(() => {
         handleFilter();
     }, [search, selectedSubject, selectedPriceSort, selectedRatingSort]);
@@ -221,24 +241,6 @@ const Teachers = () => {
         const sortedTeachers = sortTeachers([...teachers]);
         setTeachers(sortedTeachers);
     }, [selectedPriceSort]);
-
-    useEffect(() => {
-        const unsubscribe = db
-            .collection('users')
-            .where('userType', '==', 'teacher')
-            .onSnapshot((snapshot) => {
-                const teachersData: Teacher[] = snapshot.docs.map((doc) => {
-                    return {
-                        ...doc.data(),
-                        uid: doc.id,
-                    } as unknown as Teacher;
-                });
-                setTeachers(teachersData);
-            });
-        return () => {
-            unsubscribe();
-        };
-    }, []);
 
     return (
         <PageContainer>
@@ -255,37 +257,24 @@ const Teachers = () => {
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder='搜尋老師名字'
                     />
-                    <ReactSelect
-                        styles={customStyles}
-                        value={
-                            selectedPriceSort
-                                ? priceSortOptions.find((option) => option.value === selectedPriceSort)
-                                : null
-                        }
-                        options={priceSortOptions}
-                        placeholder='價格排序'
-                        onChange={(value) => setSelectedPriceSort((value as OptionType)?.value || '')}
-                    />
-                    <ReactSelect
-                        styles={customStyles}
-                        value={
-                            selectedRatingSort
-                                ? ratingSortOptions.find((option) => option.value === selectedRatingSort)
-                                : null
-                        }
-                        options={ratingSortOptions}
-                        placeholder='評分排序'
-                        onChange={(value) => setSelectedRatingSort((value as OptionType)?.value || '')}
-                    />
-                    <ReactSelect
-                        styles={customStyles}
-                        value={
-                            selectedSubject ? subjectOptions.find((option) => option.value === selectedSubject) : null
-                        }
-                        options={subjectOptions}
-                        placeholder='科目'
-                        onChange={(value) => setSelectedSubject((value as OptionType)?.value || '')}
-                    />
+                    {createReactSelect({
+                        value: selectedPriceSort,
+                        options: priceSortOptions,
+                        placeholder: '價格排序',
+                        onChange: setSelectedPriceSort,
+                    })}
+                    {createReactSelect({
+                        value: selectedRatingSort,
+                        options: ratingSortOptions,
+                        placeholder: '評分排序',
+                        onChange: setSelectedRatingSort,
+                    })}
+                    {createReactSelect({
+                        value: selectedSubject,
+                        options: subjectOptions,
+                        placeholder: '科目',
+                        onChange: setSelectedSubject,
+                    })}
                 </SearchForm>
                 <TeacherContainer>
                     {teachers.map((teacher, index) => (

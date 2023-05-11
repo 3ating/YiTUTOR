@@ -7,9 +7,7 @@ import { db } from '@/utils/firebase';
 import { BsFillSendFill } from 'react-icons/bs';
 import { AiFillDelete } from 'react-icons/ai';
 import { Spin, notification } from 'antd';
-
-// const API_KEY = OPENAI_API_KEY;
-// const API_KEY = process.env.OPENAI_API_KEY;
+import DotLoadingIcon from './DotLoadingIcon';
 
 interface MessageProps {
     position: 'incoming' | 'outgoing';
@@ -91,15 +89,12 @@ const TypingIndicator = styled.div`
     color: #656565;
     padding: 0 20px 0;
     margin: 8px;
-    /* position: absolute; */
-    /* bottom: 0; */
     margin: 0;
 `;
 
 const MessageInputContainer = styled.div`
     display: flex;
     align-items: center;
-    /* border-top: 1px solid #ccc; */
 `;
 
 const MessageInput = styled.input`
@@ -148,7 +143,11 @@ const DeleteButton = styled.button`
 
 const AIChatRoom = () => {
     const ICON_SIZE = 18;
-    const { userUid, isLoading } = useAuth();
+    const PROMPT = {
+        role: 'system',
+        content:
+            '你是一個專業的補習班老師，個性一板一眼，若是被問到考題以外的問題請你回答：「此問題與學習無關，請您重新發問！',
+    };
     const INITIAL_MESSAGE = [
         {
             message: '我是智慧解題機器人🤖，我會盡我所能為你解答任何考題！',
@@ -156,6 +155,7 @@ const AIChatRoom = () => {
             sender: 'ChatGPT',
         },
     ];
+    const { userUid } = useAuth();
     const [isTyping, setIsTyping] = useState(false);
     const [messages, setMessages] = useState(INITIAL_MESSAGE);
     const [inputMessage, setInputMessage] = useState('');
@@ -163,19 +163,15 @@ const AIChatRoom = () => {
 
     const handleSend = async () => {
         if (inputMessage.trim() === '') return;
-
         const newMessage = {
             message: inputMessage,
             direction: 'outgoing',
             sender: 'user',
             sentTime: new Date().toLocaleString(),
         };
-
         const newMessages = [...messages, newMessage];
-
         setMessages(newMessages);
         setInputMessage('');
-
         setIsTyping(true);
         await processMessageToChatGPT(newMessages);
         messageListRef.current?.scrollTo(0, messageListRef.current?.scrollHeight);
@@ -191,7 +187,7 @@ const AIChatRoom = () => {
         }
     };
 
-    async function storeQuestionAndAnswer(question: { message: any }, answer: { message: any; sender?: string }) {
+    async function storeQuestionAndAnswer(question: { message: string }, answer: { message: string; sender?: string }) {
         try {
             if (userUid) {
                 await db.collection('users').doc(userUid).collection('gpt_solutions').add({
@@ -208,13 +204,7 @@ const AIChatRoom = () => {
     }
 
     async function processMessageToChatGPT(chatMessages: any[]) {
-        let apiMessages = [
-            {
-                role: 'system',
-                content:
-                    '你是一個專業的補習班老師，個性一板一眼，若是被問到考題以外的問題請你回答：「此問題與學習無關，請您重新發問！」',
-            },
-        ].concat(
+        let apiMessages = [PROMPT].concat(
             chatMessages.map((messageObject) => {
                 let role = '';
                 if (messageObject.sender === 'ChatGPT') {
@@ -230,8 +220,6 @@ const AIChatRoom = () => {
             model: 'gpt-3.5-turbo',
             messages: apiMessages,
         };
-        console.log('apiRequestBody:', apiRequestBody);
-
         await fetch('/api/gpt/AISols', {
             method: 'POST',
             headers: {
@@ -249,11 +237,9 @@ const AIChatRoom = () => {
                     });
                     throw new Error('Status 504');
                 }
-                console.log('API response:', data);
                 return data.json();
             })
             .then((data) => {
-                console.log(data);
                 if (data.choices && data.choices.length > 0) {
                     const chatGPTMessage = {
                         message: data.choices[0].message.content,
@@ -317,9 +303,7 @@ const AIChatRoom = () => {
         if (userUid) {
             try {
                 const historySnapshot = await db.collection('users').doc(userUid).collection('gpt_solutions').get();
-
                 const batch = db.batch();
-
                 historySnapshot.forEach((doc) => {
                     batch.delete(doc.ref);
                 });
@@ -331,46 +315,6 @@ const AIChatRoom = () => {
             }
         }
     }
-
-    const DotLoadingIcon = () => {
-        return (
-            <span>
-                <i className='dot' />
-                <i className='dot' />
-                <i className='dot' />
-                <style jsx>{`
-                    .dot {
-                        display: inline-block;
-                        width: 6px;
-                        height: 6px;
-                        border-radius: 50%;
-                        background-color: #ccc;
-                        margin-right: 4px;
-                        animation: dotBounce 1.4s infinite ease-in-out;
-                    }
-                    .dot:last-child {
-                        margin-right: 0;
-                    }
-                    .dot:nth-child(1) {
-                        animation-delay: -0.32s;
-                    }
-                    .dot:nth-child(2) {
-                        animation-delay: -0.16s;
-                    }
-                    @keyframes dotBounce {
-                        0%,
-                        80%,
-                        100% {
-                            transform: translateY(0);
-                        }
-                        40% {
-                            transform: translateY(-30%);
-                        }
-                    }
-                `}</style>
-            </span>
-        );
-    };
 
     const scrollToBottom = () => {
         if (messageListRef.current) {
