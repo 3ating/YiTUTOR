@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
-import { db } from '../../../firebase';
+import { db } from '@/utils/firebase';
 import { useAuth } from '../../context/AuthContext';
 import styled from 'styled-components';
 import { BsFillSendFill } from 'react-icons/bs';

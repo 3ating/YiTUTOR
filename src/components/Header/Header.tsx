@@ -132,7 +132,7 @@ const Header: React.FC = () => {
                         </AvatarLink>
                     ) : (
                         <>
-                            <SignUpBtn href='/membership/register'>註 冊</SignUpBtn>
+                            <SignUpBtn href='/membership/signup'>註 冊</SignUpBtn>
                             <SignInBtn href='/membership/login'>登 入</SignInBtn>
                         </>
                     )}

@@ -397,7 +397,7 @@ const userTypeOptions = [
     { value: 'teacher', label: '👨🏻‍🏫 老師' },
 ];
 
-const RegistrationForm = () => {
+const SignUp = () => {
     const { isLoading } = useAuth();
     const defaultAvatarUrl = defaultAvatar.src;
     const availableSubjects = ['國文', '英文', '數學', '物理', '化學'];
@@ -423,8 +423,6 @@ const RegistrationForm = () => {
         Wednesday: new Set(),
         Thursday: new Set(),
         Friday: new Set(),
-        // Saturday: new Set(),
-        // Sunday: new Set(),
     });
     const [evaluation, setEvaluation] = useState([]);
     const [showTeacherDetails, setShowTeacherDetails] = useState(false);
@@ -821,4 +819,4 @@ const RegistrationForm = () => {
     );
 };
 
-export default RegistrationForm;
+export default SignUp;

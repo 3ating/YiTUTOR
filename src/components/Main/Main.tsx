@@ -328,7 +328,7 @@ export default function Main() {
                         <br /> Easy to Achieve <br />
                         with YiTUTOR
                     </BannerText>
-                    <DirectLink href={'/membership/SignUp'}>
+                    <DirectLink href={'/membership/signup'}>
                         {!isLoading && <PrimaryButton>立即加入</PrimaryButton>}
                     </DirectLink>
                 </BannerTextContainer>

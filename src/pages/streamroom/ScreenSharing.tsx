@@ -15,24 +15,7 @@ import styled from 'styled-components';
 import { useAuth } from '../../context/AuthContext';
 import { TbScreenShare } from 'react-icons/tb';
 import { Tooltip, message } from 'antd';
-
-// import { db } from '../../firebase';
-
-const firebaseConfig = {
-    apiKey: process.env.FIRESTORE_API_KEY,
-    authDomain: 'board-12c3c.firebaseapp.com',
-    projectId: 'board-12c3c',
-    storageBucket: 'board-12c3c.appspot.com',
-    messagingSenderId: '662676665549',
-    appId: '1:662676665549:web:d2d23417c365f3ec666584',
-    measurementId: 'G-YY6Q81WPY9',
-};
-
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
-
-const db = firebase.firestore();
+import { db } from '@/utils/firebase';
 
 // interface ScreenSharingProps {
 //     localStream: MediaStream | null;
