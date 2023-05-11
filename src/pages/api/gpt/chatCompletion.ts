@@ -65,7 +65,6 @@ export default async function handler(
     const API_KEY = process.env.OPENAI_API_KEY;
     const apiRequestBody = req.body;
 
-    // Check if apiRequestBody is a valid JSON object
     if (typeof apiRequestBody !== 'object' || apiRequestBody === null) {
         res.status(400).json({ error: 'Invalid JSON object in the request body.' });
         return;
