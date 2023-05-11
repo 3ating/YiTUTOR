@@ -160,7 +160,7 @@ const TeacherDetailsForm: React.FC<TeacherDetailsFormProps> = ({
                     {availableSubjects.map((subject, index) => (
                         <SubjectButton
                             key={index}
-                            selected={selectedSubjects.includes(subject)}
+                            selected={selectedSubjects?.includes(subject)}
                             onClick={() => handleSubjectSelection(subject)}
                             type='button'
                         >

@@ -53,7 +53,7 @@ const TeacherTimeSelection: React.FC<TeacherTimeSelectionProps> = ({
                         {Array.from({ length: 12 }, (_, i) => i + 9).map((hour) => (
                             <TimeButton
                                 key={hour}
-                                selected={selectedTimes[day].has(hour)}
+                                selected={selectedTimes[day]?.has(hour)}
                                 onClick={() => handleTimeButtonClick(day, hour)}
                                 type='button'
                             >
