@@ -7,14 +7,14 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import Image from 'next/image';
-import SignUpImg from './signup.png';
+import SignUpImg from './images/signup.png';
 import Button from '../../components/Button';
 import { AiOutlineCamera } from 'react-icons/ai';
 import Select, { OptionProps, ControlProps, StylesConfig } from 'react-select';
 import ReactSelect from 'react-select';
 import { CSSObject } from '@emotion/react';
-import { useAuth } from '../../../public/AuthContext';
-import defaultAvatar from './defaultAvatar.png';
+import { useAuth } from '../../context/AuthContext';
+import defaultAvatar from './images/defaultAvatar.png';
 
 const firebaseConfig = {
     apiKey: 'AIzaSyDrG9uBznJyP7Fe_4JRwVG7pvR7SjScQsg',
@@ -61,6 +61,7 @@ const WelcomeContainer = styled.div`
     align-items: center;
     width: 40%;
     background: antiquewhite;
+    margin: 65px 0;
 `;
 
 const WelcomeTextContainer = styled.div`
@@ -98,6 +99,7 @@ const SignupInputContainer = styled.div`
     justify-content: center;
     align-items: center;
     width: 60%;
+    margin: 65px 0;
     /* border: 1px solid black; */
 `;
 
@@ -111,7 +113,7 @@ const SignupTitle = styled.p`
     font-size: 30px;
     font-weight: 600;
     letter-spacing: 3px;
-    margin: 25px 0 10px;
+    margin: 20px 0 10px;
 `;
 
 const SignupTitleLine = styled.div`
@@ -808,7 +810,7 @@ const RegistrationForm = () => {
                                         : '提交'}
                                 </SubmitButton>
                                 {message && <p>{message}</p>}
-                                {!showTeacherDetails && <DirectLink href='SignIn'>已經有帳號，前往登入</DirectLink>}
+                                {!showTeacherDetails && <DirectLink href='signin'>已經有帳號，前往登入</DirectLink>}
                             </ButtonContainer>
                         </UserInfoForm>
                     </SignupFormContainer>

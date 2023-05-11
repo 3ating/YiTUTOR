@@ -3,7 +3,7 @@ import 'firebase/compat/firestore';
 import 'firebase/compat/auth';
 
 const firebaseConfig = {
-    apiKey: process.env.FIRESTORE_API_KEY,
+    apiKey: process.env.NEXT_PUBLIC_FIRESTORE_API_KEY,
     authDomain: 'board-12c3c.firebaseapp.com',
     projectId: 'board-12c3c',
     storageBucket: 'board-12c3c.appspot.com',

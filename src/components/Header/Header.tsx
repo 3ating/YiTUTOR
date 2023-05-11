@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
-import { useAuth } from '../../../public/AuthContext';
-import logo from './yitutor_logo.png';
+import { useAuth } from '../../context/AuthContext';
+import logo from './images/yitutor_logo.png';
 import Image from 'next/image';
 
 const HeaderWrapper = styled.header`
@@ -127,18 +127,18 @@ const Header: React.FC = () => {
             </LogoLink>
             <NavContainer>
                 <MenuContainer>
-                    <Menu href='/teacher/Teachers'>尋找老師</Menu>
-                    <Menu href='/streamroom/VideoChat'>線上教室</Menu>
+                    <Menu href='/teachers/allteachers'>尋找老師</Menu>
+                    <Menu href='/streamroom/onlineclassroom'>線上教室</Menu>
                 </MenuContainer>
                 <SignBtnContainer>
                     {isLoading ? (
-                        <AvatarLink href={`/membership/SignIn`} passHref>
+                        <AvatarLink href={`/membership/signin`} passHref>
                             <UserAvatar src={userInfo?.avatar} alt='User Avatar' />
                         </AvatarLink>
                     ) : (
                         <>
-                            <SignUpBtn href='/membership/SignUp'>註 冊</SignUpBtn>
-                            <SignInBtn href='/membership/SignIn'>登 入</SignInBtn>
+                            <SignUpBtn href='/membership/signup'>註 冊</SignUpBtn>
+                            <SignInBtn href='/membership/signin'>登 入</SignInBtn>
                         </>
                     )}
                 </SignBtnContainer>

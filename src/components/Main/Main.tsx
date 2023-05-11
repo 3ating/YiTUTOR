@@ -2,16 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import Image from 'next/image';
 import PrimaryButton from '../Button';
-import mainImg from './mainImg.png';
-import online from './onlne.png';
-import ai from './ai.png';
-import board from './board.png';
-import AIChat from '../AIChatBtn';
+import mainImg from './images/mainImg.png';
+import online from './images/onlne.png';
+import ai from './images/ai.png';
+import board from './images//board.png';
+import AIChat from '../GPT/AIChatBtn';
 import Link from 'next/link';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import TeacherCardComponents from '../TeacherCard';
-import { useAuth } from '../../../public/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 const {
     TeacherImg,

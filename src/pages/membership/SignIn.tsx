@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../../public/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import Link from 'next/link';
 import styled, { keyframes } from 'styled-components';
 import Button from '../../components/Button';
-import SignInImg from './signin.png';
+import SignInImg from './images/signin.png';
 import Image from 'next/image';
 
 const LoginContainer = styled.div`
@@ -209,7 +209,7 @@ const SignIn = () => {
                             />
                             <LoginButton type='submit'>登入</LoginButton>
                         </form>
-                        <DirectLink href='SignUp'>還沒有帳號，前往註冊</DirectLink>
+                        <DirectLink href='signup'>還沒有帳號，前往註冊</DirectLink>
                     </LoginFormWrapper>
                     <SignInImage src={SignInImg} alt='Sign In' />
                 </>

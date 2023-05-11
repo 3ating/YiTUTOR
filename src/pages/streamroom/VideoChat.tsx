@@ -6,7 +6,7 @@ import ScreenSharing from './ScreenSharing';
 import ClassChatroom from './ClassChatroom';
 import Canvas from './canvas/Canvas';
 import styled from 'styled-components';
-import { useAuth } from '../../../public/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import Link from 'next/link';
 import { AiFillSwitcher } from 'react-icons/ai';
 import { BsFillCameraVideoFill, BsFillCameraVideoOffFill, BsMicFill, BsMicMuteFill } from 'react-icons/bs';

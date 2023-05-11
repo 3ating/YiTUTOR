@@ -2,7 +2,7 @@ import React from 'react';
 import '@/styles/globals.css';
 import { AppProps } from 'next/app';
 import { createGlobalStyle, ThemeProvider, StyleSheetManager } from 'styled-components';
-import { AuthProvider } from '../../public/AuthContext';
+import { AuthProvider } from '../context/AuthContext';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
 
