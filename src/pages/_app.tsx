@@ -4,8 +4,8 @@ import { AppProps } from 'next/app';
 import { createGlobalStyle } from 'styled-components';
 import { AuthProvider } from '../context/AuthContext';
 import { TeachersProvider } from '../context/TeacherContext';
-import Header from '@/components/Header/Header';
-import Footer from '@/components/Footer/Footer';
+import Header from '@/components/header/Header';
+import Footer from '@/components/footer/Footer';
 
 const GlobalStyle = createGlobalStyle`
     body {

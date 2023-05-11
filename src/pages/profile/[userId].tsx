@@ -5,10 +5,10 @@ import { getFirestore, doc, getDoc, collection, updateDoc } from 'firebase/fires
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import styled from 'styled-components';
-import Button from '@/components/Button';
+import Button from '@/components/common/Button';
 import { AiFillEdit } from 'react-icons/ai';
-import Loader from '@/components/Loader';
-import AIChat from '../../components/GPT/AIChatBtn';
+import Loader from '@/components/common/Loader';
+import AIChat from '../../components/gpt/AIChatBtn';
 import { db } from '@/utils/firebase';
 // import { useTeachers } from '../../context/TeacherContext';
 

@@ -220,7 +220,7 @@ const AIChatRoom = () => {
             model: 'gpt-3.5-turbo',
             messages: apiMessages,
         };
-        await fetch('/api/gpt/AISols', {
+        await fetch('/api/gpt/chatCompletion', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

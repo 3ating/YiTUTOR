@@ -44,6 +44,7 @@ const TeacherTimeSelection: React.FC<TeacherTimeSelectionProps> = ({
     handleTimeButtonClick,
     convertDayToChinese,
 }) => {
+    console.log('Selected times:', selectedTimes);
     return (
         <div>
             {Object.keys(selectedTimes).map((day) => (

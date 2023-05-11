@@ -1,15 +1,15 @@
 import React, { useRef } from 'react';
 import styled from 'styled-components';
 import Image from 'next/image';
-import PrimaryButton from '../Button';
+import PrimaryButton from '../common/Button';
 import mainImg from './images/mainImg.png';
 import online from './images/onlne.png';
 import ai from './images/ai.png';
 import board from './images//board.png';
-import AIChat from '../GPT/AIChatBtn';
+import AIChat from '../gpt/AIChatBtn';
 import Link from 'next/link';
 import 'firebase/compat/firestore';
-import TeacherCardComponents from '../TeacherCard';
+import TeacherCardComponents from '../common/TeacherCard';
 import { useAuth } from '../../context/AuthContext';
 import { useTeachers } from '@/context/TeacherContext';
 
@@ -274,7 +274,7 @@ export default function Main() {
                         <br /> Easy to Achieve <br />
                         with YiTUTOR
                     </BannerText>
-                    <DirectLink href={'/membership/signup'}>
+                    <DirectLink href={'/auth/signup'}>
                         {!isLoading && <PrimaryButton>立即加入</PrimaryButton>}
                     </DirectLink>
                 </BannerTextContainer>
@@ -355,7 +355,7 @@ export default function Main() {
                                             </RatingContainer>
                                             <TeacherDescription>{teacher.description}</TeacherDescription>
                                             <div>
-                                                <DirectLink href={`/teacherpage/${teacher.uid}`} key={teacher.uid}>
+                                                <DirectLink href={`../../teachers/${teacher.uid}`} key={teacher.uid}>
                                                     <TeacherBtn>購買課程</TeacherBtn>
                                                 </DirectLink>
                                             </div>

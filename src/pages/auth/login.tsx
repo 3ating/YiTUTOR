@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import Link from 'next/link';
 import styled, { keyframes } from 'styled-components';
-import Button from '../../components/Button';
+import Button from '../../components/common/Button';
 import SignInImg from './images/signin.png';
 import Image from 'next/image';
 

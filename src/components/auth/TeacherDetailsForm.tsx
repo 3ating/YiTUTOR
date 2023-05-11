@@ -136,6 +136,8 @@ const TeacherDetailsForm: React.FC<TeacherDetailsFormProps> = ({
     handlePriceChange,
     availableSubjects,
 }) => {
+    console.log('Available subjects:', availableSubjects);
+
     return (
         <>
             <TeacherInfoLabel>

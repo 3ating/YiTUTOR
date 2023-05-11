@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import 'firebase/compat/firestore';
 import styled from 'styled-components';
 import Link from 'next/link';
-import TeacherCardComponents from '../../components/TeacherCard';
+import TeacherCardComponents from '../../components/common/TeacherCard';
 import ReactSelect, { CSSObjectWithLabel, GroupBase, OptionProps, StylesConfig } from 'react-select';
-import AIChat from '../../components/GPT/AIChatBtn';
+import AIChat from '../../components/gpt/AIChatBtn';
 import { db } from '@/utils/firebase';
 import { useTeachers } from '@/context/TeacherContext';
 
@@ -298,7 +298,7 @@ const Teachers = () => {
                                         {renderStars(parseFloat(calculateAverage(teacher.evaluation).toFixed(1)))}
                                     </RatingContainer>
                                     <TeacherDescription>{teacher.description}</TeacherDescription>
-                                    <DirectLink href={`../teacherpage/${teacher.uid}`} key={teacher.uid}>
+                                    <DirectLink href={`./${teacher.uid}`} key={teacher.uid}>
                                         <TeacherBtn>購買課程</TeacherBtn>
                                     </DirectLink>
                                 </TeacherInfoContainer>
