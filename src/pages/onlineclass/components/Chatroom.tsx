@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import { db } from '@/utils/firebase';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../../context/AuthContext';
 import styled from 'styled-components';
 import { BsFillSendFill } from 'react-icons/bs';
 import { AiOutlineClose } from 'react-icons/ai';
