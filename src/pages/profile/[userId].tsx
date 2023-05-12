@@ -644,10 +644,6 @@ const UserProfile = () => {
         }
     }, [userId]);
 
-    console.log(userId);
-    console.log(bookingsInfo);
-    console.log(userInfo);
-
     if (!userInfo) {
         return <Loader />;
     }
@@ -755,7 +751,7 @@ const UserProfile = () => {
                             bookingsInfo.map((booking, index) => (
                                 <DirectLink
                                     key={index}
-                                    href={`/streamroom/onlineclassroom?id=${booking.teacherId || booking.studentId}`}
+                                    href={`/onlineclass/classroom?id=${booking.teacherId || booking.studentId}`}
                                 >
                                     <BookingCard>
                                         <BookingAvatar
@@ -788,7 +784,7 @@ const UserProfile = () => {
                                 {userInfo?.courses && Object.entries(userInfo.courses).length > 0 ? (
                                     <CourseCardContainer>
                                         {Object.entries(userInfo.courses).map(([courseId, courseData]) => (
-                                            <DirectLink key={courseId} href={`../teacherpage/${courseData.teacherid}`}>
+                                            <DirectLink key={courseId} href={`../teachers/${courseData.teacherid}`}>
                                                 <CourseCard>
                                                     <CourseInfo>
                                                         {/* <CourseLabel>科目:</CourseLabel> */}
@@ -802,10 +798,6 @@ const UserProfile = () => {
                                                         <CourseLabel> 剩餘堂數:</CourseLabel>
                                                         <CourseValue>{courseData.quantity}</CourseValue>
                                                     </CourseInfo>
-                                                    {/* <CourseInfo>
-                                                        <CourseLabel>價格:</CourseLabel>
-                                                        <CourseValue>{courseData.price}</CourseValue>
-                                                    </CourseInfo> */}
                                                 </CourseCard>
                                             </DirectLink>
                                         ))}

@@ -123,7 +123,7 @@ const Header: React.FC = () => {
             <NavContainer>
                 <MenuContainer>
                     <Menu href='/teachers/allteachers'>尋找老師</Menu>
-                    <Menu href='/streamroom/onlineclassroom'>線上教室</Menu>
+                    <Menu href='/onlineclass/classroom'>線上教室</Menu>
                 </MenuContainer>
                 <SignBtnContainer>
                     {isLoading ? (

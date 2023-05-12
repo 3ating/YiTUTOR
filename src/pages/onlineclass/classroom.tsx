@@ -1,8 +1,8 @@
 import React, { HTMLAttributes, useEffect, useRef, useState, ButtonHTMLAttributes } from 'react';
 import firebase from 'firebase/compat/app';
 import { useRouter } from 'next/router';
-import ScreenSharing from './ScreenSharing';
-import ClassChatroom from './ClassChatroom';
+import ScreenSharing from '../../components/onlineclass/ScreenSharing';
+import ClassChatroom from '../../components/onlineclass/Chatroom';
 import Canvas from './canvas/Canvas';
 import styled from 'styled-components';
 import { useAuth } from '../../context/AuthContext';
