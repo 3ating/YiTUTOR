@@ -2,7 +2,7 @@ import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
 import { useAuth } from '../../context/AuthContext';
-import logo from './images/yitutor_logo.png';
+import logo from '../../../public/logo.png';
 import Image from 'next/image';
 
 const HeaderWrapper = styled.header`
@@ -17,14 +17,6 @@ const HeaderWrapper = styled.header`
     position: fixed;
     top: 0;
     width: 100%;
-`;
-
-const Logo = styled.h1`
-    font-style: normal;
-    font-weight: 700;
-    font-size: 40px;
-    line-height: 47px;
-    margin: 0;
 `;
 
 const NavContainer = styled.div`
