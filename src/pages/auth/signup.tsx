@@ -11,9 +11,9 @@ import { CSSObject } from '@emotion/react';
 import { useAuth } from '../../context/AuthContext';
 import defaultAvatar from './images/defaultAvatar.png';
 import { db, auth, storage } from '@/utils/firebase';
-import TeacherDetailsForm from './components/TeacherDetailsForm';
-import TeacherTimeSelection from './components/TeacherTimeSelection';
-import SignUpButton from './components/SignUpButton';
+import TeacherDetailsForm from '../../components/auth/TeacherDetailsForm';
+import TeacherTimeSelection from '../../components/auth/TeacherTimeSelection';
+import SignUpButton from '../../components/auth/SignUpButton';
 
 interface UserTypeOption {
     value: string;

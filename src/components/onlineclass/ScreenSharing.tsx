@@ -12,7 +12,7 @@ import React, {
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import styled from 'styled-components';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { TbScreenShare } from 'react-icons/tb';
 import { Tooltip, message } from 'antd';
 import { db } from '@/utils/firebase';

@@ -3,14 +3,14 @@ import { useEffect, useState } from 'react';
 import firebase from 'firebase/compat/app';
 import styled from 'styled-components';
 import { useAuth } from '../../context/AuthContext';
-import Schedule from './components/Schedule';
-import Calendar from './components/Calendar';
+import Schedule from '../../components/teachers/Schedule';
+import Calendar from '../../components/teachers/Calendar';
 import { AiFillStar, AiOutlineMail, AiOutlinePhone, AiOutlineStar } from 'react-icons/ai';
 import { BsStarHalf } from 'react-icons/bs';
 import Button from '@/components/common/Button';
 import Loader from '@/components/common/Loader';
 import { Modal, notification } from 'antd';
-import ReservationNotice from './components/ReservationNotice';
+import ReservationNotice from '../../components/teachers/ReservationNotice';
 import AIChat from '../../components/chat/AIChatBtn';
 import { db } from '@/utils/firebase';
 
