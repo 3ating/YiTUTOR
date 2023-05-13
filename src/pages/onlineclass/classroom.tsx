@@ -17,9 +17,8 @@ import { FcAlarmClock } from 'react-icons/fc';
 import { Modal, Rate, Button } from 'antd';
 import { Tooltip, message } from 'antd';
 import { db } from '@/utils/firebase';
-import CountdownTimer from '@/components/onlineclass/CountdownTimer';
+import CountdownTimer from '../../components/onlineclass/CountdownTimer';
 import LoginPrompt from '@/components/common/LoginPrompt';
-import RatingModal from '@/components/onlineclass/RatingModal';
 interface TypographyProps extends HTMLAttributes<HTMLParagraphElement> {
     variant?: 'h6' | 'body';
     gutterBottom?: boolean;
@@ -272,6 +271,7 @@ const Avatar = styled.img`
     height: 40px;
     border-radius: 50%;
     object-fit: cover;
+    /* border: 2px solid gray; */
     margin-right: 5px;
 `;
 
@@ -863,7 +863,7 @@ const VideoChat: React.FC = () => {
                                 </Tooltip>
                             </>
                         )}
-                        {/* <Modal
+                        <Modal
                             title='為老師評分'
                             open={showRatingModal}
                             onCancel={() => setShowRatingModal(false)}
@@ -879,12 +879,7 @@ const VideoChat: React.FC = () => {
                             ]}
                         >
                             <Rate onChange={(value: number) => setTeacherRating(value)} />
-                        </Modal> */}
-                        <RatingModal
-                            showRatingModal={showRatingModal}
-                            classUrlId={classUrlId}
-                            onClose={() => setShowRatingModal(false)}
-                        />
+                        </Modal>
                     </ButtonsContainer>
                 </OnlineClassContainer>
             ) : (
