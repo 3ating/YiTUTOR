@@ -10,19 +10,15 @@ const LoginContainer = styled.div`
     display: flex;
     flex-direction: row;
     align-items: center;
-
     justify-content: center;
     gap: 50px;
-    /* justify-content: space-between; */
     min-height: 100vh;
     background-color: antiquewhite;
     padding: 8% 0;
     box-sizing: border-box;
-    /* padding: 0 5%; */
 `;
 
 const SignInImage = styled(Image)`
-    /* width: 450px; */
     width: 30%;
     height: auto;
 `;
@@ -79,10 +75,8 @@ const LogoutButton = styled(Button)`
     border-radius: 9px;
     letter-spacing: 2px;
     background-color: #ffab34;
-    /* color: black; */
     &:hover {
         background-color: #f9b352;
-        /* color: #ffffff; */
     }
 `;
 
@@ -162,11 +156,6 @@ const LogIn = () => {
         e.preventDefault();
         handleLoginWithEmail(email, password);
     };
-
-    // console.log('userInfo in sign page:', userInfo);
-    console.log('use in sign page:', user);
-    console.log('isLoading:', isLoading);
-    // console.log('uid:', userUid);
 
     return (
         <LoginContainer>

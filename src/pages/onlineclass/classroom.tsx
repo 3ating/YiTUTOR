@@ -17,7 +17,9 @@ import { FcAlarmClock } from 'react-icons/fc';
 import { Modal, Rate, Button } from 'antd';
 import { Tooltip, message } from 'antd';
 import { db } from '@/utils/firebase';
-
+import CountdownTimer from '@/components/onlineclass/CountdownTimer';
+import LoginPrompt from '@/components/common/LoginPrompt';
+import RatingModal from '@/components/onlineclass/RatingModal';
 interface TypographyProps extends HTMLAttributes<HTMLParagraphElement> {
     variant?: 'h6' | 'body';
     gutterBottom?: boolean;
@@ -47,7 +49,6 @@ const MainWrapper = styled.div`
 `;
 
 const OnlineClassContainer = styled.div`
-    /* height: calc(100vh - 130px); */
     padding: 0 30px;
     display: flex;
     flex-direction: column;
@@ -57,7 +58,6 @@ const OnlineClassContainer = styled.div`
 const ClassContainer = styled.div`
     display: flex;
     position: relative;
-    /* margin-top: 10px; */
     gap: 10px;
 `;
 
@@ -172,7 +172,6 @@ const HangUpButton = styled.button<ButtonProps>`
     display: inline-block;
     font-size: 14px;
     margin: 4px 2px;
-    /* padding: 10px 19px 8px 19px; */
     padding: 10px 13px 8px 13px;
     text-align: center;
     text-decoration: none;
@@ -273,7 +272,6 @@ const Avatar = styled.img`
     height: 40px;
     border-radius: 50%;
     object-fit: cover;
-    /* border: 2px solid gray; */
     margin-right: 5px;
 `;
 
@@ -289,14 +287,12 @@ const TheOtherAvatar = styled.img<TheOtherAvatarProps>`
 
 const RemoteScreen = styled.video`
     width: 40%;
-    /* height: 500px; */
     display: ${({ show }: { show: boolean }) => (show ? 'block' : 'none')};
     border-radius: 4px;
     border: 1px solid #ddd;
     border-radius: 9px;
     object-fit: cover;
     max-height: 500px;
-    /* margin-top: 8px; */
 `;
 
 const configuration = {
@@ -316,12 +312,9 @@ const VideoChat: React.FC = () => {
     const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
     const localStream = useRef<MediaStream | null>(null);
     const remoteStream = useRef<MediaStream | null>(null);
-
     const remoteScreenRef = useRef<HTMLVideoElement | null>(null);
     const [remoteScreen, setRemoteScreen] = useState<MediaStream | null>(null);
-
     const prevBothUsersJoined = useRef(false);
-
     const [peerConnection, setPeerConnection] = useState<RTCPeerConnection | null>(null);
     const [roomId, setRoomId] = useState<string | null>(null);
     const [roomDialogOpen, setRoomDialogOpen] = useState(false);
@@ -332,7 +325,7 @@ const VideoChat: React.FC = () => {
     const [isAudioMuted, setIsAudioMuted] = useState(false);
     const [isVideoEnabled, setIsVideoEnabled] = useState(true);
     const [showChatroom, setShowChatroom] = useState(false);
-    const [timeRemaining, setTimeRemaining] = useState(50 * 60);
+    // const [timeRemaining, setTimeRemaining] = useState(50 * 60);
     const [bothUsersJoined, setBothUsersJoined] = useState(false);
     const [anotheruserAvatar, setAnotherUserAvatar] = useState('');
     const [anotherUserName, setAnotherUserName] = useState('');
@@ -425,7 +418,6 @@ const VideoChat: React.FC = () => {
         }
         setCameraEnabled(true);
     };
-    console.log('anotherUserName', anotherUserName);
 
     const hangUp = async () => {
         if (localStream.current) {
@@ -696,11 +688,11 @@ const VideoChat: React.FC = () => {
             message.info('線上上課開始');
         }, 500);
 
-        const timer = setInterval(() => {
-            setTimeRemaining((prevTime) => prevTime - 1);
-        }, 1000);
+        // const timer = setInterval(() => {
+        //     setTimeRemaining((prevTime) => prevTime - 1);
+        // }, 1000);
 
-        return () => clearInterval(timer);
+        // return () => clearInterval(timer);
     }, [bothUsersJoined]);
 
     useEffect(() => {
@@ -716,9 +708,9 @@ const VideoChat: React.FC = () => {
         };
     }, [bothUsersJoined]);
 
-    const minutes = Math.floor(timeRemaining / 60);
-    const seconds = timeRemaining % 60;
-    const formattedSeconds = seconds.toString().padStart(2, '0');
+    // const minutes = Math.floor(timeRemaining / 60);
+    // const seconds = timeRemaining % 60;
+    // const formattedSeconds = seconds.toString().padStart(2, '0');
 
     return (
         <MainWrapper>
@@ -738,7 +730,8 @@ const VideoChat: React.FC = () => {
                                     )}
                                 </AvatarContainer>
                                 <RoomTitle>
-                                    <FcAlarmClock size={26} /> {minutes}:{formattedSeconds}
+                                    {/* <FcAlarmClock size={26} /> {minutes}:{formattedSeconds} */}
+                                    <CountdownTimer initialTime={50 * 60} bothUsersJoined={bothUsersJoined} />
                                 </RoomTitle>
                             </TimeAvatarContainer>
                         </>
@@ -870,7 +863,7 @@ const VideoChat: React.FC = () => {
                                 </Tooltip>
                             </>
                         )}
-                        <Modal
+                        {/* <Modal
                             title='為老師評分'
                             open={showRatingModal}
                             onCancel={() => setShowRatingModal(false)}
@@ -886,14 +879,20 @@ const VideoChat: React.FC = () => {
                             ]}
                         >
                             <Rate onChange={(value: number) => setTeacherRating(value)} />
-                        </Modal>
+                        </Modal> */}
+                        <RatingModal
+                            showRatingModal={showRatingModal}
+                            classUrlId={classUrlId}
+                            onClose={() => setShowRatingModal(false)}
+                        />
                     </ButtonsContainer>
                 </OnlineClassContainer>
             ) : (
-                <CenteredContainer>
-                    <UnLoginText>請先登入再使用此功能</UnLoginText>
-                    <DirectLink href='/auth/login'>點我登入</DirectLink>
-                </CenteredContainer>
+                // <CenteredContainer>
+                //     <UnLoginText>請先登入再使用此功能</UnLoginText>
+                //     <DirectLink href='/auth/login'>點我登入</DirectLink>
+                // </CenteredContainer>
+                <LoginPrompt />
             )}
         </MainWrapper>
     );
