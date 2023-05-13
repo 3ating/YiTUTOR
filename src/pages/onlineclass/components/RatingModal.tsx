@@ -24,13 +24,13 @@ const RatingModal: React.FC<RatingModalProps> = ({ classUrlId, userType, userUid
             });
         }
         closeModal();
-        router.push(`/teacher/${classUrlId}`);
+        router.push(`/teachers/${classUrlId}`);
     };
 
     return (
         <Modal
             title='為老師評分'
-            visible={isVisible}
+            open={isVisible}
             onCancel={closeModal}
             footer={[
                 <Button key='submit' type='primary' onClick={submitRating} style={{ backgroundColor: '#ffab34' }}>

@@ -1,7 +1,7 @@
 import React, { HTMLAttributes, useEffect, useRef, useState, ButtonHTMLAttributes } from 'react';
 import firebase from 'firebase/compat/app';
 import { useRouter } from 'next/router';
-import ScreenSharing from './components/ScreenSharing';
+// import ScreenSharing from './components/ScreenSharing';
 import ClassChatroom from './components/Chatroom';
 import Canvas from './canvas/Canvas';
 import styled from 'styled-components';
@@ -13,8 +13,6 @@ import { ImPhoneHangUp } from 'react-icons/im';
 import { TbMessageCircle2Filled } from 'react-icons/tb';
 import { FaVolumeDown, FaVolumeMute } from 'react-icons/fa';
 import { RiVideoAddFill } from 'react-icons/ri';
-import { FcAlarmClock } from 'react-icons/fc';
-import { Modal, Rate, Button } from 'antd';
 import { Tooltip, message } from 'antd';
 import { db } from '@/utils/firebase';
 import CountdownTimer from './components/CountdownTimer';
@@ -43,7 +41,6 @@ const MainWrapper = styled.div`
     flex-direction: column;
     min-height: 100vh;
     padding: 70px 0;
-    /* margin: 65px 0; */
     box-sizing: border-box;
     background-color: antiquewhite;
     justify-content: center;
@@ -260,9 +257,7 @@ const LiveText = styled.p`
     color: white;
 `;
 
-const ChatRoomContainer = styled.div`
-    /* margin: 20px 0 5px 0; */
-`;
+const ChatRoomContainer = styled.div``;
 
 const AvatarContainer = styled.div`
     display: flex;
@@ -326,13 +321,11 @@ const VideoChat: React.FC = () => {
     const [isAudioMuted, setIsAudioMuted] = useState(false);
     const [isVideoEnabled, setIsVideoEnabled] = useState(true);
     const [showChatroom, setShowChatroom] = useState(false);
-    // const [timeRemaining, setTimeRemaining] = useState(50 * 60);
     const [bothUsersJoined, setBothUsersJoined] = useState(false);
     const [anotheruserAvatar, setAnotherUserAvatar] = useState('');
     const [anotherUserName, setAnotherUserName] = useState('');
     const [classUrlId, setClassUrlId] = useState<string | null>(null);
     const [showRatingModal, setShowRatingModal] = useState(false);
-    const [teacherRating, setTeacherRating] = useState<number | null>(null);
 
     const toggleVideoScreen = () => {
         setShowLocalVideo(!showLocalVideo);
@@ -661,24 +654,12 @@ const VideoChat: React.FC = () => {
         setShowChatroom(!showChatroom);
     };
 
-    const submitRating = async () => {
-        if (classUrlId && teacherRating !== null) {
-            const db = firebase.firestore();
-            const userRef = db.collection('users').doc(classUrlId);
-            await userRef.update({
-                evaluation: firebase.firestore.FieldValue.arrayUnion(teacherRating),
-            });
-        }
-        setShowRatingModal(false);
-        router.push(`/teacher/${classUrlId}`);
-    };
-
     useEffect(() => {
         if (prevBothUsersJoined.current && !bothUsersJoined && userInfo?.userType === 'student') {
             setShowRatingModal(true);
         }
         if (prevBothUsersJoined.current && !bothUsersJoined && userInfo?.userType === 'teacher') {
-            router.push(`/teacher/${userUid}`);
+            router.push(`/teachers/${userUid}`);
         }
         prevBothUsersJoined.current = bothUsersJoined;
     }, [bothUsersJoined, userInfo]);
@@ -688,12 +669,6 @@ const VideoChat: React.FC = () => {
         setTimeout(() => {
             message.info('線上上課開始');
         }, 500);
-
-        // const timer = setInterval(() => {
-        //     setTimeRemaining((prevTime) => prevTime - 1);
-        // }, 1000);
-
-        // return () => clearInterval(timer);
     }, [bothUsersJoined]);
 
     useEffect(() => {
@@ -708,10 +683,6 @@ const VideoChat: React.FC = () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
         };
     }, [bothUsersJoined]);
-
-    // const minutes = Math.floor(timeRemaining / 60);
-    // const seconds = timeRemaining % 60;
-    // const formattedSeconds = seconds.toString().padStart(2, '0');
 
     return (
         <MainWrapper>
@@ -731,7 +702,6 @@ const VideoChat: React.FC = () => {
                                     )}
                                 </AvatarContainer>
                                 <RoomTitle>
-                                    {/* <FcAlarmClock size={26} /> {minutes}:{formattedSeconds} */}
                                     <CountdownTimer initialTime={50 * 60} bothUsersJoined={bothUsersJoined} />
                                 </RoomTitle>
                             </TimeAvatarContainer>
@@ -799,7 +769,7 @@ const VideoChat: React.FC = () => {
                                         <AiFillSwitcher size={ICON_SIZE} />
                                     </VideoScreenButton>
                                 </Tooltip>
-                                <ScreenSharing
+                                {/* <ScreenSharing
                                     localStream={localStream.current}
                                     peerConnection={peerConnection}
                                     isScreenSharing={isScreenSharing}
@@ -808,7 +778,7 @@ const VideoChat: React.FC = () => {
                                     roomId={roomId}
                                     remoteScreen={remoteScreen}
                                     setRemoteScreen={setRemoteScreen}
-                                />
+                                /> */}
                                 <Tooltip title='聊天室'>
                                     <ChatButton
                                         active={!showChatroom}
@@ -864,23 +834,6 @@ const VideoChat: React.FC = () => {
                                 </Tooltip>
                             </>
                         )}
-                        {/* <Modal
-                            title='為老師評分'
-                            open={showRatingModal}
-                            onCancel={() => setShowRatingModal(false)}
-                            footer={[
-                                <Button
-                                    key='submit'
-                                    type='primary'
-                                    onClick={submitRating}
-                                    style={{ backgroundColor: '#ffab34' }}
-                                >
-                                    送出
-                                </Button>,
-                            ]}
-                        >
-                            <Rate onChange={(value: number) => setTeacherRating(value)} />
-                        </Modal> */}
                         <RatingModal
                             classUrlId={classUrlId}
                             userType={userInfo?.userType || ''}

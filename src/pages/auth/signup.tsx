@@ -12,9 +12,6 @@ import { useAuth } from '../../context/AuthContext';
 import defaultAvatar from './components/images/defaultAvatar.png';
 import { db, auth, storage } from '@/utils/firebase';
 import SignUpButton from './components/SignUpButton';
-// import Link from 'next/link';
-// import Button from '@/components/common/Button';
-
 interface UserTypeOption {
     value: string;
     label: string;
@@ -27,7 +24,8 @@ type SubjectButtonProps = {
 const SignupContainer = styled.div`
     width: 100%;
     display: flex;
-    min-height: 100vh;
+    min-height: calc(100vh - 130px);
+    margin: 65px 0;
 `;
 
 const WelcomeContainer = styled.div`
@@ -43,7 +41,7 @@ const WelcomeTextContainer = styled.div`
     display: flex;
     justify-content: center;
     flex-direction: column;
-    width: 400px;
+    /* width: 400px; */
     margin: 20px 0 45px;
 `;
 
