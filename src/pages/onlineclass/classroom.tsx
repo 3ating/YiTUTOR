@@ -271,7 +271,6 @@ const Avatar = styled.img`
     height: 40px;
     border-radius: 50%;
     object-fit: cover;
-    /* border: 2px solid gray; */
     margin-right: 5px;
 `;
 
