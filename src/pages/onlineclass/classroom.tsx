@@ -19,6 +19,8 @@ import { Tooltip, message } from 'antd';
 import { db } from '@/utils/firebase';
 import CountdownTimer from './components/CountdownTimer';
 import LoginPrompt from '@/components/common/LoginPrompt';
+import RatingModal from './components/RatingModal';
+
 interface TypographyProps extends HTMLAttributes<HTMLParagraphElement> {
     variant?: 'h6' | 'body';
     gutterBottom?: boolean;
@@ -862,7 +864,7 @@ const VideoChat: React.FC = () => {
                                 </Tooltip>
                             </>
                         )}
-                        <Modal
+                        {/* <Modal
                             title='為老師評分'
                             open={showRatingModal}
                             onCancel={() => setShowRatingModal(false)}
@@ -878,7 +880,14 @@ const VideoChat: React.FC = () => {
                             ]}
                         >
                             <Rate onChange={(value: number) => setTeacherRating(value)} />
-                        </Modal>
+                        </Modal> */}
+                        <RatingModal
+                            classUrlId={classUrlId}
+                            userType={userInfo?.userType || ''}
+                            userUid={userUid}
+                            isVisible={showRatingModal}
+                            closeModal={() => setShowRatingModal(false)}
+                        />
                     </ButtonsContainer>
                 </OnlineClassContainer>
             ) : (
