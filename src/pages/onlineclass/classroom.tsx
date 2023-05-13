@@ -1,8 +1,8 @@
 import React, { HTMLAttributes, useEffect, useRef, useState, ButtonHTMLAttributes } from 'react';
 import firebase from 'firebase/compat/app';
 import { useRouter } from 'next/router';
-import ScreenSharing from '../../components/onlineclass/ScreenSharing';
-import ClassChatroom from '../../components/onlineclass/Chatroom';
+import ScreenSharing from './components/ScreenSharing';
+import ClassChatroom from './components/Chatroom';
 import Canvas from './canvas/Canvas';
 import styled from 'styled-components';
 import { useAuth } from '../../context/AuthContext';
@@ -17,7 +17,7 @@ import { FcAlarmClock } from 'react-icons/fc';
 import { Modal, Rate, Button } from 'antd';
 import { Tooltip, message } from 'antd';
 import { db } from '@/utils/firebase';
-import CountdownTimer from '../../components/onlineclass/CountdownTimer';
+import CountdownTimer from './components/CountdownTimer';
 import LoginPrompt from '@/components/common/LoginPrompt';
 interface TypographyProps extends HTMLAttributes<HTMLParagraphElement> {
     variant?: 'h6' | 'body';

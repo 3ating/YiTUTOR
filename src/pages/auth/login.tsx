@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import Link from 'next/link';
 import styled, { keyframes } from 'styled-components';
 import Button from '../../components/common/Button';
-import SignInImg from '../../components/auth/images/signin.png';
+import SignInImg from './components/images/signin.png';
 import Image from 'next/image';
 
 const LoginContainer = styled.div`
