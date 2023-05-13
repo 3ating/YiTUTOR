@@ -4,27 +4,15 @@ import { useTeachers } from '@/context/TeacherContext';
 import { db } from '@/utils/firebase';
 import 'firebase/compat/firestore';
 import ReactSelect, { CSSObjectWithLabel, GroupBase, OptionProps, StylesConfig } from 'react-select';
-import TeacherCardComponents from '../../components/common/TeacherCard';
-import ChatBtn from '../../components/chat/ChatBtn';
+import TeacherCardComponents from '@/components/common/TeacherCard';
+import ChatBtn from '@/components/chat/ChatBtn';
+import { Teacher } from '@/types/Teacher';
 import Link from 'next/link';
 
 export type OptionType = {
     label: string;
     value: string;
 };
-
-interface Teacher {
-    uid: string;
-    evaluation: number[];
-    subject: any;
-    name: string;
-    email: string;
-    phone: string;
-    userType: string;
-    description?: string;
-    price?: { qty: number; price: number }[];
-    avatar?: string;
-}
 
 interface ReactSelectProps {
     value: string;

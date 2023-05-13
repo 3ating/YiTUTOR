@@ -1,18 +1,7 @@
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react';
 import { db } from '@/utils/firebase';
+import { Teacher } from '@/types/Teacher';
 
-export interface Teacher {
-    uid: string;
-    evaluation: number[];
-    subject: any;
-    name: string;
-    email: string;
-    phone: string;
-    userType: string;
-    description?: string;
-    price?: { qty: number; price: number }[];
-    avatar?: string;
-}
 interface TeacherContextProps {
     teachers: Teacher[];
     setTeachers: Dispatch<SetStateAction<Teacher[]>>;

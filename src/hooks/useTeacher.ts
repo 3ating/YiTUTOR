@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import firebase from 'firebase/compat/app';
 import { useRouter } from 'next/router';
 import { Teacher } from '@/types/Teacher';
 import { db } from '@/utils/firebase';
@@ -11,7 +10,6 @@ export const useTeacher = () => {
 
     useEffect(() => {
         if (uid) {
-            // const db = firebase.firestore();
             db.collection('users')
                 .doc(uid as string)
                 .get()
