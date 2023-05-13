@@ -5,17 +5,15 @@ import styled from 'styled-components';
 import Image from 'next/image';
 import SignUpImg from './components/images/signup.png';
 import { AiOutlineCamera } from 'react-icons/ai';
-import Select, { OptionProps, ControlProps, StylesConfig } from 'react-select';
+import { OptionProps, ControlProps, StylesConfig } from 'react-select';
 import ReactSelect from 'react-select';
 import { CSSObject } from '@emotion/react';
 import { useAuth } from '../../context/AuthContext';
 import defaultAvatar from './components/images/defaultAvatar.png';
 import { db, auth, storage } from '@/utils/firebase';
-// import TeacherDetailsForm from '../../components/auth/TeacherDetailsForm';
-// import TeacherTimeSelection from '../../components/auth/TeacherTimeSelection';
 import SignUpButton from './components/SignUpButton';
-import Link from 'next/link';
-import Button from '@/components/common/Button';
+// import Link from 'next/link';
+// import Button from '@/components/common/Button';
 
 interface UserTypeOption {
     value: string;
@@ -25,12 +23,6 @@ interface UserTypeOption {
 type SubjectButtonProps = {
     selected: boolean;
 };
-
-const PageContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    margin: 65px 0;
-`;
 
 const SignupContainer = styled.div`
     width: 100%;
@@ -106,9 +98,7 @@ const SignupTitleLine = styled.div`
 
 const UserInfoForm = styled.form`
     display: flex;
-    /* align-items: flex-start; */
     flex-direction: column;
-    /* align-items: flex-start; */
     gap: 20px;
     width: 100%;
     margin-top: 20px;
@@ -137,30 +127,6 @@ const UserInfoLabel = styled.label`
     flex-direction: column;
     font-size: 16px;
     letter-spacing: 1px;
-`;
-
-const UserInfoSelect = styled.select`
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
-    font-weight: 400;
-    color: #555;
-    background-color: #f9f9f9;
-    appearance: none;
-    cursor: pointer;
-    margin-top: 8px;
-`;
-
-const SubmitButton = styled(Button)`
-    border-radius: 9px;
-    letter-spacing: 2px;
-    background-color: ${(props) =>
-        props.children === '下一步' || props.children === '最後一步' ? 'black' : '#ffab34'};
-    &:hover {
-        background-color: ${(props) =>
-            props.children === '下一步' || props.children === '最後一步' ? '#333' : '#f9b352'};
-    }
 `;
 
 const AvatarContainer = styled.div`
@@ -200,26 +166,8 @@ const AvatarPreviewImage = styled.img`
     border-radius: 50%;
 `;
 
-const DirectLink = styled(Link)`
-    text-decoration: none;
-    color: gray;
-    width: fit-content;
-    display: inline-block;
-    margin-top: 10px;
-    &:hover {
-        color: #333333;
-    }
-`;
-
 const TeacherSubjectContainer = styled.div`
     width: 100%;
-`;
-
-const ButtonContainer = styled.div`
-    display: flex;
-    width: 100%;
-    flex-direction: column;
-    align-items: center;
 `;
 
 const TeacherInfoLabel = styled.label`
@@ -291,7 +239,6 @@ const PriceLabel = styled.label`
 `;
 
 const PriceInput = styled.input`
-    /* width: 100%; */
     max-width: 200px;
     padding: 10px 8px 5px;
     font-size: 1rem;
@@ -336,7 +283,6 @@ const TimeButton = styled.button<{ selected: boolean }>`
     background-color: ${(props) => (props.selected ? '#000' : '#ccc')};
     color: ${(props) => (props.selected ? 'white' : 'black')};
     padding: 5px 10px;
-    /* margin: 5px; */
     border-radius: 5px;
     cursor: pointer;
     border: none;

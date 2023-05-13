@@ -62,7 +62,6 @@ const TimeSlot = styled.div<{ selected: boolean; active: boolean }>`
 
 const NoTimeContent = styled.p`
     font-size: 20px;
-    /* font-weight: 600; */
     color: gray;
     letter-spacing: 2px;
     line-height: 35px;

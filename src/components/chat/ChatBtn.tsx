@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { FaRobot } from 'react-icons/fa';
 import { AiOutlineClose } from 'react-icons/ai';
 import { useAuth } from '../../context/AuthContext';
-import AIChatRoom from './AIChatRoom';
+import ChatRoom from './ChatRoom';
 import { notification } from 'antd';
 
 const ChatButtonWrapper = styled.button<{ showChatRoom: boolean }>`
@@ -30,7 +30,7 @@ const ChatButtonWrapper = styled.button<{ showChatRoom: boolean }>`
     }
 `;
 
-const AIChatBtn = () => {
+const ChatBtn = () => {
     const { isLoading } = useAuth();
     const [showChatRoom, setShowChatRoom] = useState(false);
 
@@ -51,9 +51,9 @@ const AIChatBtn = () => {
             <ChatButtonWrapper showChatRoom={showChatRoom} onClick={handleShowChatRoom}>
                 {showChatRoom ? <AiOutlineClose /> : <FaRobot />}
             </ChatButtonWrapper>
-            {showChatRoom && <AIChatRoom />}
+            {showChatRoom && <ChatRoom />}
         </>
     );
 };
 
-export default AIChatBtn;
+export default ChatBtn;

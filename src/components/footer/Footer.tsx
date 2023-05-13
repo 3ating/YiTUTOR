@@ -25,7 +25,6 @@ const Logo = styled.h1`
 `;
 
 const FooterText = styled.p`
-    /* font-weight: 700; */
     font-size: 13px;
     line-height: 21px;
 `;

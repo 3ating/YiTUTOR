@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import 'firebase/compat/firestore';
 import styled from 'styled-components';
-import Link from 'next/link';
-import TeacherCardComponents from '../../components/common/TeacherCard';
-import ReactSelect, { CSSObjectWithLabel, GroupBase, OptionProps, StylesConfig } from 'react-select';
-import AIChat from '../../components/chat/AIChatBtn';
-import { db } from '@/utils/firebase';
 import { useTeachers } from '@/context/TeacherContext';
+import { db } from '@/utils/firebase';
+import 'firebase/compat/firestore';
+import ReactSelect, { CSSObjectWithLabel, GroupBase, OptionProps, StylesConfig } from 'react-select';
+import TeacherCardComponents from '../../components/common/TeacherCard';
+import ChatBtn from '../../components/chat/ChatBtn';
+import Link from 'next/link';
 
 export type OptionType = {
     label: string;
@@ -307,7 +307,7 @@ const Teachers = () => {
                     ))}
                 </TeacherContainer>
             </TeachersPageContainer>
-            <AIChat />
+            <ChatBtn />
         </PageContainer>
     );
 };

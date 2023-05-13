@@ -11,26 +11,28 @@ import Button from '@/components/common/Button';
 import Loader from '@/components/common/Loader';
 import { Modal, notification } from 'antd';
 import ReservationNotice from './components/ReservationNotice';
-import AIChat from '../../components/chat/AIChatBtn';
+import ChatBtn from '../../components/chat/ChatBtn';
 import { db } from '@/utils/firebase';
+import { Teacher } from '@/types/Teacher';
+import { useTeacher } from '@/hooks/useTeacher';
 
-interface Teacher {
-    selectedTimes: { day: string; hours: number[] }[];
-    uid: string;
-    name: string;
-    description?: string;
-    avatar?: string;
-    certification?: boolean;
-    courses?: Record<string, any>;
-    document?: string;
-    email?: string;
-    phone?: string;
-    price?: { qty: number; price: number }[];
-    subject?: string[];
-    userType?: string;
-    intro?: string;
-    evaluation?: number[];
-}
+// interface Teacher {
+//     selectedTimes: { day: string; hours: number[] }[];
+//     uid: string;
+//     name: string;
+//     description?: string;
+//     avatar?: string;
+//     certification?: boolean;
+//     courses?: Record<string, any>;
+//     document?: string;
+//     email?: string;
+//     phone?: string;
+//     price?: { qty: number; price: number }[];
+//     subject?: string[];
+//     userType?: string;
+//     intro?: string;
+//     evaluation?: number[];
+// }
 
 const MainWrapper = styled.div`
     display: flex;
@@ -367,9 +369,10 @@ const BookButtonContainer = styled.div`
 const TeacherDetails = () => {
     const ICON_SIZE = 20;
     const router = useRouter();
+    const teacher = useTeacher();
     const { uid } = router.query;
     const { userInfo, isLoading, userUid } = useAuth();
-    const [teacher, setTeacher] = useState<Teacher | null>(null);
+    // const [teacher, setTeacher] = useState<Teacher | null>(null);
     const [confirmPurchase, setConfirmPurchase] = useState(false);
     const [selectedPrice, setSelectedPrice] = useState({ qty: 0, price: 0 });
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -426,23 +429,23 @@ const TeacherDetails = () => {
         setConfirmPurchase(false);
     };
 
-    useEffect(() => {
-        if (uid) {
-            const db = firebase.firestore();
-            db.collection('users')
-                .doc(uid as string)
-                .get()
-                .then((doc) => {
-                    if (doc.exists) {
-                        const teacherData = doc.data() as Teacher;
-                        setTeacher(teacherData);
-                    }
-                })
-                .catch((error) => {
-                    console.error('Error fetching teacher details:', error);
-                });
-        }
-    }, [uid]);
+    // useEffect(() => {
+    //     if (uid) {
+    //         const db = firebase.firestore();
+    //         db.collection('users')
+    //             .doc(uid as string)
+    //             .get()
+    //             .then((doc) => {
+    //                 if (doc.exists) {
+    //                     const teacherData = doc.data() as Teacher;
+    //                     setTeacher(teacherData);
+    //                 }
+    //             })
+    //             .catch((error) => {
+    //                 console.error('Error fetching teacher details:', error);
+    //             });
+    //     }
+    // }, [uid]);
 
     const handleTimeSlotClick = () => {
         if (userInfo?.userType === 'teacher' || !isLoading) {
@@ -676,7 +679,7 @@ const TeacherDetails = () => {
                     </CourseContainer>
                 </TeacherRightContainer>
             </TeacherContainer>
-            <AIChat />
+            <ChatBtn />
         </MainWrapper>
     );
 };

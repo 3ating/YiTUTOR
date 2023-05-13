@@ -11,11 +11,9 @@ const ChatroomContainer = styled.div`
     display: flex;
     flex-direction: column;
     max-width: 400px;
-    /* width: 85%; */
     height: 495px;
     background-color: #f5f5f5;
     padding: 5px 15px;
-    /* border-radius: 8px 8px 0 0; */
     box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.1);
     z-index: 2;
     position: relative;
@@ -161,7 +159,7 @@ export default function ClassChatroom({ roomId, toggleChat }: ChatroomProps) {
         const unsubscribe = db
             .collection('rooms')
             .doc(roomId)
-            .collection('messages') //rooms/{roomId}/messages
+            .collection('messages')
             .orderBy('timestamp', 'asc')
             .onSnapshot((snapshot) => {
                 const messagesData: MessageType[] = snapshot.docs.map((doc) => ({

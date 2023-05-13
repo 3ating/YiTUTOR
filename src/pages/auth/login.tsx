@@ -148,7 +148,7 @@ const DirectLink = styled(Link)`
 `;
 
 const LogIn = () => {
-    const { user, userInfo, isLoading, userUid, handleLoginWithEmail, handleLogout } = useAuth();
+    const { user, userInfo, isLoading, handleLoginWithEmail, handleLogout } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 

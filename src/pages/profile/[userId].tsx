@@ -1,23 +1,41 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { getFirestore, doc, getDoc, collection, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, updateDoc } from 'firebase/firestore';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import styled from 'styled-components';
 import Button from '@/components/common/Button';
 import { AiFillEdit } from 'react-icons/ai';
 import Loader from '@/components/common/Loader';
-import AIChat from '../../components/chat/AIChatBtn';
+import ChatBtn from '../../components/chat/ChatBtn';
 import { db } from '@/utils/firebase';
-// import { useTeachers } from '../../context/TeacherContext';
 
 type BookedCoursesContainerProps = {
     isBookedCourseEmpty: boolean;
 };
 
+type UserInfoKeys = 'email' | 'phone';
+
 interface ProfilRightContainerProps {
     isTeacher: boolean;
+}
+
+interface Booking {
+    date: firebase.firestore.Timestamp;
+    teacherId: string;
+    studentId?: string;
+    courseTime: { dayLabel: string; time: string };
+}
+
+interface BookingWithTeacherInfo extends Booking {
+    teacherInfo: TeacherInfo;
+}
+
+interface TeacherInfo {
+    avatar: string;
+    name: string;
+    subject: string;
 }
 
 const MainWrapper = styled.div`
@@ -40,8 +58,6 @@ const UserInfoBox = styled.div`
     display: flex;
     align-items: center;
     flex-direction: column;
-    /* background-color: #ffffff; */
-    /* padding: 1.5rem; */
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
@@ -54,16 +70,7 @@ const UserInfoBox = styled.div`
     }
 `;
 
-const InfoContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    background-color: antiquewhite;
-`;
-
 const Avatar = styled.img`
-    /* width: 182px; */
     width: 60%;
     border-radius: 50%;
     margin: 20px auto;
@@ -76,15 +83,12 @@ const UserInfoContainer = styled.div`
     flex-direction: column;
     align-items: center;
     width: 100%;
-    /* margin-bottom: 30px; */
-    /* margin-left: 24px; */
 `;
 
 const UserNameContainer = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    /* width: 240px; */
     width: 100%;
     margin: 20px 0 30px;
 `;
@@ -135,7 +139,6 @@ const UserInforContent = styled.div`
 `;
 
 const UserInformationLine = styled.div`
-    /* width: 240px; */
     width: 100%;
     height: 1px;
     background: #000000;
@@ -145,48 +148,6 @@ const UserInfo = styled.div`
     font-size: 20px;
     color: #777;
     margin: 0 0 5px 0;
-`;
-
-const UserMail = styled.p`
-    /* font-weight: 400; */
-    font-size: 20px;
-    color: #777;
-    margin: 0 0 15px 0;
-`;
-
-const InputLabel = styled.label`
-    display: block;
-    margin-bottom: 0.5rem;
-`;
-
-const TextArea = styled.textarea`
-    display: block;
-    width: 100%;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
-    resize: none;
-`;
-
-const UserInfoRow = styled.p`
-    margin-bottom: 0.5rem;
-`;
-
-const ButtonContainer = styled.div`
-    margin-top: 10px;
-    width: 100%;
-`;
-
-const StyledInput = styled.input`
-    display: block;
-    width: 100%;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
 `;
 
 const ConfirmButton = styled(Button)`
@@ -214,14 +175,12 @@ const CourseCardContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* margin-top: 2rem; */
 `;
 
 const CourseCard = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    /* width: 100%; */
     max-width: 800px;
     background-color: #ffffff;
     padding: 15px 10px;
@@ -229,12 +188,6 @@ const CourseCard = styled.div`
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     transition: all 0.3s ease;
-
-    /* &:hover {
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-        transform: translateY(-4px);
-    } */
-
     @media screen and (max-width: 850px) {
         flex-direction: column;
         align-items: flex-start;
@@ -245,7 +198,6 @@ const CourseInfo = styled.div`
     display: flex;
     align-items: center;
     font-size: 16px;
-    /* margin-right: 1.5rem; */
 `;
 
 const CourseLabel = styled.span`
@@ -258,42 +210,6 @@ const CourseLabel = styled.span`
 const CourseValue = styled.span`
     font-weight: 400;
     font-size: 18px;
-    /* width: 35.5px; */
-`;
-
-const StyledTextDescription = styled.textarea`
-    display: block;
-    width: 100%;
-    height: 100px;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
-    resize: none;
-`;
-
-const StyledTextIntro = styled.textarea`
-    display: block;
-    width: 100%;
-    height: 200px;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
-    resize: none;
-`;
-
-const BookingsContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 1;
-    /* min-width: 300px; */
-    box-sizing: border-box;
-    padding: 35px 20px;
-    width: 100%;
 `;
 
 const BookingCard = styled.div`
@@ -384,8 +300,6 @@ const TeacherLink = styled(Link)`
 
 const ProfileWrapper = styled.div`
     display: flex;
-    /* height: calc(100vh - 130px); */
-    /* border: 1px solid red; */
 `;
 
 const ProfileMiddleContainer = styled.div<BookedCoursesContainerProps>`
@@ -393,13 +307,10 @@ const ProfileMiddleContainer = styled.div<BookedCoursesContainerProps>`
     flex-direction: column;
     align-items: center;
     width: ${(props) => (props.isBookedCourseEmpty ? '70%' : '35%')};
-    /* height: 100%; */
     padding: 65px 0 0 0;
     box-sizing: border-box;
     @media (max-width: 815px) {
         width: ${(props) => (props.isBookedCourseEmpty ? '60%' : '30%')};
-
-        /* width: 60%; */
     }
 `;
 
@@ -521,41 +432,6 @@ interface UserInfo {
     }[];
     bookings: Booking[];
 }
-
-interface Booking {
-    date: firebase.firestore.Timestamp;
-    teacherId: string;
-    studentId?: string;
-    courseTime: { dayLabel: string; time: string };
-}
-
-interface BookingWithTeacherInfo extends Booking {
-    teacherInfo: TeacherInfo;
-}
-
-interface TeacherInfo {
-    avatar: string;
-    name: string;
-    subject: string;
-}
-
-type UserInfoKeys = 'email' | 'phone';
-
-// const firebaseConfig = {
-//     apiKey: process.env.FIRESTORE_API_KEY,
-//     authDomain: 'board-12c3c.firebaseapp.com',
-//     projectId: 'board-12c3c',
-//     storageBucket: 'board-12c3c.appspot.com',
-//     messagingSenderId: '662676665549',
-//     appId: '1:662676665549:web:d2d23417c365f3ec666584',
-//     measurementId: 'G-YY6Q81WPY9',
-// };
-
-// if (!firebase.apps.length) {
-//     firebase.initializeApp(firebaseConfig);
-// }
-
-// const db = firebase.firestore();
 
 const UserProfile = () => {
     const router = useRouter();
@@ -690,7 +566,6 @@ const UserProfile = () => {
                                     </EditContainer>
                                 </UserInforContent>
                             </UserInformationContainer>
-
                             <UserInformationContainer>
                                 <UserInformation>電話</UserInformation>
                                 <UserInformationLine />
@@ -812,7 +687,7 @@ const UserProfile = () => {
                     )}
                 </ProfilRightContainer>
             </ProfileWrapper>
-            <AIChat />
+            <ChatBtn />
         </MainWrapper>
     );
 };

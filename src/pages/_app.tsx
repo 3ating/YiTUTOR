@@ -24,7 +24,7 @@ function App({ Component, pageProps }: AppProps) {
         <>
             <AuthProvider>
                 <TeachersProvider>
-                    <GlobalStyle />
+                    {/* <GlobalStyle /> */}
                     <Header />
                     <title>YiTUTOR</title>
                     <Component {...pageProps} />

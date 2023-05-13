@@ -55,7 +55,6 @@ const StyledChatContainer = styled.div`
     margin: 50px auto;
     max-width: 600px;
     height: 80%;
-    /* padding-top: 8px; */
 `;
 
 const MessageList = styled.div`
@@ -141,7 +140,7 @@ const DeleteButton = styled.button`
     }
 `;
 
-const AIChatRoom = () => {
+const ChatRoom = () => {
     const ICON_SIZE = 18;
     const PROMPT = {
         role: 'system',
@@ -367,4 +366,4 @@ const AIChatRoom = () => {
     );
 };
 
-export default AIChatRoom;
+export default ChatRoom;

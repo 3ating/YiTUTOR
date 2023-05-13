@@ -6,7 +6,7 @@ import mainImg from './images/mainImg.png';
 import online from './images/onlne.png';
 import ai from './images/ai.png';
 import board from './images//board.png';
-import AIChatBtn from '../chat/AIChatBtn';
+import ChatBtn from '../chat/ChatBtn';
 import Link from 'next/link';
 import 'firebase/compat/firestore';
 import TeacherCardComponents from '../common/TeacherCard';
@@ -47,7 +47,6 @@ const BannerContainer = styled.div`
     flex-direction: row;
     align-items: center;
     padding: 0px;
-    /* gap: 44px; */
     padding: 0 20px;
 `;
 
@@ -159,13 +158,11 @@ const TeachersInfoContainer = styled.div`
     display: flex;
     justify-content: center;
     flex-direction: column;
-    /* height: 700px; */
     position: relative;
 `;
 
 const TeachersContainer = styled.div`
     display: flex;
-    /* justify-content: center; */
     gap: 10px;
     margin-bottom: 143px;
     overflow-x: scroll;
@@ -368,7 +365,7 @@ export default function Main() {
                     <ScrollButtonRight onClick={handleScrollRight}>&gt;</ScrollButtonRight>
                 </ScrollButtonContainer>
             </TeachersInfoContainer>
-            <AIChatBtn />
+            <ChatBtn />
         </MainWrapper>
     );
 }
