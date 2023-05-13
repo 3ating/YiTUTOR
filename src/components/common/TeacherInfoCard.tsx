@@ -35,7 +35,7 @@ const TeacherCardWrapper = styled.div`
     margin-bottom: 10px;
 `;
 
-const TeacherInfoCard: React.FC<TeacherInfoCardProps> = ({ teacher, href }) => {
+const TeacherInfoCard = ({ teacher, href }: TeacherInfoCardProps) => {
     return (
         <TeacherCardWrapper>
             <TeacherCard>

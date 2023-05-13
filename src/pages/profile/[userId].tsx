@@ -662,7 +662,6 @@ const UserProfile = () => {
                                             <DirectLink key={courseId} href={`../teachers/${courseData.teacherid}`}>
                                                 <CourseCard>
                                                     <CourseInfo>
-                                                        {/* <CourseLabel>科目:</CourseLabel> */}
                                                         <CourseValue>{courseData.subject} &nbsp;</CourseValue>
                                                     </CourseInfo>
                                                     <CourseInfo>

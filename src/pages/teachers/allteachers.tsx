@@ -8,6 +8,7 @@ import TeacherCardComponents from '@/components/common/TeacherCard';
 import ChatBtn from '@/components/chat/ChatBtn';
 import { Teacher } from '@/types/Teacher';
 import TeacherInfoCard from '@/components/common/TeacherInfoCard';
+import Loader from '@/components/common/Loader';
 
 type OptionType = {
     label: string;
@@ -131,24 +132,54 @@ const Teachers = () => {
     const [selectedSubject, setSelectedSubject] = useState('');
     const [selectedPriceSort, setSelectedPriceSort] = useState('');
     const [selectedRatingSort, setSelectedRatingSort] = useState('');
+    const [loading, setLoading] = useState(false);
+    const selectOptions = [
+        {
+            label: '價格排序',
+            value: selectedPriceSort,
+            options: priceSortOptions,
+            onChange: setSelectedPriceSort,
+        },
+        {
+            label: '評分排序',
+            value: selectedRatingSort,
+            options: ratingSortOptions,
+            onChange: setSelectedRatingSort,
+        },
+        {
+            label: '科目',
+            value: selectedSubject,
+            options: subjectOptions,
+            onChange: setSelectedSubject,
+        },
+    ];
 
-    const handleFilter = () => {
+    const handleFilter = async () => {
+        setLoading(true);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         let query = db.collection('users').where('userType', '==', 'teacher');
         if (selectedSubject) {
             query = query.where('subject', 'array-contains', selectedSubject);
         }
-        query.get().then((snapshot) => {
-            let filteredTeachersData = snapshot.docs
-                .map((doc) => {
-                    return {
-                        ...doc.data(),
-                        uid: doc.id,
-                    } as unknown as Teacher;
-                })
+        try {
+            const snapshot = await query.get();
+            const filteredTeachersData = snapshot.docs
+                .map(
+                    (doc) =>
+                        ({
+                            ...doc.data(),
+                            uid: doc.id,
+                        } as Teacher)
+                )
                 .filter((teacher) => teacher.name.toLowerCase().includes(search.toLowerCase()));
-            filteredTeachersData = sortTeachers(filteredTeachersData);
-            setTeachers(filteredTeachersData);
-        });
+
+            const sortedTeachersData = sortTeachers(filteredTeachersData);
+            setTeachers(sortedTeachersData);
+        } catch (error) {
+            console.error('Error filtering teachers:', error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const sortTeachers = (teachersList: Teacher[]) => {
@@ -156,12 +187,7 @@ const Teachers = () => {
             teachersList.sort((a, b) => {
                 const aPrice = a.price?.[0]?.price || 0;
                 const bPrice = b.price?.[0]?.price || 0;
-                if (selectedPriceSort === 'asc') {
-                    return aPrice - bPrice;
-                } else if (selectedPriceSort === 'desc') {
-                    return bPrice - aPrice;
-                }
-                return 0;
+                return selectedPriceSort === 'asc' ? aPrice - bPrice : bPrice - aPrice;
             });
         }
 
@@ -169,14 +195,10 @@ const Teachers = () => {
             teachersList.sort((a, b) => {
                 const aRating = calculateAverage(a.evaluation);
                 const bRating = calculateAverage(b.evaluation);
-                if (selectedRatingSort === 'asc') {
-                    return aRating - bRating;
-                } else if (selectedRatingSort === 'desc') {
-                    return bRating - aRating;
-                }
-                return 0;
+                return selectedRatingSort === 'asc' ? aRating - bRating : bRating - aRating;
             });
         }
+
         return teachersList;
     };
 
@@ -216,30 +238,23 @@ const Teachers = () => {
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder='搜尋老師名字'
                     />
-                    {createReactSelect({
-                        value: selectedPriceSort,
-                        options: priceSortOptions,
-                        placeholder: '價格排序',
-                        onChange: setSelectedPriceSort,
-                    })}
-                    {createReactSelect({
-                        value: selectedRatingSort,
-                        options: ratingSortOptions,
-                        placeholder: '評分排序',
-                        onChange: setSelectedRatingSort,
-                    })}
-                    {createReactSelect({
-                        value: selectedSubject,
-                        options: subjectOptions,
-                        placeholder: '科目',
-                        onChange: setSelectedSubject,
-                    })}
+                    {selectOptions.map(({ label, value, options, onChange }) =>
+                        createReactSelect({
+                            value,
+                            options,
+                            placeholder: label,
+                            onChange,
+                        })
+                    )}
                 </SearchForm>
-                <TeacherContainer>
-                    {teachers.map((teacher, index) => (
-                        <TeacherInfoCard key={index} teacher={teacher} href={`./${teacher.uid}`} />
-                    ))}
-                </TeacherContainer>
+                {loading && <Loader />}
+                {!loading && (
+                    <TeacherContainer>
+                        {teachers.map((teacher, index) => (
+                            <TeacherInfoCard key={index} teacher={teacher} href={`./${teacher.uid}`} />
+                        ))}
+                    </TeacherContainer>
+                )}
             </TeachersPageContainer>
             <ChatBtn />
         </PageContainer>
