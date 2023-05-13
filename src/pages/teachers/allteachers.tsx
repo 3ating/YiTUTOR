@@ -7,9 +7,9 @@ import ReactSelect, { CSSObjectWithLabel, GroupBase, OptionProps, StylesConfig }
 import TeacherCardComponents from '@/components/common/TeacherCard';
 import ChatBtn from '@/components/chat/ChatBtn';
 import { Teacher } from '@/types/Teacher';
-import Link from 'next/link';
+import TeacherInfoCard from '@/components/common/TeacherInfoCard';
 
-export type OptionType = {
+type OptionType = {
     label: string;
     value: string;
 };
@@ -21,21 +21,7 @@ interface ReactSelectProps {
     onChange: (value: string) => void;
 }
 
-const {
-    TeacherImg,
-    TeacherCard,
-    Hightline,
-    CoursePrice,
-    TeacherInfoContainer,
-    TeacherName,
-    Subject,
-    TeacherDescription,
-    TeacherBtn,
-    RatingContainer,
-    RatingNumber,
-    calculateAverage,
-    renderStars,
-} = TeacherCardComponents;
+const { calculateAverage } = TeacherCardComponents;
 
 const PageContainer = styled.div`
     display: flex;
@@ -63,21 +49,6 @@ const TeacherContainer = styled.div`
     @media (max-width: 1000px) {
         grid-template-columns: repeat(2, 345px);
     }
-`;
-
-const TeacherCardWrapper = styled.div`
-    width: 100%;
-    padding: 0 10px;
-    box-sizing: border-box;
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-    margin-bottom: 10px;
-`;
-
-const DirectLink = styled(Link)`
-    text-decoration: none;
-    color: black;
 `;
 
 const SearchForm = styled.form`
@@ -266,32 +237,7 @@ const Teachers = () => {
                 </SearchForm>
                 <TeacherContainer>
                     {teachers.map((teacher, index) => (
-                        <TeacherCardWrapper key={index}>
-                            <TeacherCard>
-                                {teacher.avatar && (
-                                    <TeacherImg
-                                        src={teacher.avatar}
-                                        alt={`${teacher.name} 的大頭照`}
-                                        width={148}
-                                        height={148}
-                                    />
-                                )}
-                                <CoursePrice>NT${teacher.price?.[0]?.price}/50分鐘</CoursePrice>
-                                <Hightline />
-                                <TeacherInfoContainer>
-                                    <TeacherName>{teacher.name}</TeacherName>
-                                    <Subject>{teacher.subject}家教</Subject>
-                                    <RatingContainer>
-                                        <RatingNumber>{calculateAverage(teacher.evaluation).toFixed(1)}</RatingNumber>
-                                        {renderStars(parseFloat(calculateAverage(teacher.evaluation).toFixed(1)))}
-                                    </RatingContainer>
-                                    <TeacherDescription>{teacher.description}</TeacherDescription>
-                                    <DirectLink href={`./${teacher.uid}`} key={teacher.uid}>
-                                        <TeacherBtn>購買課程</TeacherBtn>
-                                    </DirectLink>
-                                </TeacherInfoContainer>
-                            </TeacherCard>
-                        </TeacherCardWrapper>
+                        <TeacherInfoCard key={index} teacher={teacher} href={`./${teacher.uid}`} />
                     ))}
                 </TeacherContainer>
             </TeachersPageContainer>

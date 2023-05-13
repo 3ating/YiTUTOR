@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import firebase from 'firebase/compat/app';
 import styled from 'styled-components';
 import { useAuth } from '../../context/AuthContext';

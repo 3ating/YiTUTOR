@@ -9,37 +9,12 @@ import board from './images//board.png';
 import ChatBtn from '../chat/ChatBtn';
 import Link from 'next/link';
 import 'firebase/compat/firestore';
-import TeacherCardComponents from '../common/TeacherCard';
 import { useAuth } from '../../context/AuthContext';
 import { useTeachers } from '@/context/TeacherContext';
-
-const {
-    TeacherImg,
-    TeacherCard,
-    CoursePrice,
-    TeacherInfoContainer,
-    TeacherName,
-    Subject,
-    TeacherDescription,
-    TeacherBtn,
-    RatingContainer,
-    RatingNumber,
-    calculateAverage,
-    renderStars,
-} = TeacherCardComponents;
+import TeacherInfoCard from '../common/TeacherInfoCard';
 
 const MainWrapper = styled.div`
     margin: 65px 0;
-`;
-
-const TeacherCardWrapper = styled.div`
-    width: 100%;
-    padding: 0 10px;
-    box-sizing: border-box;
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-    margin-bottom: 10px;
 `;
 
 const BannerContainer = styled.div`
@@ -113,7 +88,6 @@ const FeatureBg = styled.div`
 const FeatureBoxContainer = styled.div`
     display: flex;
     justify-content: space-evenly;
-    /* margin: 0 50px; */
 `;
 
 const FeatureBox = styled.div`
@@ -319,47 +293,15 @@ export default function Main() {
             </FeaturesContainer>
             <TeachersInfoContainer>
                 <MainDescriptionContainer>
-                    <MainDescription>Discover personalized online tutoring</MainDescription>
+                    <MainDescription>Find your own Tutor</MainDescription>
                     <MainDescriptionHightline />
                 </MainDescriptionContainer>
                 <ScrollButtonContainer>
                     <ScrollButtonLeft onClick={handleScrollLeft}>&lt;</ScrollButtonLeft>
                     <TeachersContainer ref={containerRef}>
-                        {teachers &&
-                            teachers.map((teacher, index) => (
-                                <TeacherCardWrapper key={index}>
-                                    <TeacherCard>
-                                        {teacher.avatar && (
-                                            <TeacherImg
-                                                src={teacher.avatar}
-                                                alt={`${teacher.name} 的大頭照`}
-                                                width={148}
-                                                height={148}
-                                            />
-                                        )}
-                                        <CoursePrice>NT${teacher.price?.[0]?.price}/50分鐘</CoursePrice>
-                                        <Hightline />
-                                        <TeacherInfoContainer>
-                                            <TeacherName>{teacher.name}</TeacherName>
-                                            <Subject>{teacher.subject}家教</Subject>
-                                            <RatingContainer>
-                                                <RatingNumber>
-                                                    {calculateAverage(teacher.evaluation).toFixed(1)}
-                                                </RatingNumber>
-                                                {renderStars(
-                                                    parseFloat(calculateAverage(teacher.evaluation).toFixed(1))
-                                                )}
-                                            </RatingContainer>
-                                            <TeacherDescription>{teacher.description}</TeacherDescription>
-                                            <div>
-                                                <DirectLink href={`../../teachers/${teacher.uid}`} key={teacher.uid}>
-                                                    <TeacherBtn>購買課程</TeacherBtn>
-                                                </DirectLink>
-                                            </div>
-                                        </TeacherInfoContainer>
-                                    </TeacherCard>
-                                </TeacherCardWrapper>
-                            ))}
+                        {teachers.map((teacher, index) => (
+                            <TeacherInfoCard key={index} teacher={teacher} href={`../../teachers/${teacher.uid}`} />
+                        ))}
                     </TeachersContainer>
                     <Mask />
                     <ScrollButtonRight onClick={handleScrollRight}>&gt;</ScrollButtonRight>
