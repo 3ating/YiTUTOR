@@ -15,7 +15,6 @@ import { AiOutlineClear } from 'react-icons/ai';
 import { IoShapesOutline } from 'react-icons/io5';
 import { message } from 'antd';
 import { db } from '@/utils/firebase';
-import { findElements } from './findElements';
 
 interface ChatroomProps {
     roomId: string | null;
@@ -118,13 +117,11 @@ const Canvas = ({ roomId }: ChatroomProps) => {
     const [scaleEnabled, setScaleEnabled] = useState<boolean>(false);
     const [selectedShape, setSelectedShape] = useState<any>(null);
     const [cursorStyle, setCursorStyle] = useState('default');
-    // const [eraserEnabled, setEraserEnabled] = useState(false);
     const [selectedItem, setSelectedItem] = useState<{ type: string; index: number } | null>(null);
     const [selectedItemColor, setSelectedItemColor] = useState('');
     const [clipboardItem, setClipboardItem] = useState<{ type: string; data: object } | null>(null);
     const [isMoving, setIsMoving] = useState(false);
     const [isScaling, setIsScaling] = useState(false);
-    const { findShape, findLine } = findElements(lines, shapes);
 
     const updateCursor: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
         const rect = canvasRef.current?.getBoundingClientRect();
@@ -178,8 +175,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
 
         const foundShapeIndex = findShape(x, y);
         if (foundShapeIndex !== null) {
-            console.log('click');
-
             setSelectedItem({ type: 'shape', index: foundShapeIndex });
             return;
         }
@@ -272,8 +267,87 @@ const Canvas = ({ roomId }: ChatroomProps) => {
             renderLines();
         }
     };
-    console.log('lines', lines);
-    console.log('shapes', shapes);
+
+    const findShape = (x: number, y: number) => {
+        for (let i = shapes.length - 1; i >= 0; i--) {
+            const shapeData = shapes[i];
+            switch (shapeData.type) {
+                case 'circle':
+                    const radius = Math.sqrt(
+                        Math.pow(shapeData.endX - shapeData.startX, 2) + Math.pow(shapeData.endY - shapeData.startY, 2)
+                    );
+                    const distance = Math.sqrt(Math.pow(x - shapeData.startX, 2) + Math.pow(y - shapeData.startY, 2));
+                    if (distance <= radius) {
+                        return i;
+                    }
+                    break;
+                case 'rectangle':
+                    const minX = Math.min(shapeData.endX, shapeData.startX);
+                    const minY = Math.min(shapeData.endY, shapeData.startY);
+                    const width = Math.abs(shapeData.endX - shapeData.startX);
+                    const height = Math.abs(shapeData.endY - shapeData.startY);
+                    if (x >= minX && x <= minX + width && y >= minY && y <= minY + height) {
+                        return i;
+                    }
+                    break;
+                case 'triangle':
+                    const p1 = {
+                        x: shapeData.startX,
+                        y: shapeData.startY - Math.abs(shapeData.endY - shapeData.startY),
+                    };
+                    const p2 = {
+                        x: shapeData.startX - Math.abs(shapeData.endX - shapeData.startX) / 2,
+                        y: shapeData.startY + Math.abs(shapeData.endY - shapeData.startY),
+                    };
+                    const p3 = {
+                        x: shapeData.startX + Math.abs(shapeData.endX - shapeData.startX) / 2,
+                        y: shapeData.startY + Math.abs(shapeData.endY - shapeData.startY),
+                    };
+
+                    const area = Math.abs((p1.x * (p2.y - p3.y) + p2.x * (p3.y - p1.y) + p3.x * (p1.y - p2.y)) / 2);
+                    const area1 = Math.abs((x * (p2.y - p3.y) + p2.x * (p3.y - y) + p3.x * (y - p2.y)) / 2);
+                    const area2 = Math.abs((p1.x * (y - p3.y) + x * (p3.y - p1.y) + p3.x * (p1.y - y)) / 2);
+                    const area3 = Math.abs((p1.x * (p2.y - y) + p2.x * (y - p1.y) + x * (p1.y - p2.y)) / 2);
+
+                    if (area === area1 + area2 + area3) {
+                        return i;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        return null;
+    };
+
+    const findLine = (x: number, y: number, threshold = 5) => {
+        for (let i = lines.length - 1; i >= 0; i--) {
+            const line = lines[i];
+            for (let j = 0; j < line.points.length - 1; j++) {
+                const point1 = line.points[j];
+                const point2 = line.points[j + 1];
+                const dx = point2.x - point1.x;
+                const dy = point2.y - point1.y;
+                const length = Math.sqrt(dx * dx + dy * dy);
+                const t = ((x - point1.x) * dx + (y - point1.y) * dy) / (length * length);
+
+                if (t < 0 || t > 1) {
+                    continue;
+                }
+
+                const closestX = point1.x + t * dx;
+                const closestY = point1.y + t * dy;
+
+                const distance = Math.sqrt(Math.pow(x - closestX, 2) + Math.pow(y - closestY, 2));
+
+                if (distance <= threshold) {
+                    return i;
+                }
+            }
+        }
+
+        return null;
+    };
 
     const startMoving: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
         const canvas = canvasRef.current;
@@ -431,11 +505,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
             const ctx = canvas.getContext('2d');
             if (!ctx) return;
 
-            // ctx.globalCompositeOperation = eraserEnabled ? 'destination-out' : 'source-over';
-            // ctx.lineWidth = eraserEnabled ? 50 : lineWidth; // 如果需要，可以調整橡皮擦的大小
-            // console.log('color:', color);
-
-            console.log('globalCompositeOperation', ctx.globalCompositeOperation);
             ctx.strokeStyle = color;
             ctx.beginPath();
             ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
@@ -508,11 +577,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // ctx.globalCompositeOperation = eraserEnabled ? 'destination-out' : 'source-over';
-        // ctx.lineWidth = eraserEnabled ? 50 : lineWidth;
-
-        console.log('draw globalCompositeOperation in draw function', ctx.globalCompositeOperation);
-
         const rect = canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
@@ -542,7 +606,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                 prevY: prevLine.length > 0 ? prevLine[prevLine.length - 1].y : y,
                 color,
                 lineWidth,
-                // isErased: eraserEnabled,
             },
         ]);
     };
@@ -556,8 +619,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
 
         for (const line of lines) {
             for (const point of line.points) {
-                if (point.isErased) continue;
-
                 ctx.beginPath();
                 ctx.moveTo(point.prevX, point.prevY);
                 ctx.lineTo(point.x, point.y);
