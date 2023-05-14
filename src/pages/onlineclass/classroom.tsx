@@ -5,18 +5,12 @@ import ClassChatroom from './components/Chatroom';
 import Canvas from './components/canvas/Canvas';
 import styled from 'styled-components';
 import { useAuth } from '../../context/AuthContext';
-import Link from 'next/link';
-import { AiFillSwitcher } from 'react-icons/ai';
-import { BsFillCameraVideoFill, BsFillCameraVideoOffFill, BsMicFill, BsMicMuteFill } from 'react-icons/bs';
-import { ImPhoneHangUp } from 'react-icons/im';
-import { TbMessageCircle2Filled } from 'react-icons/tb';
-import { FaVolumeDown, FaVolumeMute } from 'react-icons/fa';
-import { RiVideoAddFill } from 'react-icons/ri';
-import { Tooltip, message } from 'antd';
+import { message } from 'antd';
 import { db } from '@/utils/firebase';
 import CountdownTimer from './components/CountdownTimer';
 import LoginPrompt from '@/components/common/LoginPrompt';
 import RatingModal from './components/RatingModal';
+import VideoToolbar from './components/VideoToolbar';
 
 interface TypographyProps extends HTMLAttributes<HTMLParagraphElement> {
     variant?: 'h6' | 'body';
@@ -87,57 +81,6 @@ const VideoContainer = styled.div`
     position: relative;
 `;
 
-const ButtonsContainer = styled.div`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 15px 0 0;
-`;
-
-const CreateButton = styled.button<ButtonProps>`
-    background-color: ${({ primary }) => (primary ? '#ffd335' : 'gray')};
-    color: white;
-    border: none;
-    border-radius: 9px;
-    cursor: pointer;
-    display: inline-block;
-    font-size: 14px;
-    margin: 4px 2px;
-    padding: 10px 19px 8px 19px;
-    text-align: center;
-    text-decoration: none;
-    &:hover {
-        background-color: ${({ primary }) => (primary ? '#ffab34' : 'darkgray')};
-    }
-    &:disabled {
-        background-color: lightgray;
-        color: gray;
-        cursor: not-allowed;
-    }
-`;
-
-const ControlButton = styled.button<ButtonProps>`
-    background-color: ${({ active }) => (active ? 'gray' : 'red')};
-    color: white;
-    border: none;
-    border-radius: 9px;
-    cursor: pointer;
-    display: inline-block;
-    font-size: 14px;
-    margin: 4px 2px;
-    padding: 10px 13px 8px 13px;
-    text-align: center;
-    text-decoration: none;
-    &:hover {
-        background-color: ${({ active }) => (active ? 'darkgray' : 'darkred')};
-    }
-    &:disabled {
-        background-color: lightgray;
-        color: gray;
-        cursor: not-allowed;
-    }
-`;
-
 const VideoScreenButton = styled.button<ButtonProps>`
     background-color: ${({ active }) => (active ? 'gray' : '#ffd335')};
     color: white;
@@ -160,30 +103,6 @@ const VideoScreenButton = styled.button<ButtonProps>`
     }
 `;
 
-const HangUpButton = styled.button<ButtonProps>`
-    background-color: red;
-    color: white;
-    border: none;
-    border-radius: 9px;
-    cursor: pointer;
-    display: inline-block;
-    font-size: 14px;
-    margin: 4px 2px;
-    padding: 10px 13px 8px 13px;
-    text-align: center;
-    text-decoration: none;
-    &:hover {
-        background-color: darkred;
-    }
-    &:disabled {
-        background-color: lightgray;
-        color: gray;
-        cursor: not-allowed;
-    }
-`;
-
-const ChatButton = styled(VideoScreenButton)``;
-
 const TimeAvatarContainer = styled.div`
     display: flex;
     justify-content: space-between;
@@ -196,27 +115,6 @@ const RoomTitle = styled.p<TypographyProps>`
     font-size: 20px;
     margin: 0;
     z-index: 1;
-`;
-
-const CenteredContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-`;
-
-const UnLoginText = styled.p`
-    font-size: 24px;
-    letter-spacing: 2px;
-    margin: 0 0 5px;
-`;
-
-const DirectLink = styled(Link)`
-    font-size: 24px;
-    letter-spacing: 2px;
-    text-decoration: none;
-    color: black;
 `;
 
 const VideoScreen = styled.video`
@@ -299,7 +197,6 @@ const configuration = {
 };
 
 const VideoChat: React.FC = () => {
-    const ICON_SIZE = 22;
     const router = useRouter();
     const { userUid, userInfo } = useAuth();
     const [showLocalVideo, setShowLocalVideo] = useState(true);
@@ -315,7 +212,6 @@ const VideoChat: React.FC = () => {
     const [roomDialogOpen, setRoomDialogOpen] = useState(false);
     const [roomIdInput, setRoomIdInput] = useState('');
     const [cameraEnabled, setCameraEnabled] = useState(false);
-    const [isScreenSharing, setIsScreenSharing] = useState(false);
     const [isMicMuted, setIsMicMuted] = useState(false);
     const [isAudioMuted, setIsAudioMuted] = useState(false);
     const [isVideoEnabled, setIsVideoEnabled] = useState(true);
@@ -325,23 +221,6 @@ const VideoChat: React.FC = () => {
     const [anotherUserName, setAnotherUserName] = useState('');
     const [classUrlId, setClassUrlId] = useState<string | null>(null);
     const [showRatingModal, setShowRatingModal] = useState(false);
-
-    const toggleVideoScreen = () => {
-        setShowLocalVideo(!showLocalVideo);
-    };
-
-    useEffect(() => {
-        if (localStream.current && remoteStream.current && localVideoRef.current && remoteVideoRef.current) {
-            localVideoRef.current.srcObject = localStream.current;
-            remoteVideoRef.current.srcObject = remoteStream.current;
-        }
-    }, [localStream, remoteStream]);
-
-    useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const userId = urlParams.get('id');
-        setClassUrlId(userId);
-    }, []);
 
     const findRoomByUserId = async (userId: string | null) => {
         if (!userId) return null;
@@ -605,23 +484,6 @@ const VideoChat: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        if (peerConnection) {
-            const handleIceCandidate = async (event: RTCPeerConnectionIceEvent) => {
-                if (event.candidate && roomId) {
-                    const roomRef = db.collection('rooms').doc(roomId);
-                    const role = localStream.current && !remoteStream.current?.getTracks().length ? 'caller' : 'callee';
-                    const candidatesCollection = roomRef.collection(`${role}Candidates`);
-                    await candidatesCollection.add(event.candidate.toJSON());
-                }
-            };
-            peerConnection.addEventListener('icecandidate', handleIceCandidate);
-            return () => {
-                peerConnection.removeEventListener('icecandidate', handleIceCandidate);
-            };
-        }
-    }, [peerConnection, roomId, localStream, remoteStream]);
-
     const toggleMic = () => {
         if (localStream) {
             const audioTracks = localStream.current!.getAudioTracks();
@@ -652,6 +514,40 @@ const VideoChat: React.FC = () => {
     const toggleChat = () => {
         setShowChatroom(!showChatroom);
     };
+
+    const toggleVideoScreen = () => {
+        setShowLocalVideo(!showLocalVideo);
+    };
+
+    useEffect(() => {
+        if (peerConnection) {
+            const handleIceCandidate = async (event: RTCPeerConnectionIceEvent) => {
+                if (event.candidate && roomId) {
+                    const roomRef = db.collection('rooms').doc(roomId);
+                    const role = localStream.current && !remoteStream.current?.getTracks().length ? 'caller' : 'callee';
+                    const candidatesCollection = roomRef.collection(`${role}Candidates`);
+                    await candidatesCollection.add(event.candidate.toJSON());
+                }
+            };
+            peerConnection.addEventListener('icecandidate', handleIceCandidate);
+            return () => {
+                peerConnection.removeEventListener('icecandidate', handleIceCandidate);
+            };
+        }
+    }, [peerConnection, roomId, localStream, remoteStream]);
+
+    useEffect(() => {
+        if (localStream.current && remoteStream.current && localVideoRef.current && remoteVideoRef.current) {
+            localVideoRef.current.srcObject = localStream.current;
+            remoteVideoRef.current.srcObject = remoteStream.current;
+        }
+    }, [localStream, remoteStream]);
+
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('id');
+        setClassUrlId(userId);
+    }, []);
 
     useEffect(() => {
         if (prevBothUsersJoined.current && !bothUsersJoined && userInfo?.userType === 'student') {
@@ -739,108 +635,36 @@ const VideoChat: React.FC = () => {
                             </LiveTextContainer>
                         </VideoContainer>
                         <RemoteScreen ref={remoteScreenRef} show={!!remoteScreen} autoPlay muted />
-
                         {showChatroom && (
                             <ChatRoomContainer>
                                 <ClassChatroom roomId={roomId} toggleChat={toggleChat} />
                             </ChatRoomContainer>
                         )}
                     </ClassContainer>
-                    <ButtonsContainer>
-                        {!roomId ? (
-                            <Tooltip title='開啟鏡頭 / 進入教室'>
-                                <CreateButton
-                                    onClick={openUserMedia}
-                                    primary={roomId == null}
-                                    disabled={roomId !== null}
-                                >
-                                    <RiVideoAddFill size={ICON_SIZE} />
-                                </CreateButton>
-                            </Tooltip>
-                        ) : (
-                            <>
-                                <Tooltip title='切換視訊'>
-                                    <VideoScreenButton
-                                        active={showLocalVideo}
-                                        onClick={toggleVideoScreen}
-                                        disabled={!localStream || !roomId}
-                                    >
-                                        <AiFillSwitcher size={ICON_SIZE} />
-                                    </VideoScreenButton>
-                                </Tooltip>
-                                {/* <ScreenSharing
-                                    localStream={localStream.current}
-                                    peerConnection={peerConnection}
-                                    isScreenSharing={isScreenSharing}
-                                    setIsScreenSharing={setIsScreenSharing}
-                                    remoteScreenRef={remoteScreenRef}
-                                    roomId={roomId}
-                                    remoteScreen={remoteScreen}
-                                    setRemoteScreen={setRemoteScreen}
-                                /> */}
-                                <Tooltip title='聊天室'>
-                                    <ChatButton
-                                        active={!showChatroom}
-                                        onClick={toggleChat}
-                                        disabled={!remoteStream || !roomId}
-                                    >
-                                        <TbMessageCircle2Filled size={ICON_SIZE} />
-                                    </ChatButton>
-                                </Tooltip>
-                                <Tooltip title='視訊開關'>
-                                    <ControlButton
-                                        active={isVideoEnabled}
-                                        onClick={toggleVideo}
-                                        disabled={!localStream || !roomId}
-                                    >
-                                        {isVideoEnabled ? (
-                                            <BsFillCameraVideoFill size={ICON_SIZE} />
-                                        ) : (
-                                            <BsFillCameraVideoOffFill size={ICON_SIZE} />
-                                        )}
-                                    </ControlButton>
-                                </Tooltip>
-                                <Tooltip title='音訊開關'>
-                                    <ControlButton
-                                        active={!isMicMuted}
-                                        onClick={toggleMic}
-                                        disabled={!localStream || !roomId}
-                                    >
-                                        {isMicMuted ? (
-                                            <BsMicMuteFill size={ICON_SIZE} />
-                                        ) : (
-                                            <BsMicFill size={ICON_SIZE} />
-                                        )}
-                                    </ControlButton>
-                                </Tooltip>
-                                <Tooltip title='音量開關'>
-                                    <ControlButton
-                                        active={isAudioMuted}
-                                        onClick={toggleAudio}
-                                        disabled={!remoteStream || !roomId}
-                                    >
-                                        {isAudioMuted ? (
-                                            <FaVolumeDown size={ICON_SIZE} />
-                                        ) : (
-                                            <FaVolumeMute size={ICON_SIZE} />
-                                        )}
-                                    </ControlButton>
-                                </Tooltip>
-                                <Tooltip title='離開教室'>
-                                    <HangUpButton onClick={hangUp} disabled={!localStream || !roomId}>
-                                        <ImPhoneHangUp size={ICON_SIZE} />
-                                    </HangUpButton>
-                                </Tooltip>
-                            </>
-                        )}
-                        <RatingModal
-                            classUrlId={classUrlId}
-                            userType={userInfo?.userType || ''}
-                            userUid={userUid}
-                            isVisible={showRatingModal}
-                            closeModal={() => setShowRatingModal(false)}
-                        />
-                    </ButtonsContainer>
+                    <VideoToolbar
+                        roomId={roomId}
+                        showLocalVideo={showLocalVideo}
+                        localStream={localStream.current}
+                        remoteStream={remoteStream.current}
+                        isVideoEnabled={isVideoEnabled}
+                        isMicMuted={isMicMuted}
+                        isAudioMuted={isAudioMuted}
+                        showChatroom={showChatroom}
+                        toggleVideoScreen={toggleVideoScreen}
+                        openUserMedia={openUserMedia}
+                        toggleChat={toggleChat}
+                        toggleVideo={toggleVideo}
+                        toggleMic={toggleMic}
+                        toggleAudio={toggleAudio}
+                        hangUp={hangUp}
+                    />
+                    <RatingModal
+                        classUrlId={classUrlId}
+                        userType={userInfo?.userType || ''}
+                        userUid={userUid}
+                        isVisible={showRatingModal}
+                        closeModal={() => setShowRatingModal(false)}
+                    />
                 </OnlineClassContainer>
             ) : (
                 <LoginPrompt />

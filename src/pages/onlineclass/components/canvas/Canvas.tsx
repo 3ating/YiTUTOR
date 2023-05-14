@@ -3,18 +3,9 @@ import styled from 'styled-components';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import 'firebase/compat/auth';
-import {
-    MdOutlineColorLens,
-    MdContentCopy,
-    MdContentPaste,
-    MdOutlineDelete,
-    MdOutlineBorderColor,
-} from 'react-icons/md';
-import { RxBorderWidth } from 'react-icons/rx';
-import { AiOutlineClear } from 'react-icons/ai';
-import { IoShapesOutline } from 'react-icons/io5';
 import { message } from 'antd';
 import { db } from '@/utils/firebase';
+import Toolbar from './CanvasToolbar';
 
 interface ChatroomProps {
     roomId: string | null;
@@ -49,48 +40,6 @@ const StyledCanvas = styled.canvas<IStyledCanvasProps>`
     border-radius: 9px;
     cursor: ${(props) => props.cursorStyle};
     pointer-events: ${(props) => (props.hasNoRoomId ? 'none' : 'auto')};
-`;
-
-const StyledToolbar = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    background: #dfdfdf;
-    padding: 12px 8px;
-    border-radius: 7px;
-    position: absolute;
-    left: 20px;
-    top: 92.5px;
-    gap: 5px;
-`;
-
-const RelativeDiv = styled.div`
-    position: relative;
-`;
-
-const ToolIcon = styled.div`
-    cursor: pointer;
-    font-size: 24px;
-    color: gray;
-    &:hover {
-        color: #000000;
-    }
-`;
-
-const StyledInput = styled.input<{ isVisible?: boolean }>`
-    position: absolute;
-    z-index: 1;
-    opacity: ${(props) => (props.isVisible ? 1 : 0)};
-`;
-
-const StyledSelect = styled.select<{ isVisible?: boolean }>`
-    position: absolute;
-    z-index: 2;
-    display: ${(props) => (props.isVisible ? 'block' : 'none')};
-`;
-
-const ToolIconAno = styled(ToolIcon)`
-    margin-top: 10px;
 `;
 
 const Canvas = ({ roomId }: ChatroomProps) => {
@@ -141,29 +90,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
             setMoveEnabled(false);
         }
     };
-
-    useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.shiftKey && event.key === 'S') {
-                setScaleEnabled(true);
-                setMoveEnabled(false);
-            }
-        };
-
-        const handleKeyUp = (event: KeyboardEvent) => {
-            if (event.key === 'Shift' || event.key === 'S') {
-                setScaleEnabled(false);
-            }
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-        window.addEventListener('keyup', handleKeyUp);
-
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-            window.removeEventListener('keyup', handleKeyUp);
-        };
-    }, []);
 
     const handleCanvasClick = (e: { clientX: number; clientY: number }) => {
         const canvas = canvasRef.current;
@@ -471,26 +397,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         message.destroy('movingMessage');
     };
 
-    useEffect(() => {
-        if (!roomId) return;
-
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-
-        canvas.width = canvas.clientWidth;
-        canvas.height = canvas.clientHeight;
-
-        ctx.lineJoin = 'round';
-        ctx.lineCap = 'round';
-        ctx.lineWidth = lineWidth;
-
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }, [roomId, lines, shapes]);
-
     const startDrawing: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -610,25 +516,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         ]);
     };
 
-    const renderLines = () => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-
-        for (const line of lines) {
-            for (const point of line.points) {
-                ctx.beginPath();
-                ctx.moveTo(point.prevX, point.prevY);
-                ctx.lineTo(point.x, point.y);
-                ctx.strokeStyle = point.color;
-                ctx.lineWidth = point.lineWidth;
-                ctx.stroke();
-            }
-        }
-    };
-
     const endDrawing = () => {
         setIsDrawing(false);
 
@@ -679,9 +566,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
 
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
-
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
         ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -691,37 +576,24 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         message.info('已清空白板');
     };
 
-    useEffect(() => {
-        if (!roomId) return;
-        const unsubscribeLines = db
-            .collection('rooms')
-            .doc(roomId)
-            .onSnapshot((doc) => {
-                const roomData = doc.data();
-                if (roomData && roomData.lines) {
-                    setLines(roomData.lines);
-                } else {
-                    setLines([]);
-                }
-            });
+    const renderLines = () => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
 
-        const unsubscribeShapes = db
-            .collection('rooms')
-            .doc(roomId)
-            .onSnapshot((doc) => {
-                const roomData = doc.data();
-                if (roomData && roomData.shapes) {
-                    setShapes(roomData.shapes);
-                } else {
-                    setShapes([]);
-                }
-            });
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
 
-        return () => {
-            unsubscribeLines();
-            unsubscribeShapes();
-        };
-    }, [roomId]);
+        for (const line of lines) {
+            for (const point of line.points) {
+                ctx.beginPath();
+                ctx.moveTo(point.prevX, point.prevY);
+                ctx.lineTo(point.x, point.y);
+                ctx.strokeStyle = point.color;
+                ctx.lineWidth = point.lineWidth;
+                ctx.stroke();
+            }
+        }
+    };
 
     const renderShapes = () => {
         const canvas = canvasRef.current;
@@ -773,11 +645,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         }
     };
 
-    useEffect(() => {
-        renderLines();
-        renderShapes();
-    }, [lines, shapes]);
-
     const startScaling: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -791,6 +658,12 @@ const Canvas = ({ roomId }: ChatroomProps) => {
 
         const shape = shapes.find((shape) => {
             switch (shape.type) {
+                case 'circle':
+                    const radius = Math.sqrt(
+                        Math.pow(shape.endX - shape.startX, 2) + Math.pow(shape.endY - shape.startY, 2)
+                    );
+                    const distanceFromCenter = Math.sqrt(Math.pow(x - shape.startX, 2) + Math.pow(y - shape.startY, 2));
+                    return distanceFromCenter <= radius;
                 case 'rectangle':
                     return (
                         x >= Math.min(shape.startX, shape.endX) &&
@@ -798,12 +671,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                         y >= Math.min(shape.startY, shape.endY) &&
                         y <= Math.max(shape.startY, shape.endY)
                     );
-                case 'circle':
-                    const radius = Math.sqrt(
-                        Math.pow(shape.endX - shape.startX, 2) + Math.pow(shape.endY - shape.startY, 2)
-                    );
-                    const distanceFromCenter = Math.sqrt(Math.pow(x - shape.startX, 2) + Math.pow(y - shape.startY, 2));
-                    return distanceFromCenter <= radius;
                 case 'triangle':
                     const path = new Path2D();
                     path.moveTo(shape.startX, shape.startY);
@@ -836,17 +703,16 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         const y = e.clientY - rect.top;
 
         switch (selectedShape.type) {
-            case 'rectangle':
-                const newWidth = x - selectedShape.startX;
-                const newHeight = y - selectedShape.startY;
-
-                selectedShape.endX = selectedShape.startX + newWidth;
-                selectedShape.endY = selectedShape.startY + newHeight;
-                break;
             case 'circle':
                 const radius = Math.sqrt(Math.pow(x - selectedShape.startX, 2) + Math.pow(y - selectedShape.startY, 2));
                 selectedShape.endX = selectedShape.startX + radius;
                 selectedShape.endY = selectedShape.startY;
+                break;
+            case 'rectangle':
+                const newWidth = x - selectedShape.startX;
+                const newHeight = y - selectedShape.startY;
+                selectedShape.endX = selectedShape.startX + newWidth;
+                selectedShape.endY = selectedShape.startY + newHeight;
                 break;
             case 'triangle':
                 const topVertex = {
@@ -855,23 +721,19 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                 };
                 const scaleX = (x - selectedShape.startX) / (selectedShape.endX - selectedShape.startX);
                 const scaleY = (y - selectedShape.startY) / (topVertex.y - selectedShape.startY);
-
                 const scaledTopVertex = {
                     x: selectedShape.startX + (topVertex.x - selectedShape.startX) * scaleX,
                     y: selectedShape.startY + (topVertex.y - selectedShape.startY) * scaleY,
                 };
-
                 selectedShape.endX = 2 * scaledTopVertex.x - selectedShape.startX;
                 selectedShape.endY = scaledTopVertex.y;
                 break;
             default:
                 break;
         }
-
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-
         renderShapes();
         renderLines();
     };
@@ -879,9 +741,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
     const endScaling = async () => {
         if (selectedShape) {
             const shapeIndex = shapes.findIndex((shape) => shape === selectedShape);
-
             setShapes(shapes.map((shape, index) => (index === shapeIndex ? selectedShape : shape)));
-
             await db
                 .collection('rooms')
                 .doc(roomId || '')
@@ -894,33 +754,85 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         setIsMoving(false);
     };
 
-    const inputRef = useRef<HTMLInputElement>(null);
-    const [showLineWidthPicker, setShowLineWidthPicker] = useState(false);
-    const [shapeSelectorVisible, setShapeSelectorVisible] = useState(false);
-    const [colorPickerVisible, setColorPickerVisible] = useState(false);
+    useEffect(() => {
+        if (!roomId) return;
 
-    const handleColorLineClick = () => {
-        inputRef.current?.click();
-        setShowLineWidthPicker(false);
-        setShapeSelectorVisible(false);
-        setColorPickerVisible(false);
-    };
-    const handleLineWidthPickerClick = () => {
-        setShowLineWidthPicker(!showLineWidthPicker);
-        setShapeSelectorVisible(false);
-        setColorPickerVisible(false);
-    };
-    const handleShapeIconClick = () => {
-        setShapeSelectorVisible(!shapeSelectorVisible);
-        setShowLineWidthPicker(false);
-        setColorPickerVisible(false);
-    };
+        const canvas = canvasRef.current;
+        if (!canvas) return;
 
-    const handleColorWandClick = () => {
-        setColorPickerVisible(!colorPickerVisible);
-        setShowLineWidthPicker(false);
-        setShapeSelectorVisible(false);
-    };
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.lineWidth = lineWidth;
+
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }, [roomId, lines, shapes]);
+
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.shiftKey && event.key === 'S') {
+                setScaleEnabled(true);
+                setMoveEnabled(false);
+            }
+        };
+
+        const handleKeyUp = (event: KeyboardEvent) => {
+            if (event.key === 'Shift' || event.key === 'S') {
+                setScaleEnabled(false);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+        };
+    }, []);
+
+    useEffect(() => {
+        renderLines();
+        renderShapes();
+    }, [lines, shapes]);
+
+    useEffect(() => {
+        if (!roomId) return;
+        const unsubscribeLines = db
+            .collection('rooms')
+            .doc(roomId)
+            .onSnapshot((doc) => {
+                const roomData = doc.data();
+                if (roomData && roomData.lines) {
+                    setLines(roomData.lines);
+                } else {
+                    setLines([]);
+                }
+            });
+
+        const unsubscribeShapes = db
+            .collection('rooms')
+            .doc(roomId)
+            .onSnapshot((doc) => {
+                const roomData = doc.data();
+                if (roomData && roomData.shapes) {
+                    setShapes(roomData.shapes);
+                } else {
+                    setShapes([]);
+                }
+            });
+
+        return () => {
+            unsubscribeLines();
+            unsubscribeShapes();
+        };
+    }, [roomId]);
 
     return (
         <BoardContainer>
@@ -946,87 +858,21 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                     onMouseOut={moveEnabled ? endMoving : scaleEnabled ? endScaling : endDrawing}
                     onClick={handleCanvasClick}
                 />
-                <StyledToolbar>
-                    <RelativeDiv>
-                        {/* <Tooltip title='畫筆顏色' placement='right'> */}
-                        <ToolIcon onClick={handleColorLineClick}>
-                            <MdOutlineColorLens />
-                        </ToolIcon>
-                        {/* </Tooltip> */}
-                        <StyledInput
-                            type='color'
-                            value={color}
-                            onChange={(e) => setColor(e.target.value)}
-                            ref={inputRef}
-                            style={{ top: '-23px', left: '40px' }}
-                        />
-                    </RelativeDiv>
-                    <RelativeDiv>
-                        {/* <Tooltip title='畫筆粗細' placement='right'> */}
-                        <ToolIcon onClick={handleLineWidthPickerClick}>
-                            <RxBorderWidth />
-                        </ToolIcon>
-                        {/* </Tooltip> */}
-                        {showLineWidthPicker && (
-                            <StyledInput
-                                type='range'
-                                min='1'
-                                max='20'
-                                value={lineWidth}
-                                onChange={(e) => setLineWidth(Number(e.target.value))}
-                                style={{ top: '10px', left: '30px' }}
-                                isVisible={showLineWidthPicker}
-                            />
-                        )}
-                    </RelativeDiv>
-                    <RelativeDiv>
-                        {/* <Tooltip title='圖案' placement='right'> */}
-                        <ToolIcon onClick={handleShapeIconClick}>
-                            <IoShapesOutline />
-                        </ToolIcon>
-                        {/* </Tooltip> */}
-                        <StyledSelect
-                            value={shape || ''}
-                            onChange={(e) => setShape(e.target.value)}
-                            style={{ top: '8px', left: '35px' }}
-                            isVisible={shapeSelectorVisible}
-                        >
-                            <option value=''>Line</option>
-                            <option value='circle'>Circle</option>
-                            <option value='rectangle'>Rectangle</option>
-                            <option value='triangle'>Triangle</option>
-                        </StyledSelect>
-                    </RelativeDiv>
-                    <RelativeDiv>
-                        {/* <Tooltip title='框線顏色' placement='right'> */}
-                        <ToolIcon onClick={handleColorWandClick}>
-                            <MdOutlineBorderColor />
-                        </ToolIcon>
-                        {/* </Tooltip> */}
-                        <StyledInput
-                            type='color'
-                            value={selectedItemColor}
-                            onChange={(e) => {
-                                setSelectedItemColor(e.target.value);
-                                changeColor(e.target.value);
-                            }}
-                            style={{ top: '5px', left: '35px' }}
-                            isVisible={colorPickerVisible}
-                        />
-                    </RelativeDiv>
-                    {/* <Tooltip title='複製' placement='right'> */}
-                    <ToolIconAno as={MdContentCopy} onClick={copySelectedItem} />
-                    {/* </Tooltip> */}
-                    {/* <Tooltip title='貼上' placement='right'> */}
-                    <ToolIconAno as={MdContentPaste} onClick={pasteClipboardItem} />
-                    {/* </Tooltip> */}
-                    {/* <Tooltip title='刪除' placement='right'> */}
-                    <ToolIconAno as={MdOutlineDelete} onClick={deleteSelectedItem} />
-                    {/* </Tooltip> */}
-                    {/* <Tooltip title='清空' placement='right'> */}
-                    <ToolIconAno as={AiOutlineClear} onClick={handleClearCanvas} />
-                    {/* </Tooltip> */}
-                </StyledToolbar>
+                <Toolbar
+                    color={color}
+                    setColor={setColor}
+                    lineWidth={lineWidth}
+                    setLineWidth={setLineWidth}
+                    shape={shape}
+                    setShape={setShape}
+                    selectedItemColor={selectedItemColor}
+                    setSelectedItemColor={setSelectedItemColor}
+                    changeColor={changeColor}
+                    copySelectedItem={copySelectedItem}
+                    pasteClipboardItem={pasteClipboardItem}
+                    deleteSelectedItem={deleteSelectedItem}
+                    handleClearCanvas={handleClearCanvas}
+                />
             </StyledCanvasContainer>
         </BoardContainer>
     );
