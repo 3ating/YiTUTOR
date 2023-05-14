@@ -10,6 +10,7 @@ import { AiFillEdit } from 'react-icons/ai';
 import Loader from '@/components/common/Loader';
 import ChatBtn from '../../components/chat/ChatBtn';
 import { db } from '@/utils/firebase';
+import { UserInfo } from '@/types/UserInfo';
 
 type BookedCoursesContainerProps = {
     isBookedCourseEmpty: boolean;
@@ -38,20 +39,22 @@ interface TeacherInfo {
     subject: string;
 }
 
+interface UserInfoDetails extends UserInfo {
+    courses?: object;
+    description?: string;
+    intro?: string;
+    selectedTimes?: {
+        day: string;
+        hours: number[];
+    }[];
+    bookings: Booking[];
+}
+
 const MainWrapper = styled.div`
     display: flex;
     flex-direction: column;
     height: 100vh;
     background-color: antiquewhite;
-`;
-
-const ProfileContainer = styled.div`
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 2rem;
-    margin-top: 2rem;
-    padding: 0 50px;
 `;
 
 const UserInfoBox = styled.div`
@@ -417,28 +420,12 @@ const NoBookedCourse = styled.div`
     color: #878787;
 `;
 
-interface UserInfo {
-    name: string;
-    email: string;
-    phone?: string;
-    userType?: string;
-    courses?: object;
-    avatar?: string;
-    description?: string;
-    intro?: string;
-    selectedTimes?: {
-        day: string;
-        hours: number[];
-    }[];
-    bookings: Booking[];
-}
-
 const UserProfile = () => {
     const router = useRouter();
     const { userId } = router.query;
-    const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+    const [userInfo, setUserInfo] = useState<UserInfoDetails | null>(null);
     const [isEditing, setIsEditing] = useState(false);
-    const [editedUserInfo, setEditedUserInfo] = useState<UserInfo | null>(null);
+    const [editedUserInfo, setEditedUserInfo] = useState<UserInfoDetails | null>(null);
     const [isEditingEmail, setIsEditingEmail] = useState(false);
     const [isEditingPhone, setIsEditingPhone] = useState(false);
     const [bookingsInfo, setBookingsInfo] = useState<BookingWithTeacherInfo[]>([]);
@@ -470,7 +457,7 @@ const UserProfile = () => {
             const usersCollectionRef = collection(
                 db,
                 'users'
-            ) as unknown as firebase.firestore.CollectionReference<UserInfo>;
+            ) as unknown as firebase.firestore.CollectionReference<UserInfoDetails>;
             const userDocRef = doc(usersCollectionRef, userId as string);
             await updateDoc(userDocRef, { [fieldName]: editedUserInfo[fieldName] });
             setUserInfo(editedUserInfo);
@@ -495,7 +482,7 @@ const UserProfile = () => {
                 const docSnapshot = await getDoc(userDocRef);
 
                 if (docSnapshot.exists()) {
-                    const userData = docSnapshot.data() as UserInfo;
+                    const userData = docSnapshot.data() as UserInfoDetails;
                     setUserInfo(userData);
                     fetchBookingData(userData.bookings);
                 }

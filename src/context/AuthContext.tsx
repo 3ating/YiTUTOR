@@ -5,15 +5,7 @@ import 'firebase/compat/firestore';
 import { useRouter } from 'next/router';
 import { Result, Modal, message } from 'antd';
 import { db } from '@/utils/firebase';
-
-interface UserInfo {
-    name: string;
-    email: string;
-    phone: string;
-    userType: string;
-    courses?: object;
-    avatar?: string;
-}
+import { UserInfo } from '../types/UserInfo';
 
 interface AuthContextValue {
     user: User | null;
