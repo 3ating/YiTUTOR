@@ -464,11 +464,6 @@ const UserProfile = () => {
         }
     };
 
-    const handleCancel = () => {
-        setIsEditing(false);
-        setEditedUserInfo(null);
-    };
-
     useEffect(() => {
         if (userId) {
             const fetchUserData = async () => {

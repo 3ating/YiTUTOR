@@ -141,7 +141,6 @@ const Schedule: React.FC<ScheduleProps> = ({
     };
 
     const handleTimeSlotClick = (time: string, dayLabel: string) => {
-        console.log(`Clicked TimeSlot: ${time} on DayLabel: ${dayLabel}`);
         onTimeSlotClick();
         setSelectedTime(selectedTime?.time === time && selectedTime.dayLabel === dayLabel ? null : { dayLabel, time });
     };

@@ -1,7 +1,6 @@
 import React, { HTMLAttributes, useEffect, useRef, useState, ButtonHTMLAttributes } from 'react';
 import firebase from 'firebase/compat/app';
 import { useRouter } from 'next/router';
-// import ScreenSharing from './components/ScreenSharing';
 import ClassChatroom from './components/Chatroom';
 import Canvas from './components/canvas/Canvas';
 import styled from 'styled-components';

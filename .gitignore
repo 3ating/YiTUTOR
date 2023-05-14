@@ -37,3 +37,4 @@ next-env.d.ts
 
 config.ts
 /src/pages/testGPT.tsx
+/src/pages/onlineclass/components/ScreenSharing.tsx
