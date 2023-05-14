@@ -13,7 +13,9 @@ import {
 import { RxBorderWidth } from 'react-icons/rx';
 import { AiOutlineClear } from 'react-icons/ai';
 import { IoShapesOutline } from 'react-icons/io5';
-import { Tooltip, message } from 'antd';
+import { message } from 'antd';
+import { db } from '@/utils/firebase';
+import { findElements } from './findElements';
 
 interface ChatroomProps {
     roomId: string | null;
@@ -36,7 +38,6 @@ const StyledCanvasContainer = styled.div`
     flex-direction: column;
     align-items: center;
     width: 100%;
-    /* margin-top: 20px; */
     position: relative;
 `;
 
@@ -46,7 +47,6 @@ const StyledCanvas = styled.canvas<IStyledCanvasProps>`
     box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
     width: 100%;
     height: 500px;
-    /* height: 10%; */
     border-radius: 9px;
     cursor: ${(props) => props.cursorStyle};
     pointer-events: ${(props) => (props.hasNoRoomId ? 'none' : 'auto')};
@@ -60,9 +60,7 @@ const StyledToolbar = styled.div`
     padding: 12px 8px;
     border-radius: 7px;
     position: absolute;
-    /* left: 2%; */
     left: 20px;
-    /* top: 19%; */
     top: 92.5px;
     gap: 5px;
 `;
@@ -96,35 +94,6 @@ const ToolIconAno = styled(ToolIcon)`
     margin-top: 10px;
 `;
 
-const Label = styled.label`
-    font-size: 16px;
-    font-weight: bold;
-    margin-right: 5px;
-`;
-
-const ShapeSelection = styled.div`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 10px;
-`;
-
-const firebaseConfig = {
-    apiKey: process.env.FIRESTORE_API_KEY,
-    authDomain: 'board-12c3c.firebaseapp.com',
-    projectId: 'board-12c3c',
-    storageBucket: 'board-12c3c.appspot.com',
-    messagingSenderId: '662676665549',
-    appId: '1:662676665549:web:d2d23417c365f3ec666584',
-    measurementId: 'G-YY6Q81WPY9',
-};
-
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
-
-const db = firebase.firestore();
-
 const Canvas = ({ roomId }: ChatroomProps) => {
     const MIN_DISTANCE = 5;
 
@@ -149,12 +118,13 @@ const Canvas = ({ roomId }: ChatroomProps) => {
     const [scaleEnabled, setScaleEnabled] = useState<boolean>(false);
     const [selectedShape, setSelectedShape] = useState<any>(null);
     const [cursorStyle, setCursorStyle] = useState('default');
-    const [eraserEnabled, setEraserEnabled] = useState(false);
+    // const [eraserEnabled, setEraserEnabled] = useState(false);
     const [selectedItem, setSelectedItem] = useState<{ type: string; index: number } | null>(null);
     const [selectedItemColor, setSelectedItemColor] = useState('');
     const [clipboardItem, setClipboardItem] = useState<{ type: string; data: object } | null>(null);
     const [isMoving, setIsMoving] = useState(false);
     const [isScaling, setIsScaling] = useState(false);
+    const { findShape, findLine } = findElements(lines, shapes);
 
     const updateCursor: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
         const rect = canvasRef.current?.getBoundingClientRect();
@@ -302,89 +272,8 @@ const Canvas = ({ roomId }: ChatroomProps) => {
             renderLines();
         }
     };
-
-    const findShape = (x: number, y: number) => {
-        for (let i = shapes.length - 1; i >= 0; i--) {
-            const shapeData = shapes[i];
-            switch (shapeData.type) {
-                case 'circle':
-                    const radius = Math.sqrt(
-                        Math.pow(shapeData.endX - shapeData.startX, 2) + Math.pow(shapeData.endY - shapeData.startY, 2)
-                    );
-                    const distance = Math.sqrt(Math.pow(x - shapeData.startX, 2) + Math.pow(y - shapeData.startY, 2));
-                    if (distance <= radius) {
-                        return i;
-                    }
-                    break;
-                case 'rectangle':
-                    const minX = Math.min(shapeData.endX, shapeData.startX);
-                    const minY = Math.min(shapeData.endY, shapeData.startY);
-                    const width = Math.abs(shapeData.endX - shapeData.startX);
-                    const height = Math.abs(shapeData.endY - shapeData.startY);
-                    if (x >= minX && x <= minX + width && y >= minY && y <= minY + height) {
-                        return i;
-                    }
-                    break;
-                case 'triangle':
-                    const p1 = {
-                        x: shapeData.startX,
-                        y: shapeData.startY - Math.abs(shapeData.endY - shapeData.startY),
-                    };
-                    const p2 = {
-                        x: shapeData.startX - Math.abs(shapeData.endX - shapeData.startX) / 2,
-                        y: shapeData.startY + Math.abs(shapeData.endY - shapeData.startY),
-                    };
-                    const p3 = {
-                        x: shapeData.startX + Math.abs(shapeData.endX - shapeData.startX) / 2,
-                        y: shapeData.startY + Math.abs(shapeData.endY - shapeData.startY),
-                    };
-
-                    const area = Math.abs((p1.x * (p2.y - p3.y) + p2.x * (p3.y - p1.y) + p3.x * (p1.y - p2.y)) / 2);
-                    const area1 = Math.abs((x * (p2.y - p3.y) + p2.x * (p3.y - y) + p3.x * (y - p2.y)) / 2);
-                    const area2 = Math.abs((p1.x * (y - p3.y) + x * (p3.y - p1.y) + p3.x * (p1.y - y)) / 2);
-                    const area3 = Math.abs((p1.x * (p2.y - y) + p2.x * (y - p1.y) + x * (p1.y - p2.y)) / 2);
-
-                    if (area === area1 + area2 + area3) {
-                        return i;
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-        return null;
-    };
-
-    const findLine = (x: number, y: number, threshold = 5) => {
-        for (let i = lines.length - 1; i >= 0; i--) {
-            const line = lines[i];
-            for (let j = 0; j < line.points.length - 1; j++) {
-                const point1 = line.points[j];
-                const point2 = line.points[j + 1];
-
-                const dx = point2.x - point1.x;
-                const dy = point2.y - point1.y;
-                const length = Math.sqrt(dx * dx + dy * dy);
-
-                const t = ((x - point1.x) * dx + (y - point1.y) * dy) / (length * length);
-
-                if (t < 0 || t > 1) {
-                    continue;
-                }
-
-                const closestX = point1.x + t * dx;
-                const closestY = point1.y + t * dy;
-
-                const distance = Math.sqrt(Math.pow(x - closestX, 2) + Math.pow(y - closestY, 2));
-
-                if (distance <= threshold) {
-                    return i;
-                }
-            }
-        }
-
-        return null;
-    };
+    console.log('lines', lines);
+    console.log('shapes', shapes);
 
     const startMoving: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
         const canvas = canvasRef.current;
@@ -528,33 +417,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
     }, [roomId, lines, shapes]);
 
-    // const startDrawing: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
-    //     const canvas = canvasRef.current;
-    //     if (!canvas) return;
-
-    //     const rect = canvas.getBoundingClientRect();
-    //     setStartX(e.clientX - rect.left);
-    //     setStartY(e.clientY - rect.top);
-
-    //     if (shape) {
-    //         setIsDrawing(true);
-    //     } else {
-    //         const ctx = canvas.getContext('2d');
-    //         if (!ctx) return;
-
-    //         ctx.globalCompositeOperation = eraserEnabled ? 'destination-out' : 'source-over';
-    //         ctx.lineWidth = eraserEnabled ? 50 : lineWidth; // 如果需要，可以調整橡皮擦的大小
-
-    //         console.log('globalCompositeOperation', ctx.globalCompositeOperation);
-
-    //         ctx.strokeStyle = color;
-    //         ctx.beginPath();
-    //         ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
-
-    //         setIsDrawing(true);
-    //     }
-    // };
-
     const startDrawing: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -569,9 +431,9 @@ const Canvas = ({ roomId }: ChatroomProps) => {
             const ctx = canvas.getContext('2d');
             if (!ctx) return;
 
-            ctx.globalCompositeOperation = eraserEnabled ? 'destination-out' : 'source-over';
-            ctx.lineWidth = eraserEnabled ? 50 : lineWidth; // 如果需要，可以調整橡皮擦的大小
-            console.log('color:', color);
+            // ctx.globalCompositeOperation = eraserEnabled ? 'destination-out' : 'source-over';
+            // ctx.lineWidth = eraserEnabled ? 50 : lineWidth; // 如果需要，可以調整橡皮擦的大小
+            // console.log('color:', color);
 
             console.log('globalCompositeOperation', ctx.globalCompositeOperation);
             ctx.strokeStyle = color;
@@ -637,50 +499,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         setLastMouseY(e.clientY);
     };
 
-    // const draw: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
-    //     if (!isDrawing) return;
-
-    //     const canvas = canvasRef.current;
-    //     if (!canvas) return;
-
-    //     const ctx = canvas.getContext('2d');
-    //     if (!ctx) return;
-
-    //     ctx.lineWidth = lineWidth;
-
-    //     const rect = canvas.getBoundingClientRect();
-    //     const x = e.clientX - rect.left;
-    //     const y = e.clientY - rect.top;
-
-    //     const dx = x - (tempLine.length > 0 ? tempLine[tempLine.length - 1].x : x);
-    //     const dy = y - (tempLine.length > 0 ? tempLine[tempLine.length - 1].y : y);
-    //     const distance = Math.sqrt(dx * dx + dy * dy);
-    //     setDistanceMoved((prevDistance) => prevDistance + distance);
-
-    //     setLastMouseX(e.clientX);
-    //     setLastMouseY(e.clientY);
-
-    //     ctx.beginPath();
-    //     ctx.moveTo(
-    //         tempLine.length > 0 ? tempLine[tempLine.length - 1].x : x,
-    //         tempLine.length > 0 ? tempLine[tempLine.length - 1].y : y
-    //     );
-    //     ctx.lineTo(x, y);
-    //     ctx.stroke();
-
-    //     setTempLine((prevLine: any) => [
-    //         ...prevLine,
-    //         {
-    //             x,
-    //             y,
-    //             prevX: prevLine.length > 0 ? prevLine[prevLine.length - 1].x : x,
-    //             prevY: prevLine.length > 0 ? prevLine[prevLine.length - 1].y : y,
-    //             color,
-    //             lineWidth,
-    //         },
-    //     ]);
-    // };
-
     const draw: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
         if (!isDrawing) return;
 
@@ -690,8 +508,8 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        ctx.globalCompositeOperation = eraserEnabled ? 'destination-out' : 'source-over';
-        ctx.lineWidth = eraserEnabled ? 50 : lineWidth;
+        // ctx.globalCompositeOperation = eraserEnabled ? 'destination-out' : 'source-over';
+        // ctx.lineWidth = eraserEnabled ? 50 : lineWidth;
 
         console.log('draw globalCompositeOperation in draw function', ctx.globalCompositeOperation);
 
@@ -724,7 +542,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                 prevY: prevLine.length > 0 ? prevLine[prevLine.length - 1].y : y,
                 color,
                 lineWidth,
-                isErased: eraserEnabled,
+                // isErased: eraserEnabled,
             },
         ]);
     };
@@ -1015,7 +833,6 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         setIsMoving(false);
     };
 
-    // console.log('eraserEnabled', eraserEnabled);
     const inputRef = useRef<HTMLInputElement>(null);
     const [showLineWidthPicker, setShowLineWidthPicker] = useState(false);
     const [shapeSelectorVisible, setShapeSelectorVisible] = useState(false);

@@ -10,7 +10,7 @@ import { AiFillEdit } from 'react-icons/ai';
 import Loader from '@/components/common/Loader';
 import ChatBtn from '../../components/chat/ChatBtn';
 import { db } from '@/utils/firebase';
-import { UserInfo } from '@/types/UserInfo';
+import { UserInfo } from '@/types/User';
 
 type BookedCoursesContainerProps = {
     isBookedCourseEmpty: boolean;
@@ -145,12 +145,6 @@ const UserInformationLine = styled.div`
     width: 100%;
     height: 1px;
     background: #000000;
-`;
-
-const UserInfo = styled.div`
-    font-size: 20px;
-    color: #777;
-    margin: 0 0 5px 0;
 `;
 
 const ConfirmButton = styled(Button)`

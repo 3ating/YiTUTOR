@@ -3,7 +3,7 @@ import firebase from 'firebase/compat/app';
 import { useRouter } from 'next/router';
 // import ScreenSharing from './components/ScreenSharing';
 import ClassChatroom from './components/Chatroom';
-import Canvas from './canvas/Canvas';
+import Canvas from './components/canvas/Canvas';
 import styled from 'styled-components';
 import { useAuth } from '../../context/AuthContext';
 import Link from 'next/link';
