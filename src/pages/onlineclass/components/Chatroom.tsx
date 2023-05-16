@@ -7,6 +7,18 @@ import styled from 'styled-components';
 import { BsFillSendFill } from 'react-icons/bs';
 import { AiOutlineClose } from 'react-icons/ai';
 
+interface MessageType {
+    id: string;
+    name: string;
+    content: string;
+    timestamp: firebase.firestore.Timestamp;
+}
+
+interface ChatroomProps {
+    roomId: string | null;
+    toggleChat: () => void;
+}
+
 const ChatroomContainer = styled.div`
     display: flex;
     flex-direction: column;
@@ -54,7 +66,6 @@ const ChatInput = styled.input`
     font-size: 16px;
     outline: none;
     transition: background-color 0.2s;
-
     &:focus {
         background-color: #e8e8e8;
     }
@@ -130,18 +141,6 @@ const CloseButton = styled.button`
     color: #333;
 `;
 
-interface MessageType {
-    id: string;
-    name: string;
-    content: string;
-    timestamp: firebase.firestore.Timestamp;
-}
-
-interface ChatroomProps {
-    roomId: string | null;
-    toggleChat: () => void;
-}
-
 export default function ClassChatroom({ roomId, toggleChat }: ChatroomProps) {
     const { userInfo } = useAuth();
     const [messages, setMessages] = useState<MessageType[]>([]);
@@ -192,7 +191,6 @@ export default function ClassChatroom({ roomId, toggleChat }: ChatroomProps) {
                 content: inputValue,
                 timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
             });
-
         setInputValue('');
     };
 
@@ -210,7 +208,6 @@ export default function ClassChatroom({ roomId, toggleChat }: ChatroomProps) {
                     <AiOutlineClose />
                 </CloseButton>
             </HeaderContainer>
-
             <MessagesContainer>
                 {messages.map((message) => {
                     const ownMessage = message.name === name;
@@ -236,7 +233,6 @@ export default function ClassChatroom({ roomId, toggleChat }: ChatroomProps) {
                 })}
                 <div ref={messagesEndRef}></div>
             </MessagesContainer>
-
             <InputContainer>
                 <ChatInput
                     type='text'

@@ -12,14 +12,15 @@ import { useAuth } from '../../context/AuthContext';
 import defaultAvatar from './components/images/defaultAvatar.png';
 import { db, auth, storage } from '@/utils/firebase';
 import SignUpButton from './components/SignUpButton';
-interface UserTypeOption {
-    value: string;
-    label: string;
-}
 
 type SubjectButtonProps = {
     selected: boolean;
 };
+
+interface UserTypeOption {
+    value: string;
+    label: string;
+}
 
 const SignupContainer = styled.div`
     width: 100%;
@@ -458,9 +459,7 @@ const SignUp = () => {
                             setPassword('');
                             setUserType('');
                             setDescription('');
-                            // setSubject('');
                             setPrice({});
-                            // setSubjects(['']);
                             setAvatarFile(null);
                         })
                         .catch((error) => {

@@ -418,7 +418,6 @@ const UserProfile = () => {
     const router = useRouter();
     const { userId } = router.query;
     const [userInfo, setUserInfo] = useState<UserInfoDetails | null>(null);
-    const [isEditing, setIsEditing] = useState(false);
     const [editedUserInfo, setEditedUserInfo] = useState<UserInfoDetails | null>(null);
     const [isEditingEmail, setIsEditingEmail] = useState(false);
     const [isEditingPhone, setIsEditingPhone] = useState(false);
@@ -588,7 +587,6 @@ const UserProfile = () => {
                         </UserInfoContainer>
                     </UserInfoBox>
                 </ProfileLeftContainer>
-
                 <ProfileMiddleContainer isBookedCourseEmpty={userInfo.userType === 'teacher'}>
                     <CourseTitle>預約課程</CourseTitle>
                     <CourseLine />

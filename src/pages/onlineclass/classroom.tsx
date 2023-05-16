@@ -301,9 +301,7 @@ const VideoChat: React.FC = () => {
         if (remoteStream.current) {
             remoteStream.current.getTracks().forEach((track) => track.stop());
         }
-
         peerConnection?.close();
-
         localStream.current = null;
         remoteStream.current = null;
         setPeerConnection(null);
@@ -331,7 +329,6 @@ const VideoChat: React.FC = () => {
             const db = firebase.firestore();
             const usersRef = db.collection('users');
             const usersSnapshot = await usersRef.get();
-
             usersSnapshot.forEach(async (userDoc) => {
                 const userData = userDoc.data();
                 const userBookings = userData.bookings || [];
