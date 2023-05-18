@@ -1,17 +1,17 @@
 import React, { useRef } from 'react';
 import styled from 'styled-components';
 import Image from 'next/image';
-import PrimaryButton from '../common/Button';
+import PrimaryButton from '../../components/common/Button';
 import mainImg from './images/mainImg.png';
 import online from './images/onlne.png';
 import ai from './images/ai.png';
 import board from './images//board.png';
-import ChatBtn from '../chat/ChatBtn';
+import ChatBtn from '../../components/chat/ChatBtn';
 import Link from 'next/link';
 import 'firebase/compat/firestore';
 import { useAuth } from '../../context/AuthContext';
 import { useTeachers } from '@/context/TeacherContext';
-import TeacherInfoCard from '../common/TeacherInfoCard';
+import TeacherInfoCard from '../../components/common/TeacherInfoCard';
 
 const MainWrapper = styled.div`
     margin: 65px 0;
