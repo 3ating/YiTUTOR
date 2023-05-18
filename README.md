@@ -44,8 +44,9 @@
 
 ## Demo
 
--   Students buy courses and book the time with tutors.
+-   Students purchase courses and reserve time with tutors.
 
+1. Students can view their purchase and reservation records on their profile page.
    <img src="./assets/demos/buy_and_book.gif" width="500">
 
 -   In an online classroom, students can experience various features that facilitate the learning process, including video conferencing, a whiteboard, and a chatroom.
