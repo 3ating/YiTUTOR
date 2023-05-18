@@ -46,16 +46,19 @@
 
 -   Students buy courses and book the time with tutors.
 
-<img src="./assets/demos/buy_and_book.gif" width="500">
+   <img src="./assets/demos/buy_and_book.gif" width="500">
 
 -   In an online classroom, students can experience various features that facilitate the learning process, including video conferencing, a whiteboard, and a chatroom.
 
 1. Users with the option to enable or disable video, audio, and microphone.
    <img src="./assets/demos/video.gif" width="500">
+
 2. In the whiteboard, users have access to features such as pen customization, shape drawing, as well as features like copy, paste, delete, move, resize, and clear.
    <img src="./assets/demos/whiteboard.gif" width="500">
+
 3. The real-time chat room enables both parties to communicate instantly during class.
    <img src="./assets/demos/chatroom.gif" width="500">
+
 4. The AI assistant restricts users to asking only questions related to learning.
    <img src="./assets/demos/ai-assistant.gif" width="500">
 
