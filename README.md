@@ -1,4 +1,4 @@
-# YiTUTOR
+# <img src="./public/favicon.ico" /> YiTUTOR
 
 [YiTUTOR](https://yitutor.vercel.app/) is an online tutoring platform facilitating virtual classes via interactive whiteboards, video conferencing and chatrooom, complemented by an AI assistant for enhanced learning support.
 
