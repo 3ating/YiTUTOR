@@ -199,6 +199,13 @@ const LogIn = () => {
                             <LoginButton type='submit'>登入</LoginButton>
                         </form>
                         <DirectLink href='signup'>還沒有帳號，前往註冊</DirectLink>
+                        <br />
+                        <div>
+                            👨‍🎓 email: yiting@gmail.com <br />
+                            👩‍🏫 email: chelsie@gmail.com
+                            <br />
+                            🔑 passwords: 00000000
+                        </div>
                     </LoginFormWrapper>
                     <SignInImage src={SignInImg} alt='Sign In' />
                 </>
