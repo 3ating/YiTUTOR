@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import Link from 'next/link';
 import styled, { keyframes } from 'styled-components';
 import Button from '../../components/common/Button';
 import SignInImg from './components/images/signin.png';
 import Image from 'next/image';
+import { Switch } from 'antd';
 
 const LoginContainer = styled.div`
     display: flex;
@@ -32,11 +33,8 @@ const LoginFormWrapper = styled.div`
     padding: 5% 35px;
     border-radius: 9px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    /* width: 400px; */
-    /* width: 28%; */
     max-width: 90%;
     width: 25%;
-    /* height: 300px; */
 `;
 
 const Title = styled.h2`
@@ -147,15 +145,35 @@ const DirectLink = styled(Link)`
     }
 `;
 
+const SwitchContainer = styled.div`
+    display: flex;
+    flex-direction: row-reverse;
+`;
+
 const LogIn = () => {
     const { user, userInfo, isLoading, handleLoginWithEmail, handleLogout } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [userType, setUserType] = useState('student');
 
     const handleFormSubmit = async (e: { preventDefault: () => void }) => {
         e.preventDefault();
         handleLoginWithEmail(email, password);
     };
+
+    const handleSwitchChange = (checked: boolean) => {
+        setUserType(checked ? 'student' : 'tutor');
+    };
+
+    useEffect(() => {
+        if (userType === 'student') {
+            setEmail('yiting@gmail.com');
+            setPassword('00000000');
+        } else {
+            setEmail('chelsie@gmail.com');
+            setPassword('00000000');
+        }
+    }, [userType]);
 
     return (
         <LoginContainer>
@@ -184,6 +202,14 @@ const LogIn = () => {
                     <LoginFormWrapper>
                         <form onSubmit={handleFormSubmit}>
                             <Title>會員登入</Title>
+                            <SwitchContainer>
+                                <Switch
+                                    checkedChildren='Student'
+                                    unCheckedChildren='Teacher'
+                                    defaultChecked
+                                    onChange={handleSwitchChange}
+                                />
+                            </SwitchContainer>
                             <InputField
                                 type='email'
                                 placeholder='輸入信箱'
@@ -199,13 +225,6 @@ const LogIn = () => {
                             <LoginButton type='submit'>登入</LoginButton>
                         </form>
                         <DirectLink href='signup'>還沒有帳號，前往註冊</DirectLink>
-                        <br />
-                        <div>
-                            👨‍🎓 email: yiting@gmail.com <br />
-                            👩‍🏫 email: chelsie@gmail.com
-                            <br />
-                            🔑 passwords: 00000000
-                        </div>
                     </LoginFormWrapper>
                     <SignInImage src={SignInImg} alt='Sign In' />
                 </>
