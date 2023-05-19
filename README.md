@@ -1,38 +1,73 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# YiTUTOR
 
-## Getting Started
+[YiTUTOR](https://yitutor.vercel.app/) is an online tutoring platform facilitating virtual classes via interactive whiteboards, video conferencing and chatrooom, complemented by an AI assistant for enhanced learning support.
 
-First, run the development server:
+## About YiTUTOR
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+-   Developed using Next.js and TypeScript, and deployed on Vercel.
+-   Built a membership system with Firebase Authentication, avoiding props drilling using useContext.
+-   Created a high-performance tutor search system with nested filters, enabling students to find tutors based on their needs. Efficiently managing data with Firestore database for CRUD interactions.
+-   Implemented video communication using WebRTC API without libraries, providing users with the option to enable or disable video, audio, and microphone.
+-   Established a whiteboard feature using Canvas API without libraries, providing options for pen customization, shape drawing, and functions such as copy, paste, delete, move, resize, and clear.
+-   Created a real-time chatroom using Firestore onSnapshot API, facilitating user communication during online classes.
+-   Integrated the AI assistant with the GPT-3.5 API, using prompts to restrict questions only to those related to learning.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Built with
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
+![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white)
+![Vercel](https://img.shields.io/badge/vercel-%23000000.svg?style=for-the-badge&logo=vercel&logoColor=white)
+![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
+![Firebase](https://img.shields.io/badge/firebase-%23039BE5.svg?style=for-the-badge&logo=firebase)
+![Styled Components](https://img.shields.io/badge/styled--components-DB7093?style=for-the-badge&logo=styled-components&logoColor=white)
+![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white)
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+**Base**
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+-   React.js
+-   TypeScript
+-   Next.js
+-   Firebase
+-   Styled Components
+-   WebRTC
+-   Canvas
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+**Libraries**
 
-## Learn More
+-   antd
+-   react-select
+-   react-spinners
 
-To learn more about Next.js, take a look at the following resources:
+## Flow chart
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+![YiTUTOR](./assets//images/flow_chart.png)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Demo
 
-## Deploy on Vercel
+-   Students purchase courses and reserve time with tutors.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Students can view their purchase and reservation records on their profile page.
+   <img src="./assets/demos/buy_and_book.gif" width="500">
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+-   In an online classroom, students can experience various features that facilitate the learning process, including video conferencing, a whiteboard, and a chatroom.
+
+1. Users with the option to enable or disable video, audio, and microphone.
+   <img src="./assets/demos/video.gif" width="500">
+
+2. In the whiteboard, users have access to features such as pen customization, shape drawing, as well as features like copy, paste, delete, move, resize, and clear.
+   <img src="./assets/demos/whiteboard.gif" width="500">
+
+3. The real-time chat room enables both parties to communicate instantly during class.
+   <img src="./assets/demos/chatroom.gif" width="500">
+
+4. The AI assistant restricts users to asking only questions related to learning.
+   <img src="./assets/demos/ai-assistant.gif" width="500">
+
+## Contact
+
+<a href="https://www.linkedin.com/in/yi-ting-lin-082265233/" text-decoration="none">
+    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" />
+</a>
+<a href="mailto:etlin1401@gmail.com">
+    <img src="https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white" />
+</a>
