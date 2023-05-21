@@ -33,7 +33,7 @@ const MainWrapper = styled.div`
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    padding: 70px 0;
+    padding: 65px 0;
     box-sizing: border-box;
     background-color: antiquewhite;
     justify-content: center;

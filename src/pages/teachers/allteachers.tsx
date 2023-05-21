@@ -190,7 +190,6 @@ const Teachers = () => {
                 return selectedPriceSort === 'asc' ? aPrice - bPrice : bPrice - aPrice;
             });
         }
-
         if (selectedRatingSort) {
             teachersList.sort((a, b) => {
                 const aRating = calculateAverage(a.evaluation);
@@ -198,7 +197,6 @@ const Teachers = () => {
                 return selectedRatingSort === 'asc' ? aRating - bRating : bRating - aRating;
             });
         }
-
         return teachersList;
     };
 
