@@ -42,7 +42,6 @@ const WelcomeTextContainer = styled.div`
     display: flex;
     justify-content: center;
     flex-direction: column;
-    /* width: 400px; */
     margin: 20px 0 45px;
 `;
 
@@ -73,7 +72,6 @@ const SignupInputContainer = styled.div`
     justify-content: center;
     align-items: center;
     width: 60%;
-    /* border: 1px solid black; */
 `;
 
 const SignupFormContainer = styled.div`
@@ -250,7 +248,6 @@ const PriceInput = styled.input`
         outline: none;
         border-bottom-color: #000000;
     }
-
     &:focus-within ~ ${PriceLabel}, &:not(:placeholder-shown) ~ ${PriceLabel} {
         font-size: 0.75rem;
         transform: translateY(-1rem);
@@ -336,9 +333,7 @@ const SignUp = () => {
     const [message, setMessage] = useState('');
     const [courses, setCourses] = useState({});
     const [description, setDescription] = useState('');
-    // const [subject, setSubject] = useState('');
     const [price, setPrice] = useState<{ [key: number]: number | undefined }>({});
-    // const [subjects, setSubjects] = useState(['']);
     const [documentFile, setDocumentFile] = useState<File | null>(null);
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [avatarPreview, setAvatarPreview] = useState('');

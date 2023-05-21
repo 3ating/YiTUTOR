@@ -16,14 +16,6 @@ const FooterWrapper = styled.footer`
     width: 100%;
 `;
 
-const Logo = styled.h1`
-    font-style: normal;
-    font-weight: 700;
-    font-size: 32px;
-    line-height: 42px;
-    letter-spacing: 0.05em;
-`;
-
 const FooterText = styled.p`
     font-size: 13px;
     line-height: 21px;
@@ -42,7 +34,6 @@ const SocialLink = styled.a`
     margin-left: 16px;
     cursor: pointer;
     transition: color 0.2s;
-
     &:hover {
         color: #333;
     }

@@ -454,7 +454,6 @@ const UserProfile = () => {
             const userDocRef = doc(usersCollectionRef, userId as string);
             await updateDoc(userDocRef, { [fieldName]: editedUserInfo[fieldName] });
             setUserInfo(editedUserInfo);
-
             if (fieldName === 'email') {
                 setIsEditingEmail(false);
             } else if (fieldName === 'phone') {
@@ -468,7 +467,6 @@ const UserProfile = () => {
             const fetchUserData = async () => {
                 const userDocRef = doc(db, 'users', userId as string);
                 const docSnapshot = await getDoc(userDocRef);
-
                 if (docSnapshot.exists()) {
                     const userData = docSnapshot.data() as UserInfoDetails;
                     setUserInfo(userData);
@@ -485,12 +483,10 @@ const UserProfile = () => {
                         const bookingData = bookingDocSnapshot.data() as TeacherInfo;
                         return { ...booking, teacherInfo: bookingData };
                     });
-
                     const teachersData = await Promise.all(bookingsDataPromises);
                     setBookingsInfo(teachersData);
                 }
             };
-
             fetchUserData();
         }
     }, [userId]);

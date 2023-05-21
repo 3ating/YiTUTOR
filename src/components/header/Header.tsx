@@ -52,7 +52,6 @@ const Menu = styled(Link)`
     text-decoration: none;
     color: #383333;
     transition: color 0.3s ease;
-
     &:hover {
         color: #000000;
     }

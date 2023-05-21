@@ -3,6 +3,13 @@ import styled from 'styled-components';
 import Button from '../../../components/common/Button';
 import Link from 'next/link.js';
 
+type SignUpFormProps = {
+    userType: string;
+    showTeacherDetails: boolean;
+    finalStep: boolean;
+    message: string;
+};
+
 const SubmitButton = styled(Button)`
     border-radius: 9px;
     letter-spacing: 2px;
@@ -31,13 +38,6 @@ const DirectLink = styled(Link)`
         color: #333333;
     }
 `;
-
-type SignUpFormProps = {
-    userType: string;
-    showTeacherDetails: boolean;
-    finalStep: boolean;
-    message: string;
-};
 
 const SignUpForm: React.FC<SignUpFormProps> = ({ userType, showTeacherDetails, finalStep, message }) => {
     return (

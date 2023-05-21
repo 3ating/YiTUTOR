@@ -40,7 +40,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [userUid, setUserUid] = useState<string | null>(null);
     const [showLoginSuccess, setShowLoginSuccess] = useState(false);
     const [showLogoutSuccess, setShowLogoutSuccess] = useState(false);
-
     const router = useRouter();
 
     useEffect(() => {
@@ -48,7 +47,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             setUser(user);
         });
-
         return () => {
             unsubscribe();
         };
@@ -59,7 +57,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const unsubscribeAuth = onAuthStateChanged(auth, (user: React.SetStateAction<User | null>) => {
             setUser(user);
         });
-
         if (user) {
             const userDocRef = db.collection('users').doc(user.uid);
             const unsubscribeFirestore = userDocRef.onSnapshot((doc) => {
@@ -75,7 +72,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 unsubscribeFirestore();
             };
         }
-
         return () => {
             unsubscribeAuth();
         };
