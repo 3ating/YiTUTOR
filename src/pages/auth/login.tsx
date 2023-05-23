@@ -6,6 +6,7 @@ import Button from '../../components/common/Button';
 import SignInImg from './components/images/signin.png';
 import Image from 'next/image';
 import { Switch } from 'antd';
+import { AiOutlineArrowRight } from 'react-icons/ai';
 
 const LoginContainer = styled.div`
     display: flex;
@@ -147,7 +148,16 @@ const DirectLink = styled(Link)`
 
 const SwitchContainer = styled.div`
     display: flex;
-    flex-direction: row-reverse;
+    justify-content: flex-end;
+    align-items: center;
+`;
+
+const SwitchContent = styled.p`
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    margin: 0 5px 0;
+    color: gray;
 `;
 
 const LogIn = () => {
@@ -203,6 +213,9 @@ const LogIn = () => {
                         <form onSubmit={handleFormSubmit}>
                             <Title>會員登入</Title>
                             <SwitchContainer>
+                                <SwitchContent>
+                                    test account <AiOutlineArrowRight />
+                                </SwitchContent>
                                 <Switch
                                     checkedChildren='Student'
                                     unCheckedChildren='Teacher'
