@@ -1,6 +1,6 @@
-import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react';
-import { db } from '@/utils/firebase';
 import { Teacher } from '@/types/Teacher';
+import { db } from '@/utils/firebase';
+import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react';
 
 interface TeacherContextProps {
     teachers: Teacher[];

@@ -1,12 +1,12 @@
-import { SetStateAction, useEffect, useRef, useState } from 'react';
+import { db } from '@/utils/firebase';
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
+import { Spin, notification } from 'antd';
 import firebase from 'firebase/compat/app';
+import { SetStateAction, useEffect, useRef, useState } from 'react';
+import { AiFillDelete } from 'react-icons/ai';
+import { BsFillSendFill } from 'react-icons/bs';
 import styled from 'styled-components';
 import { useAuth } from '../../context/AuthContext';
-import { db } from '@/utils/firebase';
-import { BsFillSendFill } from 'react-icons/bs';
-import { AiFillDelete } from 'react-icons/ai';
-import { Spin, notification } from 'antd';
 import DotLoadingIcon from './DotLoadingIcon';
 
 interface MessageProps {

@@ -1,10 +1,9 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import { db } from '@/utils/firebase';
+import { Modal, Result, message } from 'antd';
 import { User, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import { useRouter } from 'next/router';
-import { Result, Modal, message } from 'antd';
-import { db } from '@/utils/firebase';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { UserInfo } from '../types/User';
 
 interface AuthContextValue {

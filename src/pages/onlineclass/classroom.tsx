@@ -1,16 +1,16 @@
-import React, { HTMLAttributes, useEffect, useRef, useState, ButtonHTMLAttributes } from 'react';
+import LoginPrompt from '@/components/common/LoginPrompt';
+import { db } from '@/utils/firebase';
+import { message } from 'antd';
 import firebase from 'firebase/compat/app';
 import { useRouter } from 'next/router';
-import ClassChatroom from './components/Chatroom';
-import Canvas from './components/canvas/Canvas';
+import React, { ButtonHTMLAttributes, HTMLAttributes, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useAuth } from '../../context/AuthContext';
-import { message } from 'antd';
-import { db } from '@/utils/firebase';
+import ClassChatroom from './components/Chatroom';
 import CountdownTimer from './components/CountdownTimer';
-import LoginPrompt from '@/components/common/LoginPrompt';
 import RatingModal from './components/RatingModal';
 import VideoToolbar from './components/VideoToolbar';
+import Canvas from './components/canvas/Canvas';
 
 interface TypographyProps extends HTMLAttributes<HTMLParagraphElement> {
     variant?: 'h6' | 'body';

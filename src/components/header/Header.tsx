@@ -1,9 +1,9 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
-import { useAuth } from '../../context/AuthContext';
 import logo from '../../../public/logo.png';
-import Image from 'next/image';
+import { useAuth } from '../../context/AuthContext';
 
 const HeaderWrapper = styled.header`
     display: flex;

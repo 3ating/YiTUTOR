@@ -1,17 +1,16 @@
-import React, { useRef, useState } from 'react';
-import 'firebase/compat/firestore';
-import { useRouter } from 'next/router';
-import styled from 'styled-components';
-import Image from 'next/image';
-import SignUpImg from './components/images/signup.png';
-import { AiOutlineCamera } from 'react-icons/ai';
-import { OptionProps, ControlProps, StylesConfig } from 'react-select';
-import ReactSelect from 'react-select';
+import { auth, db, storage } from '@/utils/firebase';
 import { CSSObject } from '@emotion/react';
+import 'firebase/compat/firestore';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import React, { useRef, useState } from 'react';
+import { AiOutlineCamera } from 'react-icons/ai';
+import ReactSelect, { ControlProps, OptionProps, StylesConfig } from 'react-select';
+import styled from 'styled-components';
 import { useAuth } from '../../context/AuthContext';
-import defaultAvatar from './components/images/defaultAvatar.png';
-import { db, auth, storage } from '@/utils/firebase';
 import SignUpButton from './components/SignUpButton';
+import defaultAvatar from './components/images/defaultAvatar.png';
+import SignUpImg from './components/images/signup.png';
 
 type SubjectButtonProps = {
     selected: boolean;
@@ -447,7 +446,7 @@ const SignUp = () => {
                         })
                         .then(() => {
                             setMessage('註冊成功！');
-                            router.push('/membership/SignIn');
+                            router.push('/auth/login');
                             setName('');
                             setEmail('');
                             setPhone('');
