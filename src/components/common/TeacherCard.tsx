@@ -1,8 +1,8 @@
-import styled from 'styled-components';
 import Image from 'next/image';
-import PrimaryButton from './Button';
 import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
 import { BsStarHalf } from 'react-icons/bs';
+import styled from 'styled-components';
+import PrimaryButton from './Button';
 
 const TeachersContainer = styled.div`
     display: flex;
@@ -37,7 +37,7 @@ const CoursePrice = styled.p`
     margin: 17px 0 9px;
 `;
 
-const Hightline = styled.div`
+const Highline = styled.div`
     height: 4px;
     width: 57px;
     background: #ffd335;
@@ -136,7 +136,7 @@ const TeacherCardComponents = {
     TeacherImg,
     TeacherCard,
     CoursePrice,
-    Hightline,
+    Highline,
     TeacherInfoContainer,
     TeacherName,
     Subject,

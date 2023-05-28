@@ -1,9 +1,7 @@
-// TeacherCardComponent.tsx
-import React from 'react';
-import styled from 'styled-components';
-import TeacherCardComponents from './TeacherCard';
 import PurchaseButton from '@/components/common/PurchaseButton';
 import { Teacher } from '@/types/Teacher';
+import styled from 'styled-components';
+import TeacherCardComponents from './TeacherCard';
 
 interface TeacherInfoCardProps {
     teacher: Teacher;
@@ -13,7 +11,7 @@ interface TeacherInfoCardProps {
 const {
     TeacherImg,
     TeacherCard,
-    Hightline,
+    Highline,
     CoursePrice,
     TeacherInfoContainer,
     TeacherName,
@@ -43,7 +41,7 @@ const TeacherInfoCard = ({ teacher, href }: TeacherInfoCardProps) => {
                     <TeacherImg src={teacher.avatar} alt={`${teacher.name} 的大頭照`} width={148} height={148} />
                 )}
                 <CoursePrice>NT${teacher.price?.[0]?.price}/50分鐘</CoursePrice>
-                <Hightline />
+                <Highline />
                 <TeacherInfoContainer>
                     <TeacherName>{teacher.name}</TeacherName>
                     <Subject>{teacher.subject}家教</Subject>

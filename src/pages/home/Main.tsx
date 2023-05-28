@@ -1,17 +1,17 @@
-import React, { useRef } from 'react';
-import styled from 'styled-components';
+import { useTeachers } from '@/context/TeacherContext';
+import 'firebase/compat/firestore';
 import Image from 'next/image';
+import Link from 'next/link';
+import { useRef } from 'react';
+import styled from 'styled-components';
+import ChatBtn from '../../components/chat/ChatBtn';
 import PrimaryButton from '../../components/common/Button';
+import TeacherInfoCard from '../../components/common/TeacherInfoCard';
+import { useAuth } from '../../context/AuthContext';
+import board from './images//board.png';
+import ai from './images/ai.png';
 import mainImg from './images/mainImg.png';
 import online from './images/onlne.png';
-import ai from './images/ai.png';
-import board from './images//board.png';
-import ChatBtn from '../../components/chat/ChatBtn';
-import Link from 'next/link';
-import 'firebase/compat/firestore';
-import { useAuth } from '../../context/AuthContext';
-import { useTeachers } from '@/context/TeacherContext';
-import TeacherInfoCard from '../../components/common/TeacherInfoCard';
 
 const MainWrapper = styled.div`
     margin: 65px 0;
@@ -69,7 +69,7 @@ const MainDescription = styled.p`
     z-index: 1;
 `;
 
-const MainDescriptionHightline = styled.div`
+const MainDescriptionHighline = styled.div`
     position: absolute;
     bottom: 35px;
     background: #ffd335;
@@ -122,7 +122,7 @@ const FeatureBoxText = styled.p`
     width: 276px;
 `;
 
-const Hightline = styled.div`
+const Highline = styled.div`
     height: 4px;
     width: 57px;
     background: #ffd335;
@@ -254,13 +254,13 @@ export default function Main() {
             <FeaturesContainer>
                 <MainDescriptionContainer>
                     <MainDescription>Discover personalized online tutoring</MainDescription>
-                    <MainDescriptionHightline />
+                    <MainDescriptionHighline />
                 </MainDescriptionContainer>
                 <FeatureBoxContainer>
                     <FeatureBox>
                         <Image src={online} alt='Online' />
                         <FeatureBoxTitle>一對一視訊線上家教</FeatureBoxTitle>
-                        <Hightline />
+                        <Highline />
                         <FeatureBoxText>
                             視訊上課、螢幕分享、客製化教學
                             <br />
@@ -270,7 +270,7 @@ export default function Main() {
                     <FeatureBox>
                         <Image src={board} alt='Online' style={{ marginTop: '50px' }} />
                         <FeatureBoxTitle>白板同步解題</FeatureBoxTitle>
-                        <Hightline />
+                        <Highline />
                         <FeatureBoxText>
                             視覺化講解，學習不抽象
                             <br />
@@ -281,7 +281,7 @@ export default function Main() {
                     <FeatureBox>
                         <Image src={ai} width={100} alt='Online' />
                         <FeatureBoxTitle>互動式 AI 助教</FeatureBoxTitle>
-                        <Hightline />
+                        <Highline />
                         <FeatureBoxText>
                             AI 即時回覆，高效學習
                             <br />
@@ -294,7 +294,7 @@ export default function Main() {
             <TeachersInfoContainer>
                 <MainDescriptionContainer>
                     <MainDescription>Find your own Tutor</MainDescription>
-                    <MainDescriptionHightline />
+                    <MainDescriptionHighline />
                 </MainDescriptionContainer>
                 <ScrollButtonContainer>
                     <ScrollButtonLeft onClick={handleScrollLeft}>&lt;</ScrollButtonLeft>

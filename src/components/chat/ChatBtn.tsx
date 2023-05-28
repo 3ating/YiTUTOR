@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { FaRobot } from 'react-icons/fa';
+import { notification } from 'antd';
+import { useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
+import { FaRobot } from 'react-icons/fa';
+import styled from 'styled-components';
 import { useAuth } from '../../context/AuthContext';
 import ChatRoom from './ChatRoom';
-import { notification } from 'antd';
 
 const ChatButtonWrapper = styled.button<{ showChatRoom: boolean }>`
     display: flex;

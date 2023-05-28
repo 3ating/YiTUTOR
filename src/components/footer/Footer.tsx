@@ -1,6 +1,6 @@
 import React from 'react';
-import styled from 'styled-components';
 import { FaFacebookSquare, FaGithub, FaLinkedin } from 'react-icons/fa';
+import styled from 'styled-components';
 
 const FooterWrapper = styled.footer`
     display: flex;

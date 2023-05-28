@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-import { doc, getDoc, collection, updateDoc } from 'firebase/firestore';
+import Button from '@/components/common/Button';
+import Loader from '@/components/common/Loader';
+import { UserInfo } from '@/types/User';
+import { db } from '@/utils/firebase';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
-import styled from 'styled-components';
-import Button from '@/components/common/Button';
+import { collection, doc, getDoc, updateDoc } from 'firebase/firestore';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
 import { AiFillEdit } from 'react-icons/ai';
-import Loader from '@/components/common/Loader';
+import styled from 'styled-components';
 import ChatBtn from '../../components/chat/ChatBtn';
-import { db } from '@/utils/firebase';
-import { UserInfo } from '@/types/User';
 
 type BookedCoursesContainerProps = {
     isBookedCourseEmpty: boolean;

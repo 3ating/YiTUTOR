@@ -180,7 +180,7 @@ const LogIn = () => {
             setEmail('yiting@gmail.com');
             setPassword('00000000');
         } else {
-            setEmail('chelsie@gmail.com');
+            setEmail('max80713@gmail.com');
             setPassword('00000000');
         }
     }, [userType]);
