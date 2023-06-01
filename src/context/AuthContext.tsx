@@ -104,7 +104,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 setShowLogoutSuccess(false);
             }, 2000);
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
     };
 
