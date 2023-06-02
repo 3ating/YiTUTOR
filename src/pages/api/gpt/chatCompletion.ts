@@ -1,10 +1,5 @@
 import fetch from 'node-fetch';
 
-export const config = {
-    runtime: 'edge',
-    regions: ['iad1'],
-};
-
 export default async function handler(
     req: { body: any },
     res: { status: (arg0: number) => { (): any; new (): any; json: { (arg0: any): void; new (): any } } }
