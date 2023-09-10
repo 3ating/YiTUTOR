@@ -50,7 +50,7 @@ const Footer: React.FC = () => {
                 <SocialLink href='https://github.com/3ating?tab=repositories'>
                     <FaGithub />
                 </SocialLink>
-                <SocialLink href='https://www.linkedin.com/in/yiting-lin-082265233/'>
+                <SocialLink href='https://www.linkedin.com/in/yi-ting-lin-082265233/'>
                     <FaLinkedin />
                 </SocialLink>
             </SocialLinks>
