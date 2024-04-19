@@ -1,4 +1,4 @@
-import { DotLoader } from 'react-spinners';
+import { MoonLoader } from 'react-spinners';
 
 const Loader = () => {
     return (
@@ -11,7 +11,7 @@ const Loader = () => {
                 transform: 'translate(-50%, -50%)',
             }}
         >
-            <DotLoader color='#ffab34' size={60} />
+            <MoonLoader color='#ffab34' size={50} />
         </div>
     );
 };

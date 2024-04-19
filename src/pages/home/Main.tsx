@@ -95,7 +95,7 @@ const FeatureBox = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 350px;
+    width: 23.9%;
     height: 426px;
     filter: drop-shadow(7px 9px 0px #000000);
     background: #ffffff;
