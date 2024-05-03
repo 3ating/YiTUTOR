@@ -130,19 +130,20 @@ const ratingSortOptions: OptionType[] = [
   { label: '由低到高', value: 'asc' },
 ];
 
-// TODO: 優化「沒有符合條件的老師」閃爍問題以及throttle、debounce
+// TODO: 優化「沒有符合條件的老師」閃爍問題以及 throttle、debounce
 const Teachers = () => {
-  const { teachers, setTeachers } = useTeachers();
+  const { teachers } = useTeachers();
+  const [displayTeachers, setDisplayTeachers] = useState<Teacher[]>([]);
   const [search, setSearch] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('');
   const [selectedPriceSort, setSelectedPriceSort] = useState('');
   const [selectedRatingSort, setSelectedRatingSort] = useState('');
-  const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 8;
-  const filteredTeachers = teachers.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-  console.log('filteredTeachers', !filteredTeachers);
-
+  const filteredTeachers = displayTeachers.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  console.log('displayTeachers', displayTeachers);
+  console.log('filteredTeachers', filteredTeachers);
+  console.log('search', search);
   const selectOptions = [
     {
       label: '價格排序',
@@ -165,7 +166,6 @@ const Teachers = () => {
   ];
 
   const handleFilter = async () => {
-    setLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1000));
     let query = db.collection('users').where('userType', '==', 'teacher');
     if (selectedSubject) {
@@ -184,12 +184,10 @@ const Teachers = () => {
         .filter((teacher) => teacher.name.toLowerCase().includes(search.toLowerCase()));
 
       const sortedTeachersData = sortTeachers(filteredTeachersData);
-      setTeachers(sortedTeachersData);
+      setDisplayTeachers(sortedTeachersData);
       setCurrentPage(1);
     } catch (error) {
       console.error('Error filtering teachers:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -229,11 +227,6 @@ const Teachers = () => {
     handleFilter();
   }, [search, selectedSubject, selectedPriceSort, selectedRatingSort]);
 
-  useEffect(() => {
-    const sortedTeachers = sortTeachers([...teachers]);
-    setTeachers(sortedTeachers);
-  }, [selectedPriceSort]);
-
   return (
     <PageContainer>
       <TeachersPageContainer>
@@ -258,24 +251,20 @@ const Teachers = () => {
             })
           )}
         </SearchForm>
-        {loading && <Loader />}
-        {!loading && (
-          <>
-            <TeacherContainer>
-              {filteredTeachers.map((teacher, index) => (
-                <TeacherInfoCard key={index} teacher={teacher} href={`./${teacher.uid}`} />
-              ))}
-            </TeacherContainer>
-            {filteredTeachers.length === 0 && <div>沒有符合條件的老師，請重新搜尋</div>}
-            {filteredTeachers.length !== 0 && (
-              <Pagination
-                current={currentPage}
-                onChange={(page) => setCurrentPage(page)}
-                pageSize={pageSize}
-                total={teachers.length}
-              />
-            )}
-          </>
+        {filteredTeachers.length === 0 && !search && <Loader />}
+        <TeacherContainer>
+          {filteredTeachers.map((teacher, index) => (
+            <TeacherInfoCard key={index} teacher={teacher} href={`./${teacher.uid}`} />
+          ))}
+        </TeacherContainer>
+        {search && filteredTeachers.length === 0 && <div>沒有符合條件的老師，請重新搜尋</div>}
+        {filteredTeachers.length !== 0 && (
+          <Pagination
+            current={currentPage}
+            onChange={(page) => setCurrentPage(page)}
+            pageSize={pageSize}
+            total={teachers.length}
+          />
         )}
       </TeachersPageContainer>
       <ChatBtn />

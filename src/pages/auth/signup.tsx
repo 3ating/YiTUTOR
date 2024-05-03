@@ -42,6 +42,7 @@ const WelcomeTextContainer = styled.div`
     justify-content: center;
     flex-direction: column;
     margin: 20px 0 45px;
+    user-select: none;
 `;
 
 const WelcomeTitle = styled.p`
@@ -84,6 +85,7 @@ const SignupTitle = styled.p`
     font-weight: 600;
     letter-spacing: 3px;
     margin: 25px 0 10px;
+    user-select: none;
 `;
 
 const SignupTitleLine = styled.div`
@@ -123,6 +125,7 @@ const UserInfoLabel = styled.label`
     flex-direction: column;
     font-size: 16px;
     letter-spacing: 1px;
+    user-select: none;
 `;
 
 const AvatarContainer = styled.div`
@@ -138,6 +141,7 @@ const AvatarText = styled.p`
     color: gray;
     margin-left: 20px;
     line-height: 25px;
+    user-select: none;
 `;
 
 const AvatarInput = styled(UserInfoInput)`
@@ -153,6 +157,9 @@ const AvatarPreviewContainer = styled.div`
     border: 3px solid #ccc;
     border-radius: 50%;
     cursor: pointer;
+    &:hover {
+        border: 3px solid #ffd335;
+    }
 `;
 
 const AvatarPreviewImage = styled.img`
@@ -293,6 +300,7 @@ const InputHint = styled.span`
     font-size: 11px;
     color: #999;
     margin-left: auto;
+    user-select: none;
 `;
 
 const customStyles: StylesConfig<UserTypeOption, false> = {

@@ -69,6 +69,9 @@ const SignInBtn = styled(Link)`
     color: #f5f5f5;
     background: #000000;
     text-decoration: none;
+    &:hover {
+        background-color: #383333;
+    }
 `;
 
 const SignUpBtn = styled(Link)`
@@ -84,6 +87,9 @@ const SignUpBtn = styled(Link)`
     background: #f5f5f5;
     opacity: 0.7;
     text-decoration: none;
+    &:hover {
+        opacity: 1;
+    }
 `;
 
 const UserAvatar = styled.img`
