@@ -38,8 +38,8 @@ const StyledCanvas = styled.canvas<IStyledCanvasProps>`
     width: 100%;
     height: 500px;
     border-radius: 9px;
-    cursor: ${(props) => props.cursorStyle};
-    pointer-events: ${(props) => (props.hasNoRoomId ? 'none' : 'auto')};
+    cursor: ${props => props.cursorStyle};
+    pointer-events: ${props => (props.hasNoRoomId ? 'none' : 'auto')};
 `;
 
 const Canvas = ({ roomId }: ChatroomProps) => {
@@ -59,20 +59,30 @@ const Canvas = ({ roomId }: ChatroomProps) => {
     const [shapes, setShapes] = useState<any[]>([]);
     const [distanceMoved, setDistanceMoved] = useState<number>(0);
     const [moveEnabled, setMoveEnabled] = useState<boolean>(false);
-    const [selectedShapeIndex, setSelectedShapeIndex] = useState<number | null>(null);
-    const [selectedLineIndex, setSelectedLineIndex] = useState<number | null>(null);
+    const [selectedShapeIndex, setSelectedShapeIndex] = useState<number | null>(
+        null
+    );
+    const [selectedLineIndex, setSelectedLineIndex] = useState<number | null>(
+        null
+    );
     const [moveStartX, setMoveStartX] = useState<number>(0);
     const [moveStartY, setMoveStartY] = useState<number>(0);
     const [scaleEnabled, setScaleEnabled] = useState<boolean>(false);
     const [selectedShape, setSelectedShape] = useState<any>(null);
     const [cursorStyle, setCursorStyle] = useState('default');
-    const [selectedItem, setSelectedItem] = useState<{ type: string; index: number } | null>(null);
+    const [selectedItem, setSelectedItem] = useState<{
+        type: string;
+        index: number;
+    } | null>(null);
     const [selectedItemColor, setSelectedItemColor] = useState('');
-    const [clipboardItem, setClipboardItem] = useState<{ type: string; data: object } | null>(null);
+    const [clipboardItem, setClipboardItem] = useState<{
+        type: string;
+        data: object;
+    } | null>(null);
     const [isMoving, setIsMoving] = useState(false);
     const [isScaling, setIsScaling] = useState(false);
 
-    const updateCursor: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
+    const updateCursor: React.MouseEventHandler<HTMLCanvasElement> = e => {
         const rect = canvasRef.current?.getBoundingClientRect();
         if (!rect) return;
 
@@ -145,14 +155,18 @@ const Canvas = ({ roomId }: ChatroomProps) => {
     const deleteSelectedItem = async () => {
         if (selectedItem) {
             if (selectedItem.type === 'line') {
-                const newLines = lines.filter((_: any, index: number) => index !== selectedItem.index);
+                const newLines = lines.filter(
+                    (_: any, index: number) => index !== selectedItem.index
+                );
                 setLines(newLines);
                 await db
                     .collection('rooms')
                     .doc(roomId ?? '')
                     .update({ lines: newLines });
             } else if (selectedItem.type === 'shape') {
-                const newShapes = shapes.filter((_, index) => index !== selectedItem.index);
+                const newShapes = shapes.filter(
+                    (_, index) => index !== selectedItem.index
+                );
                 setShapes(newShapes);
                 await db
                     .collection('rooms')
@@ -168,7 +182,9 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         if (selectedItem) {
             if (selectedItem.type === 'line') {
                 const newLines = [...lines];
-                newLines[selectedItem.index].points = newLines[selectedItem.index].points.map((point: any) => ({
+                newLines[selectedItem.index].points = newLines[
+                    selectedItem.index
+                ].points.map((point: any) => ({
                     ...point,
                     color: newColor,
                 }));
@@ -200,9 +216,13 @@ const Canvas = ({ roomId }: ChatroomProps) => {
             switch (shapeData.type) {
                 case 'circle':
                     const radius = Math.sqrt(
-                        Math.pow(shapeData.endX - shapeData.startX, 2) + Math.pow(shapeData.endY - shapeData.startY, 2)
+                        Math.pow(shapeData.endX - shapeData.startX, 2) +
+                            Math.pow(shapeData.endY - shapeData.startY, 2)
                     );
-                    const distance = Math.sqrt(Math.pow(x - shapeData.startX, 2) + Math.pow(y - shapeData.startY, 2));
+                    const distance = Math.sqrt(
+                        Math.pow(x - shapeData.startX, 2) +
+                            Math.pow(y - shapeData.startY, 2)
+                    );
                     if (distance <= radius) {
                         return i;
                     }
@@ -212,28 +232,63 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                     const minY = Math.min(shapeData.endY, shapeData.startY);
                     const width = Math.abs(shapeData.endX - shapeData.startX);
                     const height = Math.abs(shapeData.endY - shapeData.startY);
-                    if (x >= minX && x <= minX + width && y >= minY && y <= minY + height) {
+                    if (
+                        x >= minX &&
+                        x <= minX + width &&
+                        y >= minY &&
+                        y <= minY + height
+                    ) {
                         return i;
                     }
                     break;
                 case 'triangle':
                     const p1 = {
                         x: shapeData.startX,
-                        y: shapeData.startY - Math.abs(shapeData.endY - shapeData.startY),
+                        y:
+                            shapeData.startY -
+                            Math.abs(shapeData.endY - shapeData.startY),
                     };
                     const p2 = {
-                        x: shapeData.startX - Math.abs(shapeData.endX - shapeData.startX) / 2,
-                        y: shapeData.startY + Math.abs(shapeData.endY - shapeData.startY),
+                        x:
+                            shapeData.startX -
+                            Math.abs(shapeData.endX - shapeData.startX) / 2,
+                        y:
+                            shapeData.startY +
+                            Math.abs(shapeData.endY - shapeData.startY),
                     };
                     const p3 = {
-                        x: shapeData.startX + Math.abs(shapeData.endX - shapeData.startX) / 2,
-                        y: shapeData.startY + Math.abs(shapeData.endY - shapeData.startY),
+                        x:
+                            shapeData.startX +
+                            Math.abs(shapeData.endX - shapeData.startX) / 2,
+                        y:
+                            shapeData.startY +
+                            Math.abs(shapeData.endY - shapeData.startY),
                     };
 
-                    const area = Math.abs((p1.x * (p2.y - p3.y) + p2.x * (p3.y - p1.y) + p3.x * (p1.y - p2.y)) / 2);
-                    const area1 = Math.abs((x * (p2.y - p3.y) + p2.x * (p3.y - y) + p3.x * (y - p2.y)) / 2);
-                    const area2 = Math.abs((p1.x * (y - p3.y) + x * (p3.y - p1.y) + p3.x * (p1.y - y)) / 2);
-                    const area3 = Math.abs((p1.x * (p2.y - y) + p2.x * (y - p1.y) + x * (p1.y - p2.y)) / 2);
+                    const area = Math.abs(
+                        (p1.x * (p2.y - p3.y) +
+                            p2.x * (p3.y - p1.y) +
+                            p3.x * (p1.y - p2.y)) /
+                            2
+                    );
+                    const area1 = Math.abs(
+                        (x * (p2.y - p3.y) +
+                            p2.x * (p3.y - y) +
+                            p3.x * (y - p2.y)) /
+                            2
+                    );
+                    const area2 = Math.abs(
+                        (p1.x * (y - p3.y) +
+                            x * (p3.y - p1.y) +
+                            p3.x * (p1.y - y)) /
+                            2
+                    );
+                    const area3 = Math.abs(
+                        (p1.x * (p2.y - y) +
+                            p2.x * (y - p1.y) +
+                            x * (p1.y - p2.y)) /
+                            2
+                    );
 
                     if (area === area1 + area2 + area3) {
                         return i;
@@ -255,7 +310,9 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                 const dx = point2.x - point1.x;
                 const dy = point2.y - point1.y;
                 const length = Math.sqrt(dx * dx + dy * dy);
-                const t = ((x - point1.x) * dx + (y - point1.y) * dy) / (length * length);
+                const t =
+                    ((x - point1.x) * dx + (y - point1.y) * dy) /
+                    (length * length);
 
                 if (t < 0 || t > 1) {
                     continue;
@@ -264,7 +321,9 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                 const closestX = point1.x + t * dx;
                 const closestY = point1.y + t * dy;
 
-                const distance = Math.sqrt(Math.pow(x - closestX, 2) + Math.pow(y - closestY, 2));
+                const distance = Math.sqrt(
+                    Math.pow(x - closestX, 2) + Math.pow(y - closestY, 2)
+                );
 
                 if (distance <= threshold) {
                     return i;
@@ -275,7 +334,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         return null;
     };
 
-    const startMoving: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
+    const startMoving: React.MouseEventHandler<HTMLCanvasElement> = e => {
         const canvas = canvasRef.current;
         if (!canvas || scaleEnabled) return;
 
@@ -291,10 +350,14 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         setIsMoving(true);
         setMoveStartX(x);
         setMoveStartY(y);
-        message.loading({ content: '移動中...', key: 'movingMessage', duration: 0 });
+        message.loading({
+            content: '移動中...',
+            key: 'movingMessage',
+            duration: 0,
+        });
     };
 
-    const move: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
+    const move: React.MouseEventHandler<HTMLCanvasElement> = e => {
         if (!isMoving) return;
         if (isScaling) return;
         if (selectedShapeIndex === null && selectedLineIndex === null) return;
@@ -318,14 +381,23 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                 endY: shapes[selectedShapeIndex].endY + dy,
             };
 
-            setShapes(shapes.map((shape, index) => (index === selectedShapeIndex ? movedShape : shape)));
+            setShapes(
+                shapes.map((shape, index) =>
+                    index === selectedShapeIndex ? movedShape : shape
+                )
+            );
         }
 
         if (selectedLineIndex !== null) {
             const movedLine = {
                 ...lines[selectedLineIndex],
                 points: lines[selectedLineIndex].points.map(
-                    (point: { x: number; y: number; prevX: number; prevY: number }) => ({
+                    (point: {
+                        x: number;
+                        y: number;
+                        prevX: number;
+                        prevY: number;
+                    }) => ({
                         ...point,
                         x: point.x + dx,
                         y: point.y + dy,
@@ -335,14 +407,18 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                 ),
             };
 
-            setLines(lines.map((line: any, index: number) => (index === selectedLineIndex ? movedLine : line)));
+            setLines(
+                lines.map((line: any, index: number) =>
+                    index === selectedLineIndex ? movedLine : line
+                )
+            );
         }
 
         setMoveStartX(x);
         setMoveStartY(y);
     };
 
-    const endMoving: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
+    const endMoving: React.MouseEventHandler<HTMLCanvasElement> = e => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
@@ -364,7 +440,9 @@ const Canvas = ({ roomId }: ChatroomProps) => {
             db.collection('rooms')
                 .doc(roomId || '')
                 .update({
-                    shapes: shapes.map((shape, index) => (index === selectedShapeIndex ? movedShape : shape)),
+                    shapes: shapes.map((shape, index) =>
+                        index === selectedShapeIndex ? movedShape : shape
+                    ),
                 });
 
             setSelectedShapeIndex(null);
@@ -372,7 +450,12 @@ const Canvas = ({ roomId }: ChatroomProps) => {
             const movedLine = lines[selectedLineIndex];
 
             movedLine.points = movedLine.points.map(
-                (point: { x: number; y: number; prevX: number; prevY: number }) => ({
+                (point: {
+                    x: number;
+                    y: number;
+                    prevX: number;
+                    prevY: number;
+                }) => ({
                     ...point,
                     x: point.x + deltaX,
                     y: point.y + deltaY,
@@ -384,7 +467,9 @@ const Canvas = ({ roomId }: ChatroomProps) => {
             db.collection('rooms')
                 .doc(roomId || '')
                 .update({
-                    lines: lines.map((line: any, index: number) => (index === selectedLineIndex ? movedLine : line)),
+                    lines: lines.map((line: any, index: number) =>
+                        index === selectedLineIndex ? movedLine : line
+                    ),
                 });
 
             setSelectedLineIndex(null);
@@ -397,7 +482,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         message.destroy('movingMessage');
     };
 
-    const startDrawing: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
+    const startDrawing: React.MouseEventHandler<HTMLCanvasElement> = e => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
@@ -413,13 +498,16 @@ const Canvas = ({ roomId }: ChatroomProps) => {
 
             ctx.strokeStyle = color;
             ctx.beginPath();
-            ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+            ctx.moveTo(
+                e.clientX - canvas.offsetLeft,
+                e.clientY - canvas.offsetTop
+            );
 
             setIsDrawing(true);
         }
     };
 
-    const drawShape: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
+    const drawShape: React.MouseEventHandler<HTMLCanvasElement> = e => {
         if (!isDrawing) return;
 
         const canvas = canvasRef.current;
@@ -450,20 +538,33 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         switch (shape) {
             case 'circle':
                 ctx.beginPath();
-                const radius = Math.sqrt(Math.pow(x - startX, 2) + Math.pow(y - startY, 2));
+                const radius = Math.sqrt(
+                    Math.pow(x - startX, 2) + Math.pow(y - startY, 2)
+                );
                 ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
                 ctx.stroke();
                 break;
             case 'rectangle':
                 ctx.beginPath();
-                ctx.rect(Math.min(x, startX), Math.min(y, startY), Math.abs(x - startX), Math.abs(y - startY));
+                ctx.rect(
+                    Math.min(x, startX),
+                    Math.min(y, startY),
+                    Math.abs(x - startX),
+                    Math.abs(y - startY)
+                );
                 ctx.stroke();
                 break;
             case 'triangle':
                 ctx.beginPath();
                 ctx.moveTo(startX, startY - Math.abs(y - startY));
-                ctx.lineTo(startX - Math.abs(x - startX) / 2, startY + Math.abs(y - startY));
-                ctx.lineTo(startX + Math.abs(x - startX) / 2, startY + Math.abs(y - startY));
+                ctx.lineTo(
+                    startX - Math.abs(x - startX) / 2,
+                    startY + Math.abs(y - startY)
+                );
+                ctx.lineTo(
+                    startX + Math.abs(x - startX) / 2,
+                    startY + Math.abs(y - startY)
+                );
                 ctx.closePath();
                 ctx.stroke();
                 break;
@@ -474,7 +575,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         setLastMouseY(e.clientY);
     };
 
-    const draw: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
+    const draw: React.MouseEventHandler<HTMLCanvasElement> = e => {
         if (!isDrawing) return;
 
         const canvas = canvasRef.current;
@@ -487,10 +588,12 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
-        const dx = x - (tempLine.length > 0 ? tempLine[tempLine.length - 1].x : x);
-        const dy = y - (tempLine.length > 0 ? tempLine[tempLine.length - 1].y : y);
+        const dx =
+            x - (tempLine.length > 0 ? tempLine[tempLine.length - 1].x : x);
+        const dy =
+            y - (tempLine.length > 0 ? tempLine[tempLine.length - 1].y : y);
         const distance = Math.sqrt(dx * dx + dy * dy);
-        setDistanceMoved((prevDistance) => prevDistance + distance);
+        setDistanceMoved(prevDistance => prevDistance + distance);
 
         setLastMouseX(e.clientX);
         setLastMouseY(e.clientY);
@@ -508,8 +611,10 @@ const Canvas = ({ roomId }: ChatroomProps) => {
             {
                 x,
                 y,
-                prevX: prevLine.length > 0 ? prevLine[prevLine.length - 1].x : x,
-                prevY: prevLine.length > 0 ? prevLine[prevLine.length - 1].y : y,
+                prevX:
+                    prevLine.length > 0 ? prevLine[prevLine.length - 1].x : x,
+                prevY:
+                    prevLine.length > 0 ? prevLine[prevLine.length - 1].y : y,
                 color,
                 lineWidth,
             },
@@ -539,7 +644,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                 lineWidth,
             };
 
-            setShapes((prevShapes) => [...prevShapes, shapeData]);
+            setShapes(prevShapes => [...prevShapes, shapeData]);
 
             db.collection('rooms')
                 .doc(roomId || '')
@@ -550,7 +655,9 @@ const Canvas = ({ roomId }: ChatroomProps) => {
             db.collection('rooms')
                 .doc(roomId || '')
                 .update({
-                    lines: firebase.firestore.FieldValue.arrayUnion({ points: tempLine }),
+                    lines: firebase.firestore.FieldValue.arrayUnion({
+                        points: tempLine,
+                    }),
                 })
                 .then(() => {
                     setTempLine([]);
@@ -610,9 +717,16 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                 case 'circle':
                     ctx.beginPath();
                     const radius = Math.sqrt(
-                        Math.pow(shapeData.endX - shapeData.startX, 2) + Math.pow(shapeData.endY - shapeData.startY, 2)
+                        Math.pow(shapeData.endX - shapeData.startX, 2) +
+                            Math.pow(shapeData.endY - shapeData.startY, 2)
                     );
-                    ctx.arc(shapeData.startX, shapeData.startY, radius, 0, 2 * Math.PI);
+                    ctx.arc(
+                        shapeData.startX,
+                        shapeData.startY,
+                        radius,
+                        0,
+                        2 * Math.PI
+                    );
                     ctx.stroke();
                     break;
                 case 'rectangle':
@@ -627,14 +741,22 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                     break;
                 case 'triangle':
                     ctx.beginPath();
-                    ctx.moveTo(shapeData.startX, shapeData.startY - Math.abs(shapeData.endY - shapeData.startY));
-                    ctx.lineTo(
-                        shapeData.startX - Math.abs(shapeData.endX - shapeData.startX) / 2,
-                        shapeData.startY + Math.abs(shapeData.endY - shapeData.startY)
+                    ctx.moveTo(
+                        shapeData.startX,
+                        shapeData.startY -
+                            Math.abs(shapeData.endY - shapeData.startY)
                     );
                     ctx.lineTo(
-                        shapeData.startX + Math.abs(shapeData.endX - shapeData.startX) / 2,
-                        shapeData.startY + Math.abs(shapeData.endY - shapeData.startY)
+                        shapeData.startX -
+                            Math.abs(shapeData.endX - shapeData.startX) / 2,
+                        shapeData.startY +
+                            Math.abs(shapeData.endY - shapeData.startY)
+                    );
+                    ctx.lineTo(
+                        shapeData.startX +
+                            Math.abs(shapeData.endX - shapeData.startX) / 2,
+                        shapeData.startY +
+                            Math.abs(shapeData.endY - shapeData.startY)
                     );
                     ctx.closePath();
                     ctx.stroke();
@@ -645,7 +767,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         }
     };
 
-    const startScaling: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
+    const startScaling: React.MouseEventHandler<HTMLCanvasElement> = e => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
@@ -656,13 +778,17 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
-        const shape = shapes.find((shape) => {
+        const shape = shapes.find(shape => {
             switch (shape.type) {
                 case 'circle':
                     const radius = Math.sqrt(
-                        Math.pow(shape.endX - shape.startX, 2) + Math.pow(shape.endY - shape.startY, 2)
+                        Math.pow(shape.endX - shape.startX, 2) +
+                            Math.pow(shape.endY - shape.startY, 2)
                     );
-                    const distanceFromCenter = Math.sqrt(Math.pow(x - shape.startX, 2) + Math.pow(y - shape.startY, 2));
+                    const distanceFromCenter = Math.sqrt(
+                        Math.pow(x - shape.startX, 2) +
+                            Math.pow(y - shape.startY, 2)
+                    );
                     return distanceFromCenter <= radius;
                 case 'rectangle':
                     return (
@@ -674,7 +800,10 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                 case 'triangle':
                     const path = new Path2D();
                     path.moveTo(shape.startX, shape.startY);
-                    path.lineTo(shape.startX + (shape.endX - shape.startX) / 2, shape.endY);
+                    path.lineTo(
+                        shape.startX + (shape.endX - shape.startX) / 2,
+                        shape.endY
+                    );
                     path.lineTo(shape.endX, shape.startY);
                     path.closePath();
                     return ctx.isPointInPath(path, x, y);
@@ -689,7 +818,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         }
     };
 
-    const scale: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
+    const scale: React.MouseEventHandler<HTMLCanvasElement> = e => {
         if (!isDrawing || !selectedShape) return;
 
         const canvas = canvasRef.current;
@@ -704,7 +833,10 @@ const Canvas = ({ roomId }: ChatroomProps) => {
 
         switch (selectedShape.type) {
             case 'circle':
-                const radius = Math.sqrt(Math.pow(x - selectedShape.startX, 2) + Math.pow(y - selectedShape.startY, 2));
+                const radius = Math.sqrt(
+                    Math.pow(x - selectedShape.startX, 2) +
+                        Math.pow(y - selectedShape.startY, 2)
+                );
                 selectedShape.endX = selectedShape.startX + radius;
                 selectedShape.endY = selectedShape.startY;
                 break;
@@ -716,16 +848,27 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                 break;
             case 'triangle':
                 const topVertex = {
-                    x: selectedShape.startX + (selectedShape.endX - selectedShape.startX) / 2,
+                    x:
+                        selectedShape.startX +
+                        (selectedShape.endX - selectedShape.startX) / 2,
                     y: selectedShape.endY,
                 };
-                const scaleX = (x - selectedShape.startX) / (selectedShape.endX - selectedShape.startX);
-                const scaleY = (y - selectedShape.startY) / (topVertex.y - selectedShape.startY);
+                const scaleX =
+                    (x - selectedShape.startX) /
+                    (selectedShape.endX - selectedShape.startX);
+                const scaleY =
+                    (y - selectedShape.startY) /
+                    (topVertex.y - selectedShape.startY);
                 const scaledTopVertex = {
-                    x: selectedShape.startX + (topVertex.x - selectedShape.startX) * scaleX,
-                    y: selectedShape.startY + (topVertex.y - selectedShape.startY) * scaleY,
+                    x:
+                        selectedShape.startX +
+                        (topVertex.x - selectedShape.startX) * scaleX,
+                    y:
+                        selectedShape.startY +
+                        (topVertex.y - selectedShape.startY) * scaleY,
                 };
-                selectedShape.endX = 2 * scaledTopVertex.x - selectedShape.startX;
+                selectedShape.endX =
+                    2 * scaledTopVertex.x - selectedShape.startX;
                 selectedShape.endY = scaledTopVertex.y;
                 break;
             default:
@@ -740,13 +883,21 @@ const Canvas = ({ roomId }: ChatroomProps) => {
 
     const endScaling = async () => {
         if (selectedShape) {
-            const shapeIndex = shapes.findIndex((shape) => shape === selectedShape);
-            setShapes(shapes.map((shape, index) => (index === shapeIndex ? selectedShape : shape)));
+            const shapeIndex = shapes.findIndex(
+                shape => shape === selectedShape
+            );
+            setShapes(
+                shapes.map((shape, index) =>
+                    index === shapeIndex ? selectedShape : shape
+                )
+            );
             await db
                 .collection('rooms')
                 .doc(roomId || '')
                 .update({
-                    shapes: shapes.map((shape, index) => (index === shapeIndex ? selectedShape : shape)),
+                    shapes: shapes.map((shape, index) =>
+                        index === shapeIndex ? selectedShape : shape
+                    ),
                 });
         }
         setIsDrawing(false);
@@ -772,7 +923,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
 
         ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }, [roomId, lines, shapes]);
+    }, [roomId, lines, shapes, lineWidth]);
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -807,7 +958,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         const unsubscribeLines = db
             .collection('rooms')
             .doc(roomId)
-            .onSnapshot((doc) => {
+            .onSnapshot(doc => {
                 const roomData = doc.data();
                 if (roomData && roomData.lines) {
                     setLines(roomData.lines);
@@ -819,7 +970,7 @@ const Canvas = ({ roomId }: ChatroomProps) => {
         const unsubscribeShapes = db
             .collection('rooms')
             .doc(roomId)
-            .onSnapshot((doc) => {
+            .onSnapshot(doc => {
                 const roomData = doc.data();
                 if (roomData && roomData.shapes) {
                     setShapes(roomData.shapes);
@@ -841,8 +992,14 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                     ref={canvasRef}
                     hasNoRoomId={!roomId}
                     cursorStyle={cursorStyle}
-                    onMouseDown={moveEnabled ? startMoving : scaleEnabled ? startScaling : startDrawing}
-                    onMouseMove={(e) => {
+                    onMouseDown={
+                        moveEnabled
+                            ? startMoving
+                            : scaleEnabled
+                              ? startScaling
+                              : startDrawing
+                    }
+                    onMouseMove={e => {
                         updateCursor(e);
                         if (moveEnabled) {
                             move(e);
@@ -854,8 +1011,20 @@ const Canvas = ({ roomId }: ChatroomProps) => {
                             draw(e);
                         }
                     }}
-                    onMouseUp={moveEnabled ? endMoving : scaleEnabled ? endScaling : endDrawing}
-                    onMouseOut={moveEnabled ? endMoving : scaleEnabled ? endScaling : endDrawing}
+                    onMouseUp={
+                        moveEnabled
+                            ? endMoving
+                            : scaleEnabled
+                              ? endScaling
+                              : endDrawing
+                    }
+                    onMouseOut={
+                        moveEnabled
+                            ? endMoving
+                            : scaleEnabled
+                              ? endScaling
+                              : endDrawing
+                    }
                     onClick={handleCanvasClick}
                 />
                 <Toolbar

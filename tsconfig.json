@@ -18,6 +18,12 @@
             "@/*": ["./src/*"]
         }
     },
-    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "./src/pages/RemoteScreenSharing.tsx", "test.js"],
+    "include": [
+        "next-env.d.ts",
+        "**/*.ts",
+        "**/*.tsx",
+        "./src/pages/RemoteScreenSharing.tsx",
+        "test.js"
+    ],
     "exclude": ["node_modules"]
 }

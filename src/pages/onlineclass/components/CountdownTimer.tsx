@@ -6,13 +6,16 @@ interface CountdownTimerProps {
     bothUsersJoined: boolean;
 }
 
-const CountdownTimer: React.FC<CountdownTimerProps> = ({ initialTime, bothUsersJoined }) => {
+const CountdownTimer: React.FC<CountdownTimerProps> = ({
+    initialTime,
+    bothUsersJoined,
+}) => {
     const [timeRemaining, setTimeRemaining] = useState(initialTime);
 
     useEffect(() => {
         if (!bothUsersJoined) return;
         const timer = setInterval(() => {
-            setTimeRemaining((prevTime) => prevTime - 1);
+            setTimeRemaining(prevTime => prevTime - 1);
         }, 1000);
 
         return () => clearInterval(timer);

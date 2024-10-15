@@ -13,11 +13,15 @@ type SignUpFormProps = {
 const SubmitButton = styled(Button)`
     border-radius: 9px;
     letter-spacing: 2px;
-    background-color: ${(props) =>
-        props.children === '下一步' || props.children === '最後一步' ? 'black' : '#ffab34'};
+    background-color: ${props =>
+        props.children === '下一步' || props.children === '最後一步'
+            ? 'black'
+            : '#ffab34'};
     &:hover {
-        background-color: ${(props) =>
-            props.children === '下一步' || props.children === '最後一步' ? '#333' : '#f9b352'};
+        background-color: ${props =>
+            props.children === '下一步' || props.children === '最後一步'
+                ? '#333'
+                : '#f9b352'};
     }
 `;
 
@@ -39,10 +43,15 @@ const DirectLink = styled(Link)`
     }
 `;
 
-const SignUpForm: React.FC<SignUpFormProps> = ({ userType, showTeacherDetails, finalStep, message }) => {
+const SignUpForm: React.FC<SignUpFormProps> = ({
+    userType,
+    showTeacherDetails,
+    finalStep,
+    message,
+}) => {
     return (
         <ButtonContainer>
-            <SubmitButton type='submit'>
+            <SubmitButton type="submit">
                 {userType === 'teacher'
                     ? showTeacherDetails
                         ? finalStep
@@ -50,11 +59,13 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ userType, showTeacherDetails, f
                             : '最後一步'
                         : '下一步'
                     : finalStep
-                    ? '提交'
-                    : '提交'}
+                      ? '提交'
+                      : '提交'}
             </SubmitButton>
             {message && <p>{message}</p>}
-            {!showTeacherDetails && <DirectLink href='login'>已經有帳號，前往登入</DirectLink>}
+            {!showTeacherDetails && (
+                <DirectLink href="login">已經有帳號，前往登入</DirectLink>
+            )}
         </ButtonContainer>
     );
 };

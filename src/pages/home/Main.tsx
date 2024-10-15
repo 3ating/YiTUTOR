@@ -223,7 +223,9 @@ export default function Main() {
             const currentScroll = container.scrollLeft;
             const maxScroll = container.scrollWidth - container.clientWidth;
             const nextScroll =
-                direction === 'right' ? currentScroll + TOTALCARD_WIDTH : currentScroll - TOTALCARD_WIDTH;
+                direction === 'right'
+                    ? currentScroll + TOTALCARD_WIDTH
+                    : currentScroll - TOTALCARD_WIDTH;
             container.scrollLeft = Math.min(maxScroll, Math.max(nextScroll, 0));
         }
     };
@@ -249,16 +251,23 @@ export default function Main() {
                         {!isLoading && <PrimaryButton>立即加入</PrimaryButton>}
                     </DirectLink>
                 </BannerTextContainer>
-                <Image src={mainImg} width={700} alt='Banner image' style={{ margin: '0 auto' }} />
+                <Image
+                    src={mainImg}
+                    width={700}
+                    alt="Banner image"
+                    style={{ margin: '0 auto' }}
+                />
             </BannerContainer>
             <FeaturesContainer>
                 <MainDescriptionContainer>
-                    <MainDescription>Discover personalized online tutoring</MainDescription>
+                    <MainDescription>
+                        Discover personalized online tutoring
+                    </MainDescription>
                     <MainDescriptionHighline />
                 </MainDescriptionContainer>
                 <FeatureBoxContainer>
                     <FeatureBox>
-                        <Image src={online} alt='Online' />
+                        <Image src={online} alt="Online" />
                         <FeatureBoxTitle>一對一視訊線上家教</FeatureBoxTitle>
                         <Highline />
                         <FeatureBoxText>
@@ -268,7 +277,11 @@ export default function Main() {
                         </FeatureBoxText>
                     </FeatureBox>
                     <FeatureBox>
-                        <Image src={board} alt='Online' style={{ marginTop: '50px' }} />
+                        <Image
+                            src={board}
+                            alt="Online"
+                            style={{ marginTop: '50px' }}
+                        />
                         <FeatureBoxTitle>白板同步解題</FeatureBoxTitle>
                         <Highline />
                         <FeatureBoxText>
@@ -279,7 +292,7 @@ export default function Main() {
                         <FeatureBoxText></FeatureBoxText>
                     </FeatureBox>
                     <FeatureBox>
-                        <Image src={ai} width={100} alt='Online' />
+                        <Image src={ai} width={100} alt="Online" />
                         <FeatureBoxTitle>互動式 AI 助教</FeatureBoxTitle>
                         <Highline />
                         <FeatureBoxText>
@@ -297,14 +310,22 @@ export default function Main() {
                     <MainDescriptionHighline />
                 </MainDescriptionContainer>
                 <ScrollButtonContainer>
-                    <ScrollButtonLeft onClick={handleScrollLeft}>&lt;</ScrollButtonLeft>
+                    <ScrollButtonLeft onClick={handleScrollLeft}>
+                        &lt;
+                    </ScrollButtonLeft>
                     <TeachersContainer ref={containerRef}>
                         {teachers.map((teacher, index) => (
-                            <TeacherInfoCard key={index} teacher={teacher} href={`../../teachers/${teacher.uid}`} />
+                            <TeacherInfoCard
+                                key={index}
+                                teacher={teacher}
+                                href={`../../teachers/${teacher.uid}`}
+                            />
                         ))}
                     </TeachersContainer>
                     <Mask />
-                    <ScrollButtonRight onClick={handleScrollRight}>&gt;</ScrollButtonRight>
+                    <ScrollButtonRight onClick={handleScrollRight}>
+                        &gt;
+                    </ScrollButtonRight>
                 </ScrollButtonContainer>
             </TeachersInfoContainer>
             <ChatBtn />

@@ -1,6 +1,14 @@
 import { Teacher } from '@/types/Teacher';
 import { db } from '@/utils/firebase';
-import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react';
+import {
+    createContext,
+    Dispatch,
+    ReactNode,
+    SetStateAction,
+    useContext,
+    useEffect,
+    useState,
+} from 'react';
 
 interface TeacherContextProps {
     teachers: Teacher[];
@@ -27,8 +35,8 @@ export const TeachersProvider = ({ children }: TeacherProviderProps) => {
         const unsubscribe = db
             .collection('users')
             .where('userType', '==', 'teacher')
-            .onSnapshot((snapshot) => {
-                const teachersData: Teacher[] = snapshot.docs.map((doc) => {
+            .onSnapshot(snapshot => {
+                const teachersData: Teacher[] = snapshot.docs.map(doc => {
                     return {
                         ...doc.data(),
                         uid: doc.id,
@@ -42,5 +50,9 @@ export const TeachersProvider = ({ children }: TeacherProviderProps) => {
         };
     }, []);
 
-    return <TeacherContext.Provider value={{ teachers, setTeachers }}>{children}</TeacherContext.Provider>;
+    return (
+        <TeacherContext.Provider value={{ teachers, setTeachers }}>
+            {children}
+        </TeacherContext.Provider>
+    );
 };

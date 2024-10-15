@@ -2,13 +2,21 @@ import fetch from 'node-fetch';
 
 export default async function handler(
     req: { body: any },
-    res: { status: (arg0: number) => { (): any; new (): any; json: { (arg0: any): void; new (): any } } }
+    res: {
+        status: (arg0: number) => {
+            (): any;
+            new (): any;
+            json: { (arg0: any): void; new (): any };
+        };
+    }
 ) {
     const API_KEY = process.env.OPENAI_API_KEY;
     const apiRequestBody = req.body;
 
     if (typeof apiRequestBody !== 'object' || apiRequestBody === null) {
-        res.status(400).json({ error: 'Invalid JSON object in the request body.' });
+        res.status(400).json({
+            error: 'Invalid JSON object in the request body.',
+        });
         return;
     }
 

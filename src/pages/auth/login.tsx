@@ -161,7 +161,8 @@ const SwitchContent = styled.p`
 `;
 
 const LogIn = () => {
-    const { user, userInfo, isLoading, handleLoginWithEmail, handleLogout } = useAuth();
+    const { user, userInfo, isLoading, handleLoginWithEmail, handleLogout } =
+        useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [userType, setUserType] = useState('student');
@@ -192,17 +193,27 @@ const LogIn = () => {
                     <>
                         <LoginFormWrapper>
                             <UserInfo>
-                                {userInfo?.avatar && <Avatar src={userInfo.avatar} alt={`${userInfo.name} 的大頭照`} />}
+                                {userInfo?.avatar && (
+                                    <Avatar
+                                        src={userInfo.avatar}
+                                        alt={`${userInfo.name} 的大頭照`}
+                                    />
+                                )}
                                 <UserContent>{userInfo?.name}</UserContent>
                                 <UserContent>{userInfo?.email}</UserContent>
 
-                                <LogoutButton onClick={handleLogout}>登出</LogoutButton>
-                                <DirectLink href={`/profile/${user.uid}`} passHref>
+                                <LogoutButton onClick={handleLogout}>
+                                    登出
+                                </LogoutButton>
+                                <DirectLink
+                                    href={`/profile/${user.uid}`}
+                                    passHref
+                                >
                                     <ProfileButton>查看個人資料</ProfileButton>
                                 </DirectLink>
                             </UserInfo>
                         </LoginFormWrapper>
-                        <SignInImage src={SignInImg} alt='Sign In' />
+                        <SignInImage src={SignInImg} alt="Sign In" />
                     </>
                 ) : (
                     <LoadingSpinner />
@@ -217,29 +228,31 @@ const LogIn = () => {
                                     test account <AiOutlineArrowRight />
                                 </SwitchContent>
                                 <Switch
-                                    checkedChildren='Student'
-                                    unCheckedChildren='Teacher'
+                                    checkedChildren="Student"
+                                    unCheckedChildren="Teacher"
                                     defaultChecked
                                     onChange={handleSwitchChange}
                                 />
                             </SwitchContainer>
                             <InputField
-                                type='email'
-                                placeholder='輸入信箱'
+                                type="email"
+                                placeholder="輸入信箱"
                                 value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                onChange={e => setEmail(e.target.value)}
                             />
                             <InputField
-                                type='password'
-                                placeholder='輸入密碼'
+                                type="password"
+                                placeholder="輸入密碼"
                                 value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                onChange={e => setPassword(e.target.value)}
                             />
-                            <LoginButton type='submit'>登入</LoginButton>
+                            <LoginButton type="submit">登入</LoginButton>
                         </form>
-                        <DirectLink href='signup'>還沒有帳號，前往註冊</DirectLink>
+                        <DirectLink href="signup">
+                            還沒有帳號，前往註冊
+                        </DirectLink>
                     </LoginFormWrapper>
-                    <SignInImage src={SignInImg} alt='Sign In' />
+                    <SignInImage src={SignInImg} alt="Sign In" />
                 </>
             )}
         </LoginContainer>

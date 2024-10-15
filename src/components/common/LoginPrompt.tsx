@@ -26,7 +26,7 @@ const LoginPrompt = () => {
     return (
         <CenteredContainer>
             <UnLoginText>請先登入再使用此功能</UnLoginText>
-            <DirectLink href='/auth/login'>點我登入</DirectLink>
+            <DirectLink href="/auth/login">點我登入</DirectLink>
         </CenteredContainer>
     );
 };

@@ -47,7 +47,8 @@ const CalendarDay = styled.div<{ isToday?: boolean; isSelected?: boolean }>`
     align-items: center;
     border-radius: 50%;
     cursor: pointer;
-    background-color: ${({ isToday, isSelected }) => (isSelected ? '#000' : isToday ? '#ccc' : 'transparent')};
+    background-color: ${({ isToday, isSelected }) =>
+        isSelected ? '#000' : isToday ? '#ccc' : 'transparent'};
     color: ${({ isSelected }) => (isSelected ? '#fff' : 'inherit')};
 `;
 
@@ -72,30 +73,52 @@ const CalendarDaysGrid = styled.div`
 `;
 interface CalendarProps {
     handleSelectDate: (date: Date) => void;
-    setSelectedTime: (selectedTime: { dayLabel: string; time: string } | null) => void;
+    setSelectedTime: (
+        selectedTime: { dayLabel: string; time: string } | null
+    ) => void;
     setShowBookButtons: (show: boolean) => void;
 }
 
-export default function Calendar({ handleSelectDate, setShowBookButtons, setSelectedTime }: CalendarProps) {
+export default function Calendar({
+    handleSelectDate,
+    setShowBookButtons,
+    setSelectedTime,
+}: CalendarProps) {
     const [selectedDate, setSelectedDate] = useState(new Date());
 
     const prevMonth = () => {
-        setSelectedDate((prevDate) => {
-            const prevMonth = new Date(prevDate.getFullYear(), prevDate.getMonth() - 1, 1);
+        setSelectedDate(prevDate => {
+            const prevMonth = new Date(
+                prevDate.getFullYear(),
+                prevDate.getMonth() - 1,
+                1
+            );
             return prevMonth;
         });
     };
 
     const nextMonth = () => {
-        setSelectedDate((prevDate) => {
-            const nextMonth = new Date(prevDate.getFullYear(), prevDate.getMonth() + 1, 1);
+        setSelectedDate(prevDate => {
+            const nextMonth = new Date(
+                prevDate.getFullYear(),
+                prevDate.getMonth() + 1,
+                1
+            );
             return nextMonth;
         });
     };
 
     function generateCalendarDays(selectedDate: Date) {
-        const startOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
-        const endOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
+        const startOfMonth = new Date(
+            selectedDate.getFullYear(),
+            selectedDate.getMonth(),
+            1
+        );
+        const endOfMonth = new Date(
+            selectedDate.getFullYear(),
+            selectedDate.getMonth() + 1,
+            0
+        );
         const startWeekday = startOfMonth.getDay();
         const daysInMonth = endOfMonth.getDate();
         const days = [];
@@ -105,9 +128,14 @@ export default function Calendar({ handleSelectDate, setShowBookButtons, setSele
         }
 
         for (let i = 1; i <= daysInMonth; i++) {
-            const date = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), i);
+            const date = new Date(
+                selectedDate.getFullYear(),
+                selectedDate.getMonth(),
+                i
+            );
             const isToday = date.toDateString() === new Date().toDateString();
-            const isSelected = date.toDateString() === selectedDate.toDateString();
+            const isSelected =
+                date.toDateString() === selectedDate.toDateString();
             const handleClickDate = () => {
                 handleSelectDate(date);
                 setSelectedDate(date);
@@ -115,7 +143,12 @@ export default function Calendar({ handleSelectDate, setShowBookButtons, setSele
                 setSelectedTime(null);
             };
             days.push(
-                <CalendarDay key={`day-${i}`} isToday={isToday} isSelected={isSelected} onClick={handleClickDate}>
+                <CalendarDay
+                    key={`day-${i}`}
+                    isToday={isToday}
+                    isSelected={isSelected}
+                    onClick={handleClickDate}
+                >
                     {i}
                 </CalendarDay>
             );
@@ -136,11 +169,17 @@ export default function Calendar({ handleSelectDate, setShowBookButtons, setSele
                 <CalendarButton onClick={nextMonth}>&gt;</CalendarButton>
             </CalendarHeader>
             <CalendarWeekdays>
-                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((weekday) => (
-                    <CalendarDayHeader key={weekday}>{weekday}</CalendarDayHeader>
-                ))}
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(
+                    weekday => (
+                        <CalendarDayHeader key={weekday}>
+                            {weekday}
+                        </CalendarDayHeader>
+                    )
+                )}
             </CalendarWeekdays>
-            <CalendarDaysGrid>{generateCalendarDays(selectedDate)}</CalendarDaysGrid>
+            <CalendarDaysGrid>
+                {generateCalendarDays(selectedDate)}
+            </CalendarDaysGrid>
         </CalendarContainer>
     );
 }

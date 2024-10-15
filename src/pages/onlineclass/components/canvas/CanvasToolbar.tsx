@@ -58,13 +58,13 @@ const ToolIcon = styled.div`
 const StyledInput = styled.input<{ isVisible?: boolean }>`
     position: absolute;
     z-index: 1;
-    opacity: ${(props) => (props.isVisible ? 1 : 0)};
+    opacity: ${props => (props.isVisible ? 1 : 0)};
 `;
 
 const StyledSelect = styled.select<{ isVisible?: boolean }>`
     position: absolute;
     z-index: 2;
-    display: ${(props) => (props.isVisible ? 'block' : 'none')};
+    display: ${props => (props.isVisible ? 'block' : 'none')};
 `;
 
 const ToolIconAno = styled(ToolIcon)`
@@ -121,9 +121,9 @@ const Toolbar: React.FC<ToolbarProps> = ({
                     <MdOutlineColorLens />
                 </ToolIcon>
                 <StyledInput
-                    type='color'
+                    type="color"
                     value={color}
-                    onChange={(e) => setColor(e.target.value)}
+                    onChange={e => setColor(e.target.value)}
                     ref={inputRef}
                     style={{ top: '-23px', left: '40px' }}
                 />
@@ -134,11 +134,11 @@ const Toolbar: React.FC<ToolbarProps> = ({
                 </ToolIcon>
                 {showLineWidthPicker && (
                     <StyledInput
-                        type='range'
-                        min='1'
-                        max='20'
+                        type="range"
+                        min="1"
+                        max="20"
                         value={lineWidth}
-                        onChange={(e) => setLineWidth(Number(e.target.value))}
+                        onChange={e => setLineWidth(Number(e.target.value))}
                         style={{ top: '10px', left: '30px' }}
                         isVisible={showLineWidthPicker}
                     />
@@ -150,14 +150,14 @@ const Toolbar: React.FC<ToolbarProps> = ({
                 </ToolIcon>
                 <StyledSelect
                     value={shape || ''}
-                    onChange={(e) => setShape(e.target.value)}
+                    onChange={e => setShape(e.target.value)}
                     style={{ top: '8px', left: '35px' }}
                     isVisible={shapeSelectorVisible}
                 >
-                    <option value=''>Line</option>
-                    <option value='circle'>Circle</option>
-                    <option value='rectangle'>Rectangle</option>
-                    <option value='triangle'>Triangle</option>
+                    <option value="">Line</option>
+                    <option value="circle">Circle</option>
+                    <option value="rectangle">Rectangle</option>
+                    <option value="triangle">Triangle</option>
                 </StyledSelect>
             </RelativeDiv>
             <RelativeDiv>
@@ -165,9 +165,9 @@ const Toolbar: React.FC<ToolbarProps> = ({
                     <MdOutlineBorderColor />
                 </ToolIcon>
                 <StyledInput
-                    type='color'
+                    type="color"
                     value={selectedItemColor}
-                    onChange={(e) => {
+                    onChange={e => {
                         setSelectedItemColor(e.target.value);
                         changeColor(e.target.value);
                     }}

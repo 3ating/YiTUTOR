@@ -16,7 +16,8 @@ const ChatButtonWrapper = styled.button<{ showChatRoom: boolean }>`
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background-color: ${({ showChatRoom }) => (showChatRoom ? '#000' : '#f8ab13')};
+    background-color: ${({ showChatRoom }) =>
+        showChatRoom ? '#000' : '#f8ab13'};
     border: none;
     outline: none;
     cursor: pointer;
@@ -26,7 +27,8 @@ const ChatButtonWrapper = styled.button<{ showChatRoom: boolean }>`
     z-index: 2;
 
     &:hover {
-        background-color: ${({ showChatRoom }) => (showChatRoom ? '#333' : '#f5c300')};
+        background-color: ${({ showChatRoom }) =>
+            showChatRoom ? '#333' : '#f5c300'};
     }
 `;
 
@@ -42,13 +44,16 @@ const ChatBtn = () => {
                 placement: 'topRight',
             });
         } else {
-            setShowChatRoom((prevShowChatRoom) => !prevShowChatRoom);
+            setShowChatRoom(prevShowChatRoom => !prevShowChatRoom);
         }
     };
 
     return (
         <>
-            <ChatButtonWrapper showChatRoom={showChatRoom} onClick={handleShowChatRoom}>
+            <ChatButtonWrapper
+                showChatRoom={showChatRoom}
+                onClick={handleShowChatRoom}
+            >
                 {showChatRoom ? <AiOutlineClose /> : <FaRobot />}
             </ChatButtonWrapper>
             {showChatRoom && <ChatRoom />}

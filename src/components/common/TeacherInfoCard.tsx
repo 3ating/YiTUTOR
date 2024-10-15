@@ -38,7 +38,12 @@ const TeacherInfoCard = ({ teacher, href }: TeacherInfoCardProps) => {
         <TeacherCardWrapper>
             <TeacherCard>
                 {teacher.avatar && (
-                    <TeacherImg src={teacher.avatar} alt={`${teacher.name} 的大頭照`} width={148} height={148} />
+                    <TeacherImg
+                        src={teacher.avatar}
+                        alt={`${teacher.name} 的大頭照`}
+                        width={148}
+                        height={148}
+                    />
                 )}
                 <CoursePrice>NT${teacher.price?.[0]?.price}/50分鐘</CoursePrice>
                 <Highline />
@@ -46,10 +51,18 @@ const TeacherInfoCard = ({ teacher, href }: TeacherInfoCardProps) => {
                     <TeacherName>{teacher.name}</TeacherName>
                     <Subject>{teacher.subject}家教</Subject>
                     <RatingContainer>
-                        <RatingNumber>{calculateAverage(teacher.evaluation).toFixed(1)}</RatingNumber>
-                        {renderStars(parseFloat(calculateAverage(teacher.evaluation).toFixed(1)))}
+                        <RatingNumber>
+                            {calculateAverage(teacher.evaluation).toFixed(1)}
+                        </RatingNumber>
+                        {renderStars(
+                            parseFloat(
+                                calculateAverage(teacher.evaluation).toFixed(1)
+                            )
+                        )}
                     </RatingContainer>
-                    <TeacherDescription>{teacher.description}</TeacherDescription>
+                    <TeacherDescription>
+                        {teacher.description}
+                    </TeacherDescription>
                     <PurchaseButton href={href} />
                 </TeacherInfoContainer>
             </TeacherCard>

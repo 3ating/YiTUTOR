@@ -1,6 +1,12 @@
 import { db } from '@/utils/firebase';
 import { Modal, Result, message } from 'antd';
-import { User, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import {
+    User,
+    getAuth,
+    onAuthStateChanged,
+    signInWithEmailAndPassword,
+    signOut,
+} from 'firebase/auth';
 import 'firebase/compat/firestore';
 import { useRouter } from 'next/router';
 import React, { createContext, useContext, useEffect, useState } from 'react';
@@ -43,7 +49,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     useEffect(() => {
         const auth = getAuth();
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        const unsubscribe = onAuthStateChanged(auth, user => {
             setUser(user);
         });
         return () => {
@@ -53,12 +59,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     useEffect(() => {
         const auth = getAuth();
-        const unsubscribeAuth = onAuthStateChanged(auth, (user: React.SetStateAction<User | null>) => {
-            setUser(user);
-        });
+        const unsubscribeAuth = onAuthStateChanged(
+            auth,
+            (user: React.SetStateAction<User | null>) => {
+                setUser(user);
+            }
+        );
         if (user) {
             const userDocRef = db.collection('users').doc(user.uid);
-            const unsubscribeFirestore = userDocRef.onSnapshot((doc) => {
+            const unsubscribeFirestore = userDocRef.onSnapshot(doc => {
                 const userData = doc.data();
                 setIsLoading(true);
                 if (doc.exists && userData) {
@@ -79,7 +88,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const handleLoginWithEmail = async (email: string, password: string) => {
         const auth = getAuth();
         try {
-            const result = await signInWithEmailAndPassword(auth, email, password);
+            const result = await signInWithEmailAndPassword(
+                auth,
+                email,
+                password
+            );
             setUser(result.user);
             setIsLoading(true);
             setShowLoginSuccess(true);
@@ -127,7 +140,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 centered
                 onCancel={() => setShowLoginSuccess(false)}
             >
-                <Result status='success' title='登入成功' />
+                <Result status="success" title="登入成功" />
             </Modal>
             <Modal
                 open={showLogoutSuccess}
@@ -136,7 +149,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 centered
                 onCancel={() => setShowLogoutSuccess(false)}
             >
-                <Result status='success' title='登出成功' />
+                <Result status="success" title="登出成功" />
             </Modal>
         </AuthContext.Provider>
     );

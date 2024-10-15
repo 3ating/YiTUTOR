@@ -3,7 +3,7 @@ import { MoonLoader } from 'react-spinners';
 const Loader = () => {
     return (
         <div
-            className='text-center mt-5'
+            className="text-center mt-5"
             style={{
                 position: 'fixed',
                 top: '50%',
@@ -11,7 +11,7 @@ const Loader = () => {
                 transform: 'translate(-50%, -50%)',
             }}
         >
-            <MoonLoader color='#ffab34' size={50} />
+            <MoonLoader color="#ffab34" size={50} />
         </div>
     );
 };

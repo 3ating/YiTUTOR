@@ -44,13 +44,13 @@ const Footer: React.FC = () => {
         <FooterWrapper>
             <FooterText>© 2023 YiTUTOR All rights reserved.</FooterText>
             <SocialLinks>
-                <SocialLink href='https://www.facebook.com/kevin.lin.50115/'>
+                <SocialLink href="https://www.facebook.com/kevin.lin.50115/">
                     <FaFacebookSquare />
                 </SocialLink>
-                <SocialLink href='https://github.com/3ating?tab=repositories'>
+                <SocialLink href="https://github.com/3ating?tab=repositories">
                     <FaGithub />
                 </SocialLink>
-                <SocialLink href='https://www.linkedin.com/in/yi-ting-lin-082265233/'>
+                <SocialLink href="https://www.linkedin.com/in/yi-ting-lin-082265233/">
                     <FaLinkedin />
                 </SocialLink>
             </SocialLinks>

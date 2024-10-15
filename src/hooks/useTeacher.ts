@@ -4,34 +4,34 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 export const useTeacher = () => {
-  const router = useRouter();
-  const { uid } = router.query;
-  const [teacher, setTeacher] = useState<Teacher | null>(null);
+    const router = useRouter();
+    const { uid } = router.query;
+    const [teacher, setTeacher] = useState<Teacher | null>(null);
 
-  useEffect(() => {
-    if (uid) {
-      db.collection('users')
-        .doc(uid as string)
-        .get()
-        .then((doc) => {
-          if (doc.exists) {
-            const teacherData = doc.data() as Teacher;
-            if (typeof teacherData.avatar === 'string') {
-              const img = new Image();
-              img.src = teacherData.avatar;
-              img.onload = () => {
-                setTeacher(teacherData);
-              };
-            } else {
-              setTeacher(teacherData);
-            }
-          }
-        })
-        .catch((error) => {
-          console.error('Error fetching teacher details:', error);
-        });
-    }
-  }, [uid]);
+    useEffect(() => {
+        if (uid) {
+            db.collection('users')
+                .doc(uid as string)
+                .get()
+                .then(doc => {
+                    if (doc.exists) {
+                        const teacherData = doc.data() as Teacher;
+                        if (typeof teacherData.avatar === 'string') {
+                            const img = new Image();
+                            img.src = teacherData.avatar;
+                            img.onload = () => {
+                                setTeacher(teacherData);
+                            };
+                        } else {
+                            setTeacher(teacherData);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching teacher details:', error);
+                });
+        }
+    }, [uid]);
 
-  return teacher;
+    return teacher;
 };

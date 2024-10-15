@@ -3,9 +3,9 @@ import React from 'react';
 const DotLoadingIcon: React.FC = () => {
     return (
         <span>
-            <i className='dot' />
-            <i className='dot' />
-            <i className='dot' />
+            <i className="dot" />
+            <i className="dot" />
+            <i className="dot" />
             <style jsx>{`
                 .dot {
                     display: inline-block;

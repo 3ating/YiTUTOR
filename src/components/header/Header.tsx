@@ -115,22 +115,25 @@ const Header: React.FC = () => {
     return (
         <HeaderWrapper>
             <LogoLink href={'/'}>
-                <Image src={logo} alt='YiTUTOR Logo' />
+                <Image src={logo} alt="YiTUTOR Logo" />
             </LogoLink>
             <NavContainer>
                 <MenuContainer>
-                    <Menu href='/teachers/allteachers'>尋找老師</Menu>
-                    <Menu href='/onlineclass/classroom'>線上教室</Menu>
+                    <Menu href="/teachers/allteachers">尋找老師</Menu>
+                    <Menu href="/onlineclass/classroom">線上教室</Menu>
                 </MenuContainer>
                 <SignBtnContainer>
                     {isLoading ? (
                         <AvatarLink href={`/auth/login`} passHref>
-                            <UserAvatar src={userInfo?.avatar} alt='User Avatar' />
+                            <UserAvatar
+                                src={userInfo?.avatar}
+                                alt="User Avatar"
+                            />
                         </AvatarLink>
                     ) : (
                         <>
-                            <SignUpBtn href='/auth/signup'>註 冊</SignUpBtn>
-                            <SignInBtn href='/auth/login'>登 入</SignInBtn>
+                            <SignUpBtn href="/auth/signup">註 冊</SignUpBtn>
+                            <SignInBtn href="/auth/login">登 入</SignInBtn>
                         </>
                     )}
                 </SignBtnContainer>

@@ -5,7 +5,11 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useRef, useState } from 'react';
 import { AiOutlineCamera } from 'react-icons/ai';
-import ReactSelect, { ControlProps, OptionProps, StylesConfig } from 'react-select';
+import ReactSelect, {
+    ControlProps,
+    OptionProps,
+    StylesConfig,
+} from 'react-select';
 import styled from 'styled-components';
 import { useAuth } from '../../context/AuthContext';
 import SignUpButton from './components/SignUpButton';
@@ -203,8 +207,8 @@ const SubjectContainer = styled.div`
 const SubjectButton = styled.button<SubjectButtonProps>`
     width: 100%;
     padding: 0.5rem 1rem;
-    background-color: ${(props) => (props.selected ? '#ffab34' : '#ccc')};
-    color: ${(props) => (props.selected ? 'white' : 'black')};
+    background-color: ${props => (props.selected ? '#ffab34' : '#ccc')};
+    color: ${props => (props.selected ? 'white' : 'black')};
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -282,8 +286,8 @@ const WeekDay = styled.p`
 `;
 
 const TimeButton = styled.button<{ selected: boolean }>`
-    background-color: ${(props) => (props.selected ? '#000' : '#ccc')};
-    color: ${(props) => (props.selected ? 'white' : 'black')};
+    background-color: ${props => (props.selected ? '#000' : '#ccc')};
+    color: ${props => (props.selected ? 'white' : 'black')};
     padding: 5px 10px;
     border-radius: 5px;
     cursor: pointer;
@@ -340,12 +344,16 @@ const SignUp = () => {
     const [message, setMessage] = useState('');
     const [courses, setCourses] = useState({});
     const [description, setDescription] = useState('');
-    const [price, setPrice] = useState<{ [key: number]: number | undefined }>({});
+    const [price, setPrice] = useState<{ [key: number]: number | undefined }>(
+        {}
+    );
     const [documentFile, setDocumentFile] = useState<File | null>(null);
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [avatarPreview, setAvatarPreview] = useState('');
     const [intro, setIntro] = useState('');
-    const [selectedTimes, setSelectedTimes] = useState<{ [day: string]: Set<number> }>({
+    const [selectedTimes, setSelectedTimes] = useState<{
+        [day: string]: Set<number>;
+    }>({
         Monday: new Set(),
         Tuesday: new Set(),
         Wednesday: new Set(),
@@ -370,9 +378,11 @@ const SignUp = () => {
 
         return dayMap[day] || day;
     };
-    const selectedTimesArray = Object.entries(selectedTimes).map(([day, hours]) => {
-        return { day, hours: Array.from(hours) };
-    });
+    const selectedTimesArray = Object.entries(selectedTimes).map(
+        ([day, hours]) => {
+            return { day, hours: Array.from(hours) };
+        }
+    );
 
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
@@ -412,7 +422,9 @@ const SignUp = () => {
         let documentUrl = '';
         if (documentFile) {
             const storageRef = storage.ref();
-            const documentRef = storageRef.child(`documents/${documentFile.name}`);
+            const documentRef = storageRef.child(
+                `documents/${documentFile.name}`
+            );
             const snapshot = await documentRef.put(documentFile);
             documentUrl = await snapshot.ref.getDownloadURL();
         }
@@ -432,7 +444,7 @@ const SignUp = () => {
         });
 
         auth.createUserWithEmailAndPassword(email, password)
-            .then((result) => {
+            .then(result => {
                 if (result.user) {
                     db.collection('users')
                         .doc(result.user.uid)
@@ -464,14 +476,14 @@ const SignUp = () => {
                             setPrice({});
                             setAvatarFile(null);
                         })
-                        .catch((error) => {
+                        .catch(error => {
                             console.error('Error writing document: ', error);
                         });
                 } else {
                     setMessage('註冊失敗。');
                 }
             })
-            .catch((error) => {
+            .catch(error => {
                 console.error('Error creating user: ', error);
                 setMessage('註冊失敗。');
             });
@@ -517,7 +529,7 @@ const SignUp = () => {
                         成為 YiTUTOR 的一員，與我們一同成長吧！
                     </WelcomeText>
                 </WelcomeTextContainer>
-                <SignUpImage src={SignUpImg} alt='Sign Up' />
+                <SignUpImage src={SignUpImg} alt="Sign Up" />
             </WelcomeContainer>
             <SignupInputContainer>
                 <SignupFormContainer>
@@ -529,15 +541,25 @@ const SignUp = () => {
                                 <AvatarContainer>
                                     <AvatarInput
                                         ref={avatarInputRef}
-                                        type='file'
-                                        accept='image/*'
-                                        onChange={(e) => handleAvatarChange(e)}
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={e => handleAvatarChange(e)}
                                     />
-                                    <AvatarPreviewContainer onClick={() => avatarInputRef.current?.click()}>
+                                    <AvatarPreviewContainer
+                                        onClick={() =>
+                                            avatarInputRef.current?.click()
+                                        }
+                                    >
                                         {avatarPreview ? (
-                                            <AvatarPreviewImage src={avatarPreview} alt='Avatar Preview' />
+                                            <AvatarPreviewImage
+                                                src={avatarPreview}
+                                                alt="Avatar Preview"
+                                            />
                                         ) : (
-                                            <AiOutlineCamera size={35} color='#818181' />
+                                            <AiOutlineCamera
+                                                size={35}
+                                                color="#818181"
+                                            />
                                         )}
                                     </AvatarPreviewContainer>
                                     <AvatarText>
@@ -551,10 +573,12 @@ const SignUp = () => {
                                         姓名：
                                         <UserInfoInput
                                             required
-                                            type='text'
+                                            type="text"
                                             value={name}
-                                            onChange={(e) => setName(e.target.value)}
-                                            pattern='[\u4e00-\u9fa5]+'
+                                            onChange={e =>
+                                                setName(e.target.value)
+                                            }
+                                            pattern="[\u4e00-\u9fa5]+"
                                         />
                                         <InputHint>請輸入中文姓名</InputHint>
                                     </UserInfoLabel>
@@ -562,18 +586,22 @@ const SignUp = () => {
                                         手機：
                                         <UserInfoInput
                                             required
-                                            type='tel'
+                                            type="tel"
                                             value={phone}
-                                            onChange={(e) => setPhone(e.target.value)}
+                                            onChange={e =>
+                                                setPhone(e.target.value)
+                                            }
                                         />
                                     </UserInfoLabel>
                                     <UserInfoLabel>
                                         信箱：
                                         <UserInfoInput
                                             required
-                                            type='email'
+                                            type="email"
                                             value={email}
-                                            onChange={(e) => setEmail(e.target.value)}
+                                            onChange={e =>
+                                                setEmail(e.target.value)
+                                            }
                                         />
                                         <InputHint>同時為您的帳號</InputHint>
                                     </UserInfoLabel>
@@ -581,21 +609,31 @@ const SignUp = () => {
                                         密碼：
                                         <UserInfoInput
                                             required
-                                            type='password'
+                                            type="password"
                                             value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
+                                            onChange={e =>
+                                                setPassword(e.target.value)
+                                            }
                                         />
-                                        <InputHint>{passwordError || '至少由8個數字或英文組成'}</InputHint>
+                                        <InputHint>
+                                            {passwordError ||
+                                                '至少由8個數字或英文組成'}
+                                        </InputHint>
                                     </UserInfoLabel>
                                     <UserInfoLabel>
                                         身份：
                                         <ReactSelect
                                             styles={customStyles}
                                             options={userTypeOptions}
-                                            value={userTypeOptions.find((option) => option.value === userType)}
-                                            onChange={(selectedOption) => {
+                                            value={userTypeOptions.find(
+                                                option =>
+                                                    option.value === userType
+                                            )}
+                                            onChange={selectedOption => {
                                                 if (selectedOption !== null) {
-                                                    setUserType(selectedOption.value);
+                                                    setUserType(
+                                                        selectedOption.value
+                                                    );
                                                 }
                                             }}
                                         />
@@ -603,103 +641,148 @@ const SignUp = () => {
                                 </UserInfoContainer>
                             </>
                         )}
-                        {userType === 'teacher' && showTeacherDetails && !finalStep && (
-                            <>
-                                <TeacherInfoLabel>
-                                    簡述：
-                                    <TeacherTextArea
-                                        required
-                                        value={description}
-                                        onChange={(e) => setDescription(e.target.value)}
-                                        rows={2}
-                                        cols={50}
-                                        maxLength={60}
-                                    />
-                                    <InputHint>請勿超過 60 個字</InputHint>
-                                </TeacherInfoLabel>
-                                <TeacherInfoLabel>
-                                    自我介紹：
-                                    <TeacherTextArea
-                                        required
-                                        value={intro}
-                                        onChange={(e) => setIntro(e.target.value)}
-                                        rows={5}
-                                        cols={50}
-                                    />
-                                </TeacherInfoLabel>
-                                <TeacherSubjectContainer>
-                                    <TeacherInfoLabel>科目：</TeacherInfoLabel>
-                                    <SubjectContainer>
-                                        {availableSubjects.map((subject, index) => (
-                                            <SubjectButton
-                                                key={index}
-                                                selected={selectedSubjects.includes(subject)}
-                                                onClick={() => handleSubjectSelection(subject)}
-                                                type='button'
-                                            >
-                                                {subject}
-                                            </SubjectButton>
-                                        ))}
-                                    </SubjectContainer>
-                                </TeacherSubjectContainer>
-                                <TeacherInfoLabel>
-                                    課程價格：
-                                    <PriceContainer>
-                                        <PriceItem>
-                                            <PriceInput
-                                                required
-                                                type='number'
-                                                value={price[1] || ''}
-                                                onChange={(e) => handlePriceChange(1, e.target.value)}
-                                                placeholder=' '
-                                            />
-                                            <PriceLabel>一堂課</PriceLabel>
-                                        </PriceItem>
-                                        <PriceItem>
-                                            <PriceInput
-                                                required
-                                                type='number'
-                                                value={price[5] || ''}
-                                                onChange={(e) => handlePriceChange(5, e.target.value)}
-                                                placeholder=' '
-                                            />
-                                            <PriceLabel>五堂課</PriceLabel>
-                                        </PriceItem>
-                                        <PriceItem>
-                                            <PriceInput
-                                                required
-                                                type='number'
-                                                value={price[10] || ''}
-                                                onChange={(e) => handlePriceChange(10, e.target.value)}
-                                                placeholder=' '
-                                            />
-                                            <PriceLabel>十堂課</PriceLabel>
-                                        </PriceItem>
-                                    </PriceContainer>
-                                </TeacherInfoLabel>
-                            </>
-                        )}
-                        {userType === 'teacher' && showTeacherDetails && finalStep && (
-                            <div>
-                                {Object.keys(selectedTimes).map((day) => (
-                                    <TimeDayContainer key={day}>
-                                        <WeekDay>{convertDayToChinese(day)}</WeekDay>
-                                        <TimeButtonContainer>
-                                            {Array.from({ length: 12 }, (_, i) => i + 9).map((hour) => (
-                                                <TimeButton
-                                                    key={hour}
-                                                    selected={selectedTimes[day].has(hour)}
-                                                    onClick={() => handleTimeButtonClick(day, hour)}
-                                                    type='button'
-                                                >
-                                                    {hour}:00
-                                                </TimeButton>
-                                            ))}
-                                        </TimeButtonContainer>
-                                    </TimeDayContainer>
-                                ))}
-                            </div>
-                        )}
+                        {userType === 'teacher' &&
+                            showTeacherDetails &&
+                            !finalStep && (
+                                <>
+                                    <TeacherInfoLabel>
+                                        簡述：
+                                        <TeacherTextArea
+                                            required
+                                            value={description}
+                                            onChange={e =>
+                                                setDescription(e.target.value)
+                                            }
+                                            rows={2}
+                                            cols={50}
+                                            maxLength={60}
+                                        />
+                                        <InputHint>請勿超過 60 個字</InputHint>
+                                    </TeacherInfoLabel>
+                                    <TeacherInfoLabel>
+                                        自我介紹：
+                                        <TeacherTextArea
+                                            required
+                                            value={intro}
+                                            onChange={e =>
+                                                setIntro(e.target.value)
+                                            }
+                                            rows={5}
+                                            cols={50}
+                                        />
+                                    </TeacherInfoLabel>
+                                    <TeacherSubjectContainer>
+                                        <TeacherInfoLabel>
+                                            科目：
+                                        </TeacherInfoLabel>
+                                        <SubjectContainer>
+                                            {availableSubjects.map(
+                                                (subject, index) => (
+                                                    <SubjectButton
+                                                        key={index}
+                                                        selected={selectedSubjects.includes(
+                                                            subject
+                                                        )}
+                                                        onClick={() =>
+                                                            handleSubjectSelection(
+                                                                subject
+                                                            )
+                                                        }
+                                                        type="button"
+                                                    >
+                                                        {subject}
+                                                    </SubjectButton>
+                                                )
+                                            )}
+                                        </SubjectContainer>
+                                    </TeacherSubjectContainer>
+                                    <TeacherInfoLabel>
+                                        課程價格：
+                                        <PriceContainer>
+                                            <PriceItem>
+                                                <PriceInput
+                                                    required
+                                                    type="number"
+                                                    value={price[1] || ''}
+                                                    onChange={e =>
+                                                        handlePriceChange(
+                                                            1,
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    placeholder=" "
+                                                />
+                                                <PriceLabel>一堂課</PriceLabel>
+                                            </PriceItem>
+                                            <PriceItem>
+                                                <PriceInput
+                                                    required
+                                                    type="number"
+                                                    value={price[5] || ''}
+                                                    onChange={e =>
+                                                        handlePriceChange(
+                                                            5,
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    placeholder=" "
+                                                />
+                                                <PriceLabel>五堂課</PriceLabel>
+                                            </PriceItem>
+                                            <PriceItem>
+                                                <PriceInput
+                                                    required
+                                                    type="number"
+                                                    value={price[10] || ''}
+                                                    onChange={e =>
+                                                        handlePriceChange(
+                                                            10,
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    placeholder=" "
+                                                />
+                                                <PriceLabel>十堂課</PriceLabel>
+                                            </PriceItem>
+                                        </PriceContainer>
+                                    </TeacherInfoLabel>
+                                </>
+                            )}
+                        {userType === 'teacher' &&
+                            showTeacherDetails &&
+                            finalStep && (
+                                <div>
+                                    {Object.keys(selectedTimes).map(day => (
+                                        <TimeDayContainer key={day}>
+                                            <WeekDay>
+                                                {convertDayToChinese(day)}
+                                            </WeekDay>
+                                            <TimeButtonContainer>
+                                                {Array.from(
+                                                    { length: 12 },
+                                                    (_, i) => i + 9
+                                                ).map(hour => (
+                                                    <TimeButton
+                                                        key={hour}
+                                                        selected={selectedTimes[
+                                                            day
+                                                        ].has(hour)}
+                                                        onClick={() =>
+                                                            handleTimeButtonClick(
+                                                                day,
+                                                                hour
+                                                            )
+                                                        }
+                                                        type="button"
+                                                    >
+                                                        {hour}:00
+                                                    </TimeButton>
+                                                ))}
+                                            </TimeButtonContainer>
+                                        </TimeDayContainer>
+                                    ))}
+                                </div>
+                            )}
                         <SignUpButton
                             userType={userType}
                             showTeacherDetails={showTeacherDetails}

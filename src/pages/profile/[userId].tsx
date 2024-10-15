@@ -221,7 +221,9 @@ const BookingCard = styled.div`
     cursor: pointer;
     background-color: white;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.3s, transform 0.3s;
+    transition:
+        box-shadow 0.3s,
+        transform 0.3s;
     &:hover {
         box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
         transform: translateY(-2px);
@@ -303,11 +305,11 @@ const ProfileMiddleContainer = styled.div<BookedCoursesContainerProps>`
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: ${(props) => (props.isBookedCourseEmpty ? '70%' : '35%')};
+    width: ${props => (props.isBookedCourseEmpty ? '70%' : '35%')};
     padding: 65px 0 0 0;
     box-sizing: border-box;
     @media (max-width: 815px) {
-        width: ${(props) => (props.isBookedCourseEmpty ? '60%' : '30%')};
+        width: ${props => (props.isBookedCourseEmpty ? '60%' : '30%')};
     }
 `;
 
@@ -326,7 +328,7 @@ const CourseLine = styled.div`
 `;
 
 const BookedCoursesContainer = styled.div<BookedCoursesContainerProps>`
-    display: ${(props) => (props.isBookedCourseEmpty ? 'flex' : 'grid')};
+    display: ${props => (props.isBookedCourseEmpty ? 'flex' : 'grid')};
     grid-template-columns: 1fr 1fr;
     justify-items: center;
     align-items: center;
@@ -350,11 +352,11 @@ const ProfilRightContainer = styled.div<ProfilRightContainerProps>`
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: ${(props) => (props.isTeacher ? '0' : '35%')};
+    width: ${props => (props.isTeacher ? '0' : '35%')};
     padding: 65px 0 0 0;
     box-sizing: border-box;
     @media (max-width: 815px) {
-        width: ${(props) => (props.isTeacher ? '0' : '30%')};
+        width: ${props => (props.isTeacher ? '0' : '30%')};
     }
 `;
 
@@ -418,12 +420,18 @@ const UserProfile = () => {
     const router = useRouter();
     const { userId } = router.query;
     const [userInfo, setUserInfo] = useState<UserInfoDetails | null>(null);
-    const [editedUserInfo, setEditedUserInfo] = useState<UserInfoDetails | null>(null);
+    const [editedUserInfo, setEditedUserInfo] =
+        useState<UserInfoDetails | null>(null);
     const [isEditingEmail, setIsEditingEmail] = useState(false);
     const [isEditingPhone, setIsEditingPhone] = useState(false);
-    const [bookingsInfo, setBookingsInfo] = useState<BookingWithTeacherInfo[]>([]);
+    const [bookingsInfo, setBookingsInfo] = useState<BookingWithTeacherInfo[]>(
+        []
+    );
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, fieldName: string) => {
+    const handleChange = (
+        event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+        fieldName: string
+    ) => {
         const { value } = event.target;
         if (editedUserInfo) {
             setEditedUserInfo({ ...editedUserInfo, [fieldName]: value });
@@ -452,7 +460,9 @@ const UserProfile = () => {
                 'users'
             ) as unknown as firebase.firestore.CollectionReference<UserInfoDetails>;
             const userDocRef = doc(usersCollectionRef, userId as string);
-            await updateDoc(userDocRef, { [fieldName]: editedUserInfo[fieldName] });
+            await updateDoc(userDocRef, {
+                [fieldName]: editedUserInfo[fieldName],
+            });
             setUserInfo(editedUserInfo);
             if (fieldName === 'email') {
                 setIsEditingEmail(false);
@@ -477,13 +487,18 @@ const UserProfile = () => {
             const fetchBookingData = async (bookings: Booking[]) => {
                 const usersCollectionRef = collection(db, 'users');
                 if (bookings) {
-                    const bookingsDataPromises = bookings.map(async (booking) => {
-                        const bookingDocRef = doc(usersCollectionRef, booking.teacherId || booking.studentId);
+                    const bookingsDataPromises = bookings.map(async booking => {
+                        const bookingDocRef = doc(
+                            usersCollectionRef,
+                            booking.teacherId || booking.studentId
+                        );
                         const bookingDocSnapshot = await getDoc(bookingDocRef);
-                        const bookingData = bookingDocSnapshot.data() as TeacherInfo;
+                        const bookingData =
+                            bookingDocSnapshot.data() as TeacherInfo;
                         return { ...booking, teacherInfo: bookingData };
                     });
-                    const teachersData = await Promise.all(bookingsDataPromises);
+                    const teachersData =
+                        await Promise.all(bookingsDataPromises);
                     setBookingsInfo(teachersData);
                 }
             };
@@ -500,7 +515,12 @@ const UserProfile = () => {
             <ProfileWrapper>
                 <ProfileLeftContainer>
                     <UserInfoBox>
-                        {userInfo.avatar && <Avatar src={userInfo.avatar} alt={`${name} 的大頭照`} />}
+                        {userInfo.avatar && (
+                            <Avatar
+                                src={userInfo.avatar}
+                                alt={`${name} 的大頭照`}
+                            />
+                        )}
                         <UserInfoContainer>
                             <UserNameContainer>
                                 <UserName>{userInfo.name}</UserName>
@@ -508,8 +528,8 @@ const UserProfile = () => {
                                     {userInfo.userType === 'student'
                                         ? '學生'
                                         : userInfo.userType === 'teacher'
-                                        ? '老師'
-                                        : ''}
+                                          ? '老師'
+                                          : ''}
                                 </UserType>
                             </UserNameContainer>
                             <UserInformationContainer>
@@ -520,17 +540,26 @@ const UserProfile = () => {
                                         {isEditingEmail ? (
                                             <>
                                                 <ModifiedInput
-                                                    type='email'
-                                                    name='email'
-                                                    value={editedUserInfo?.email || ''}
-                                                    onChange={(e) => handleChange(e, 'email')}
+                                                    type="email"
+                                                    name="email"
+                                                    value={
+                                                        editedUserInfo?.email ||
+                                                        ''
+                                                    }
+                                                    onChange={e =>
+                                                        handleChange(e, 'email')
+                                                    }
                                                 />
                                             </>
                                         ) : (
                                             <>
                                                 {userInfo.email}
                                                 <IconWrapper>
-                                                    <AiFillEdit onClick={() => handleEdit('email')} />
+                                                    <AiFillEdit
+                                                        onClick={() =>
+                                                            handleEdit('email')
+                                                        }
+                                                    />
                                                 </IconWrapper>
                                             </>
                                         )}
@@ -545,17 +574,26 @@ const UserProfile = () => {
                                         {isEditingPhone ? (
                                             <>
                                                 <ModifiedInput
-                                                    type='number'
-                                                    name='phone'
-                                                    value={editedUserInfo?.phone || ''}
-                                                    onChange={(e) => handleChange(e, 'phone')}
+                                                    type="number"
+                                                    name="phone"
+                                                    value={
+                                                        editedUserInfo?.phone ||
+                                                        ''
+                                                    }
+                                                    onChange={e =>
+                                                        handleChange(e, 'phone')
+                                                    }
                                                 />
                                             </>
                                         ) : (
                                             <>
                                                 {userInfo.phone}
                                                 <IconWrapper>
-                                                    <AiFillEdit onClick={() => handleEdit('phone')} />
+                                                    <AiFillEdit
+                                                        onClick={() =>
+                                                            handleEdit('phone')
+                                                        }
+                                                    />
                                                 </IconWrapper>
                                             </>
                                         )}
@@ -565,10 +603,18 @@ const UserProfile = () => {
                             {(isEditingEmail || isEditingPhone) && (
                                 <>
                                     {isEditingEmail && (
-                                        <ConfirmButton onClick={() => handleSave('email')}>確認</ConfirmButton>
+                                        <ConfirmButton
+                                            onClick={() => handleSave('email')}
+                                        >
+                                            確認
+                                        </ConfirmButton>
                                     )}
                                     {isEditingPhone && (
-                                        <ConfirmButton onClick={() => handleSave('phone')}>確認</ConfirmButton>
+                                        <ConfirmButton
+                                            onClick={() => handleSave('phone')}
+                                        >
+                                            確認
+                                        </ConfirmButton>
                                     )}
                                     <CancelButton
                                         onClick={() => {
@@ -583,13 +629,19 @@ const UserProfile = () => {
                         </UserInfoContainer>
                     </UserInfoBox>
                 </ProfileLeftContainer>
-                <ProfileMiddleContainer isBookedCourseEmpty={userInfo.userType === 'teacher'}>
+                <ProfileMiddleContainer
+                    isBookedCourseEmpty={userInfo.userType === 'teacher'}
+                >
                     <CourseTitle>預約課程</CourseTitle>
                     <CourseLine />
-                    <BookedCoursesContainer isBookedCourseEmpty={bookingsInfo.length === 0}>
-                        {userInfo.userType === 'teacher' && bookingsInfo.length === 0 ? (
+                    <BookedCoursesContainer
+                        isBookedCourseEmpty={bookingsInfo.length === 0}
+                    >
+                        {userInfo.userType === 'teacher' &&
+                        bookingsInfo.length === 0 ? (
                             <NoBookedCourse>目前無學生預約課程</NoBookedCourse>
-                        ) : userInfo.userType === 'student' && bookingsInfo.length === 0 ? (
+                        ) : userInfo.userType === 'student' &&
+                          bookingsInfo.length === 0 ? (
                             <NoBookedCourse>無預約課程</NoBookedCourse>
                         ) : (
                             bookingsInfo.length > 0 &&
@@ -605,13 +657,22 @@ const UserProfile = () => {
                                         />
                                         <BookingInfo>
                                             <BookingTitleContainer>
-                                                <BookingInfoTitle>{booking.teacherInfo.name}</BookingInfoTitle>
-                                                {userInfo.userType === 'student' && (
-                                                    <BookingSubject>{booking.teacherInfo.subject}</BookingSubject>
+                                                <BookingInfoTitle>
+                                                    {booking.teacherInfo.name}
+                                                </BookingInfoTitle>
+                                                {userInfo.userType ===
+                                                    'student' && (
+                                                    <BookingSubject>
+                                                        {
+                                                            booking.teacherInfo
+                                                                .subject
+                                                        }
+                                                    </BookingSubject>
                                                 )}
                                             </BookingTitleContainer>
                                             <BookingInfoTime>
-                                                {booking.courseTime.dayLabel} {booking.courseTime.time}
+                                                {booking.courseTime.dayLabel}{' '}
+                                                {booking.courseTime.time}
                                             </BookingInfoTime>
                                         </BookingInfo>
                                     </BookingCard>
@@ -620,35 +681,66 @@ const UserProfile = () => {
                         )}
                     </BookedCoursesContainer>
                 </ProfileMiddleContainer>
-                <ProfilRightContainer isTeacher={userInfo.userType === 'teacher'}>
+                <ProfilRightContainer
+                    isTeacher={userInfo.userType === 'teacher'}
+                >
                     {userInfo.userType === 'student' && (
                         <>
                             <CourseTitle>購買課程</CourseTitle>
                             <CourseLine />
                             <PurchasedContainer>
-                                {userInfo?.courses && Object.entries(userInfo.courses).length > 0 ? (
+                                {userInfo?.courses &&
+                                Object.entries(userInfo.courses).length > 0 ? (
                                     <CourseCardContainer>
-                                        {Object.entries(userInfo.courses).map(([courseId, courseData]) => (
-                                            <DirectLink key={courseId} href={`../teachers/${courseData.teacherid}`}>
-                                                <CourseCard>
-                                                    <CourseInfo>
-                                                        <CourseValue>{courseData.subject} &nbsp;</CourseValue>
-                                                    </CourseInfo>
-                                                    <CourseInfo>
-                                                        <CourseLabel>老師:</CourseLabel>
-                                                        <CourseValue>{courseData.teachername} &nbsp;</CourseValue>
-                                                    </CourseInfo>
-                                                    <CourseInfo>
-                                                        <CourseLabel> 剩餘堂數:</CourseLabel>
-                                                        <CourseValue>{courseData.quantity}</CourseValue>
-                                                    </CourseInfo>
-                                                </CourseCard>
-                                            </DirectLink>
-                                        ))}
+                                        {Object.entries(userInfo.courses).map(
+                                            ([courseId, courseData]) => (
+                                                <DirectLink
+                                                    key={courseId}
+                                                    href={`../teachers/${courseData.teacherid}`}
+                                                >
+                                                    <CourseCard>
+                                                        <CourseInfo>
+                                                            <CourseValue>
+                                                                {
+                                                                    courseData.subject
+                                                                }{' '}
+                                                                &nbsp;
+                                                            </CourseValue>
+                                                        </CourseInfo>
+                                                        <CourseInfo>
+                                                            <CourseLabel>
+                                                                老師:
+                                                            </CourseLabel>
+                                                            <CourseValue>
+                                                                {
+                                                                    courseData.teachername
+                                                                }{' '}
+                                                                &nbsp;
+                                                            </CourseValue>
+                                                        </CourseInfo>
+                                                        <CourseInfo>
+                                                            <CourseLabel>
+                                                                {' '}
+                                                                剩餘堂數:
+                                                            </CourseLabel>
+                                                            <CourseValue>
+                                                                {
+                                                                    courseData.quantity
+                                                                }
+                                                            </CourseValue>
+                                                        </CourseInfo>
+                                                    </CourseCard>
+                                                </DirectLink>
+                                            )
+                                        )}
                                     </CourseCardContainer>
                                 ) : (
                                     <NoBookedCourse>
-                                        <TeacherLink href={'/teachers/allteachers'}>尋找老師</TeacherLink>
+                                        <TeacherLink
+                                            href={'/teachers/allteachers'}
+                                        >
+                                            尋找老師
+                                        </TeacherLink>
                                     </NoBookedCourse>
                                 )}
                             </PurchasedContainer>

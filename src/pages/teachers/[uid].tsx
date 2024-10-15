@@ -5,7 +5,12 @@ import styled from 'styled-components';
 import { useAuth } from '../../context/AuthContext';
 import Schedule from './components/Schedule';
 import Calendar from './components/Calendar';
-import { AiFillStar, AiOutlineMail, AiOutlinePhone, AiOutlineStar } from 'react-icons/ai';
+import {
+    AiFillStar,
+    AiOutlineMail,
+    AiOutlinePhone,
+    AiOutlineStar,
+} from 'react-icons/ai';
 import { BsStarHalf } from 'react-icons/bs';
 import Button from '@/components/common/Button';
 import Loader from '@/components/common/Loader';
@@ -356,7 +361,10 @@ const TeacherDetails = () => {
     const [confirmPurchase, setConfirmPurchase] = useState(false);
     const [selectedPrice, setSelectedPrice] = useState({ qty: 0, price: 0 });
     const [selectedDate, setSelectedDate] = useState(new Date());
-    const [selectedTime, setSelectedTime] = useState<{ dayLabel: string; time: string } | null>(null);
+    const [selectedTime, setSelectedTime] = useState<{
+        dayLabel: string;
+        time: string;
+    } | null>(null);
     const [showBookButtons, setShowBookButtons] = useState(false);
 
     const handleSelectDate = (date: Date) => {
@@ -439,7 +447,9 @@ const TeacherDetails = () => {
             const studentDoc = await studentDocRef.get();
 
             const courses = studentDoc.data()?.courses || [];
-            const matchingCourseIndex = courses.findIndex((course: any) => course.teacherid === uid);
+            const matchingCourseIndex = courses.findIndex(
+                (course: any) => course.teacherid === uid
+            );
 
             if (matchingCourseIndex === -1) {
                 notification.error({
@@ -537,17 +547,26 @@ const TeacherDetails = () => {
                         <TeacherContentContainer>
                             <NameTopContainer>
                                 <TeacherAvatarContainer>
-                                    <Avatar src={teacher.avatar} alt={`${teacher.name} 的大頭照`} />
+                                    <Avatar
+                                        src={teacher.avatar}
+                                        alt={`${teacher.name} 的大頭照`}
+                                    />
                                 </TeacherAvatarContainer>
                                 <NameRatingContainer>
                                     <TeacherNameContainer>
-                                        <TeacherName>{teacher.name}</TeacherName>
+                                        <TeacherName>
+                                            {teacher.name}
+                                        </TeacherName>
                                         <TeacherSubjectContainer>
-                                            <TeacherSubject>{teacher.subject?.join(', ')}</TeacherSubject>
+                                            <TeacherSubject>
+                                                {teacher.subject?.join(', ')}
+                                            </TeacherSubject>
                                         </TeacherSubjectContainer>
                                     </TeacherNameContainer>
                                     <RatingContainer>
-                                        <RatingNumber>{formattedRating}</RatingNumber>
+                                        <RatingNumber>
+                                            {formattedRating}
+                                        </RatingNumber>
                                         {renderStars(rating)}
                                     </RatingContainer>
                                 </NameRatingContainer>
@@ -579,8 +598,16 @@ const TeacherDetails = () => {
                                 </div>
                                 {showBookButtons && selectedTime && (
                                     <BookButtonContainer>
-                                        <ConfirmButton onClick={handleConfirmBook}>確認</ConfirmButton>
-                                        <RejectButton onClick={handleRejectBook}>取消</RejectButton>
+                                        <ConfirmButton
+                                            onClick={handleConfirmBook}
+                                        >
+                                            確認
+                                        </ConfirmButton>
+                                        <RejectButton
+                                            onClick={handleRejectBook}
+                                        >
+                                            取消
+                                        </RejectButton>
                                     </BookButtonContainer>
                                 )}
                             </ScheduleContainer>
@@ -593,47 +620,79 @@ const TeacherDetails = () => {
                     <CourseContainer>
                         <CoursePriceContainer>
                             <Section>
-                                <CoursePriceSubHeading>課程價格</CoursePriceSubHeading>
+                                <CoursePriceSubHeading>
+                                    課程價格
+                                </CoursePriceSubHeading>
                                 <TitleLine />
                                 <CoursePriceButtonContainer>
                                     {teacher.price &&
-                                        teacher.price.map((priceObj: { qty: number; price: number }, idx: number) => {
-                                            return (
-                                                <PriceButton key={idx} onClick={() => handlePurchaseClick(priceObj)}>
-                                                    {priceObj.qty} 堂課 NT${priceObj.price} 元
-                                                </PriceButton>
-                                            );
-                                        })}
+                                        teacher.price.map(
+                                            (
+                                                priceObj: {
+                                                    qty: number;
+                                                    price: number;
+                                                },
+                                                idx: number
+                                            ) => {
+                                                return (
+                                                    <PriceButton
+                                                        key={idx}
+                                                        onClick={() =>
+                                                            handlePurchaseClick(
+                                                                priceObj
+                                                            )
+                                                        }
+                                                    >
+                                                        {priceObj.qty} 堂課 NT$
+                                                        {priceObj.price} 元
+                                                    </PriceButton>
+                                                );
+                                            }
+                                        )}
                                 </CoursePriceButtonContainer>
-                                <CoursePriceSubHeading>聯絡老師</CoursePriceSubHeading>
+                                <CoursePriceSubHeading>
+                                    聯絡老師
+                                </CoursePriceSubHeading>
                                 <TitleLine />
                                 <TeacherContactContainer>
                                     <TeacherEmailContainer>
                                         <AiOutlineMail size={ICON_SIZE} />
-                                        <TeacherEmail>{teacher.email}</TeacherEmail>
+                                        <TeacherEmail>
+                                            {teacher.email}
+                                        </TeacherEmail>
                                     </TeacherEmailContainer>
                                     <TeacherPhoneContainer>
                                         <AiOutlinePhone size={ICON_SIZE} />
-                                        <TeacherPhone>{teacher.phone}</TeacherPhone>
+                                        <TeacherPhone>
+                                            {teacher.phone}
+                                        </TeacherPhone>
                                     </TeacherPhoneContainer>
                                 </TeacherContactContainer>
                             </Section>
                             {userInfo?.userType !== 'teacher' && (
                                 <Modal
-                                    title='確認購買'
+                                    title="確認購買"
                                     open={confirmPurchase}
                                     onCancel={handleCancelPurchase}
                                     footer={[
-                                        <ConfirmBuyButton key='confirm' onClick={handleConfirmPurchase}>
+                                        <ConfirmBuyButton
+                                            key="confirm"
+                                            onClick={handleConfirmPurchase}
+                                        >
                                             確認
                                         </ConfirmBuyButton>,
-                                        <ConfirmBuyButton key='cancel' onClick={handleCancelPurchase}>
+                                        <ConfirmBuyButton
+                                            key="cancel"
+                                            onClick={handleCancelPurchase}
+                                        >
                                             取消
                                         </ConfirmBuyButton>,
                                     ]}
                                 >
                                     <ConfirmText>
-                                        您確定要購買 {selectedPrice.qty} 堂課，價格為 {selectedPrice.price} 元嗎？
+                                        您確定要購買 {selectedPrice.qty}{' '}
+                                        堂課，價格為 {selectedPrice.price}{' '}
+                                        元嗎？
                                     </ConfirmText>
                                 </Modal>
                             )}

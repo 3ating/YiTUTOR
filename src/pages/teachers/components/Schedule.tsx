@@ -39,17 +39,19 @@ const TimeSlot = styled.div<{ selected: boolean; active: boolean }>`
     height: 35px;
     border: 2px solid #ccc;
     border-radius: 4px;
-    background-color: ${(props) => (props.active ? '#ffab34' : props.selected ? 'white' : '#f0f0f0')};
-    color: ${(props) => (props.active ? '#fff' : props.selected ? '#333' : '#666')};
+    background-color: ${props =>
+        props.active ? '#ffab34' : props.selected ? 'white' : '#f0f0f0'};
+    color: ${props =>
+        props.active ? '#fff' : props.selected ? '#333' : '#666'};
     font-size: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
-    cursor: ${(props) => (props.selected ? 'pointer' : 'not-allowed')};
+    cursor: ${props => (props.selected ? 'pointer' : 'not-allowed')};
     transition: all 0.2s ease-in-out;
     margin: 0;
 
-    ${(props) =>
+    ${props =>
         props.selected &&
         `
         &:hover {
@@ -87,7 +89,9 @@ interface ScheduleProps {
     userInfo?: UserInfo;
     selectedDate: Date;
     onTimeSlotClick: () => void;
-    setSelectedTime: (selectedTime: { dayLabel: string; time: string } | null) => void;
+    setSelectedTime: (
+        selectedTime: { dayLabel: string; time: string } | null
+    ) => void;
     selectedTime: { dayLabel: string; time: string } | null;
 }
 
@@ -98,7 +102,15 @@ const Schedule: React.FC<ScheduleProps> = ({
     setSelectedTime,
     selectedTime,
 }) => {
-    const dayMapping = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayMapping = [
+        'Sunday',
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+    ];
     const currentDate = selectedDate.getDay();
 
     const getToday = () => {
@@ -121,18 +133,25 @@ const Schedule: React.FC<ScheduleProps> = ({
 
     const getSelectedTimesForDay = (dayIndex: number) => {
         const dayName = dayMapping[dayIndex];
-        const dayData = selectedTimes?.find((item) => item.day === dayName);
+        const dayData = selectedTimes?.find(item => item.day === dayName);
         return dayData ? dayData.hours : [];
     };
 
-    const renderTimeSlots = (hours: number[], day: string, dayLabel: string) => {
+    const renderTimeSlots = (
+        hours: number[],
+        day: string,
+        dayLabel: string
+    ) => {
         return hours
-            .filter((hour) => hour >= 9 && hour <= 21)
-            .map((hour) => (
+            .filter(hour => hour >= 9 && hour <= 21)
+            .map(hour => (
                 <TimeSlot
                     key={`${day}-${hour}`}
                     selected
-                    active={selectedTime?.dayLabel === dayLabel && selectedTime?.time === `${hour}:00`}
+                    active={
+                        selectedTime?.dayLabel === dayLabel &&
+                        selectedTime?.time === `${hour}:00`
+                    }
                     onClick={() => handleTimeSlotClick(`${hour}:00`, dayLabel)}
                 >
                     {hour}:00
@@ -142,7 +161,11 @@ const Schedule: React.FC<ScheduleProps> = ({
 
     const handleTimeSlotClick = (time: string, dayLabel: string) => {
         onTimeSlotClick();
-        setSelectedTime(selectedTime?.time === time && selectedTime.dayLabel === dayLabel ? null : { dayLabel, time });
+        setSelectedTime(
+            selectedTime?.time === time && selectedTime.dayLabel === dayLabel
+                ? null
+                : { dayLabel, time }
+        );
     };
 
     const availability = getWeekdays().reduce(
@@ -168,11 +191,20 @@ const Schedule: React.FC<ScheduleProps> = ({
                 const dayIndex = (currentDate + index) % 7;
                 const hours = getSelectedTimesForDay(dayIndex);
                 if (hours.length > 0) {
-                    const dateLabel = date.toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' });
+                    const dateLabel = date.toLocaleDateString(undefined, {
+                        month: 'numeric',
+                        day: 'numeric',
+                    });
                     return (
                         <TimeContainer key={index}>
                             <DayLabel>{dateLabel}</DayLabel>
-                            <DayRow>{renderTimeSlots(hours, dayMapping[dayIndex], dateLabel)}</DayRow>
+                            <DayRow>
+                                {renderTimeSlots(
+                                    hours,
+                                    dayMapping[dayIndex],
+                                    dateLabel
+                                )}
+                            </DayRow>
                         </TimeContainer>
                     );
                 } else {

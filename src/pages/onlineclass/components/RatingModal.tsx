@@ -12,7 +12,13 @@ interface RatingModalProps {
     closeModal: () => void;
 }
 
-const RatingModal: React.FC<RatingModalProps> = ({ classUrlId, userType, userUid, isVisible, closeModal }) => {
+const RatingModal: React.FC<RatingModalProps> = ({
+    classUrlId,
+    userType,
+    userUid,
+    isVisible,
+    closeModal,
+}) => {
     const [teacherRating, setTeacherRating] = useState<number | null>(null);
     const router = useRouter();
 
@@ -20,7 +26,8 @@ const RatingModal: React.FC<RatingModalProps> = ({ classUrlId, userType, userUid
         if (classUrlId && teacherRating !== null) {
             const userRef = db.collection('users').doc(classUrlId);
             await userRef.update({
-                evaluation: firebase.firestore.FieldValue.arrayUnion(teacherRating),
+                evaluation:
+                    firebase.firestore.FieldValue.arrayUnion(teacherRating),
             });
         }
         closeModal();
@@ -29,11 +36,16 @@ const RatingModal: React.FC<RatingModalProps> = ({ classUrlId, userType, userUid
 
     return (
         <Modal
-            title='為老師評分'
+            title="為老師評分"
             open={isVisible}
             onCancel={closeModal}
             footer={[
-                <Button key='submit' type='primary' onClick={submitRating} style={{ backgroundColor: '#ffab34' }}>
+                <Button
+                    key="submit"
+                    type="primary"
+                    onClick={submitRating}
+                    style={{ backgroundColor: '#ffab34' }}
+                >
                     送出
                 </Button>,
             ]}

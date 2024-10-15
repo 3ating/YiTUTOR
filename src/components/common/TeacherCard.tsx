@@ -109,7 +109,10 @@ const calculateAverage = (ratings: number[] = []) => {
         return 0;
     }
 
-    const sum = ratings.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+    const sum = ratings.reduce(
+        (accumulator, currentValue) => accumulator + currentValue,
+        0
+    );
     return sum / ratings.length;
 };
 

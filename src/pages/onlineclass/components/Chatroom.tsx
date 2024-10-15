@@ -95,14 +95,17 @@ const MessagesContainer = styled.div`
 const MessageContainer = styled.div`
     display: flex;
     flex-direction: column;
-    align-items: ${({ ownMessage }: { ownMessage: boolean }) => (ownMessage ? 'flex-end' : 'flex-start')};
+    align-items: ${({ ownMessage }: { ownMessage: boolean }) =>
+        ownMessage ? 'flex-end' : 'flex-start'};
 `;
 
 const MessageBubble = styled.div`
     margin-bottom: 4px;
     padding: 5px 15px;
-    background-color: ${({ ownMessage }: { ownMessage: boolean }) => (ownMessage ? 'white' : '#e9e8e8')};
-    color: ${({ ownMessage }: { ownMessage: boolean }) => (ownMessage ? '#333' : '#333')};
+    background-color: ${({ ownMessage }: { ownMessage: boolean }) =>
+        ownMessage ? 'white' : '#e9e8e8'};
+    color: ${({ ownMessage }: { ownMessage: boolean }) =>
+        ownMessage ? '#333' : '#333'};
     border-radius: 8px;
     /* max-width: 70%; */
     display: inline-block;
@@ -111,22 +114,27 @@ const MessageBubble = styled.div`
 
 const MessageSender = styled.strong`
     font-size: 13px;
-    color: ${({ ownMessage }: { ownMessage: boolean }) => (ownMessage ? '#333' : '#555')};
+    color: ${({ ownMessage }: { ownMessage: boolean }) =>
+        ownMessage ? '#333' : '#555'};
     margin-right: 8px;
 `;
 
 const MessageTimestamp = styled.span`
     font-size: 10px;
-    color: ${({ ownMessage }: { ownMessage: boolean }) => (ownMessage ? '#999' : '#999')};
-    margin-right: ${({ ownMessage }: { ownMessage: boolean }) => (ownMessage ? '4px' : '0')};
-    margin-left: ${({ ownMessage }: { ownMessage: boolean }) => (ownMessage ? '0' : '4px')};
+    color: ${({ ownMessage }: { ownMessage: boolean }) =>
+        ownMessage ? '#999' : '#999'};
+    margin-right: ${({ ownMessage }: { ownMessage: boolean }) =>
+        ownMessage ? '4px' : '0'};
+    margin-left: ${({ ownMessage }: { ownMessage: boolean }) =>
+        ownMessage ? '0' : '4px'};
     display: block;
 `;
 
 const MessageRow = styled.div`
     display: flex;
     font-size: 14px;
-    justify-content: ${({ ownMessage }: { ownMessage: boolean }) => (ownMessage ? 'flex-end' : 'flex-start')};
+    justify-content: ${({ ownMessage }: { ownMessage: boolean }) =>
+        ownMessage ? 'flex-end' : 'flex-start'};
     margin-bottom: 3px;
 `;
 
@@ -160,8 +168,8 @@ export default function ClassChatroom({ roomId, toggleChat }: ChatroomProps) {
             .doc(roomId)
             .collection('messages')
             .orderBy('timestamp', 'asc')
-            .onSnapshot((snapshot) => {
-                const messagesData: MessageType[] = snapshot.docs.map((doc) => ({
+            .onSnapshot(snapshot => {
+                const messagesData: MessageType[] = snapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data(),
                 })) as MessageType[];
@@ -209,7 +217,7 @@ export default function ClassChatroom({ roomId, toggleChat }: ChatroomProps) {
                 </CloseButton>
             </HeaderContainer>
             <MessagesContainer>
-                {messages.map((message) => {
+                {messages.map(message => {
                     const ownMessage = message.name === name;
                     return (
                         <MessageRow key={message.id} ownMessage={ownMessage}>
@@ -221,11 +229,13 @@ export default function ClassChatroom({ roomId, toggleChat }: ChatroomProps) {
                                     {message.content}
                                 </MessageBubble>
                                 <MessageTimestamp ownMessage={ownMessage}>
-                                    {message.timestamp.toDate().toLocaleTimeString('zh-TW', {
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                        hour12: false,
-                                    })}
+                                    {message.timestamp
+                                        .toDate()
+                                        .toLocaleTimeString('zh-TW', {
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                            hour12: false,
+                                        })}
                                 </MessageTimestamp>
                             </MessageContainer>
                         </MessageRow>
@@ -235,13 +245,16 @@ export default function ClassChatroom({ roomId, toggleChat }: ChatroomProps) {
             </MessagesContainer>
             <InputContainer>
                 <ChatInput
-                    type='text'
-                    placeholder='傳送訊息'
+                    type="text"
+                    placeholder="傳送訊息"
                     value={inputValue}
                     onChange={handleInputChange}
                     onKeyPress={handleKeyPress}
                 />
-                <SendButton hasInput={inputValue.trim().length > 0} onClick={sendMessage}>
+                <SendButton
+                    hasInput={inputValue.trim().length > 0}
+                    onClick={sendMessage}
+                >
                     <BsFillSendFill size={18} />
                 </SendButton>
             </InputContainer>

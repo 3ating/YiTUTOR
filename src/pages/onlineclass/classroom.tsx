@@ -3,7 +3,13 @@ import { db } from '@/utils/firebase';
 import { message } from 'antd';
 import firebase from 'firebase/compat/app';
 import { useRouter } from 'next/router';
-import React, { ButtonHTMLAttributes, HTMLAttributes, useEffect, useRef, useState } from 'react';
+import React, {
+    ButtonHTMLAttributes,
+    HTMLAttributes,
+    useEffect,
+    useRef,
+    useState,
+} from 'react';
 import styled from 'styled-components';
 import { useAuth } from '../../context/AuthContext';
 import ClassChatroom from './components/Chatroom';
@@ -11,6 +17,7 @@ import CountdownTimer from './components/CountdownTimer';
 import RatingModal from './components/RatingModal';
 import VideoToolbar from './components/VideoToolbar';
 import Canvas from './components/canvas/Canvas';
+import VideoComponent from './components/video/Video';
 
 interface TypographyProps extends HTMLAttributes<HTMLParagraphElement> {
     variant?: 'h6' | 'body';
@@ -121,7 +128,9 @@ const VideoScreen = styled.video`
     width: 100%;
     height: 100%;
     border-radius: 7px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+    box-shadow:
+        0 4px 6px rgba(0, 0, 0, 0.1),
+        0 1px 3px rgba(0, 0, 0, 0.08);
     z-index: 1;
     background-color: black;
     opacity: 0;
@@ -137,7 +146,7 @@ const LiveTextContainer = styled.div<LiveTextContainerProps>`
     display: flex;
     justify-content: center;
     align-items: center;
-    background: ${(props) => (props.bothUsersJoined ? '#ff5555' : '#ccc')};
+    background: ${props => (props.bothUsersJoined ? '#ff5555' : '#ccc')};
     width: 68px;
     height: 25px;
     border-radius: 9px;
@@ -174,8 +183,8 @@ const TheOtherAvatar = styled.img<TheOtherAvatarProps>`
     border-radius: 50%;
     object-fit: cover;
     margin-right: 5px;
-    filter: ${(props) => (props.TheOtherUserJoined ? 'none' : 'grayscale(100%)')};
-    opacity: ${(props) => (props.TheOtherUserJoined ? '1' : '0.5')};
+    filter: ${props => (props.TheOtherUserJoined ? 'none' : 'grayscale(100%)')};
+    opacity: ${props => (props.TheOtherUserJoined ? '1' : '0.5')};
 `;
 
 const RemoteScreen = styled.video`
@@ -196,7 +205,7 @@ const configuration = {
     ],
 };
 
-const VideoChat: React.FC = () => {
+const Classroom: React.FC = () => {
     const router = useRouter();
     const { userUid, userInfo } = useAuth();
     const [showLocalVideo, setShowLocalVideo] = useState(true);
@@ -207,7 +216,8 @@ const VideoChat: React.FC = () => {
     const remoteScreenRef = useRef<HTMLVideoElement | null>(null);
     const [remoteScreen, setRemoteScreen] = useState<MediaStream | null>(null);
     const prevBothUsersJoined = useRef(false);
-    const [peerConnection, setPeerConnection] = useState<RTCPeerConnection | null>(null);
+    const [peerConnection, setPeerConnection] =
+        useState<RTCPeerConnection | null>(null);
     const [roomId, setRoomId] = useState<string | null>(null);
     const [roomDialogOpen, setRoomDialogOpen] = useState(false);
     const [roomIdInput, setRoomIdInput] = useState('');
@@ -265,7 +275,10 @@ const VideoChat: React.FC = () => {
     };
 
     const openUserMedia = async () => {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true,
+        });
         localStream.current = stream;
         remoteStream.current = new MediaStream();
 
@@ -293,13 +306,13 @@ const VideoChat: React.FC = () => {
 
     const hangUp = async () => {
         if (localStream.current) {
-            localStream.current.getTracks().forEach((track) => {
+            localStream.current.getTracks().forEach(track => {
                 track.stop();
             });
         }
 
         if (remoteStream.current) {
-            remoteStream.current.getTracks().forEach((track) => track.stop());
+            remoteStream.current.getTracks().forEach(track => track.stop());
         }
         peerConnection?.close();
         localStream.current = null;
@@ -313,12 +326,16 @@ const VideoChat: React.FC = () => {
 
             await roomRef.update({ callEnded: true });
 
-            const calleeCandidates = await roomRef.collection('calleeCandidates').get();
-            calleeCandidates.forEach(async (candidate) => {
+            const calleeCandidates = await roomRef
+                .collection('calleeCandidates')
+                .get();
+            calleeCandidates.forEach(async candidate => {
                 await candidate.ref.delete();
             });
-            const callerCandidates = await roomRef.collection('callerCandidates').get();
-            callerCandidates.forEach(async (candidate) => {
+            const callerCandidates = await roomRef
+                .collection('callerCandidates')
+                .get();
+            callerCandidates.forEach(async candidate => {
                 await candidate.ref.delete();
             });
             await roomRef.delete();
@@ -329,11 +346,14 @@ const VideoChat: React.FC = () => {
             const db = firebase.firestore();
             const usersRef = db.collection('users');
             const usersSnapshot = await usersRef.get();
-            usersSnapshot.forEach(async (userDoc) => {
+            usersSnapshot.forEach(async userDoc => {
                 const userData = userDoc.data();
                 const userBookings = userData.bookings || [];
                 const updatedBookings = userBookings.filter((booking: any) => {
-                    return booking.studentId !== classUrlId && booking.teacherId !== classUrlId;
+                    return (
+                        booking.studentId !== classUrlId &&
+                        booking.teacherId !== classUrlId
+                    );
                 });
                 if (userBookings.length !== updatedBookings.length) {
                     await userDoc.ref.update({ bookings: updatedBookings });
@@ -348,18 +368,18 @@ const VideoChat: React.FC = () => {
 
         const pc = new RTCPeerConnection(configuration);
 
-        pc.oniceconnectionstatechange = (event) => {};
+        pc.oniceconnectionstatechange = event => {};
 
         setPeerConnection(pc);
 
         if (localStream.current) {
-            localStream.current.getTracks().forEach((track) => {
+            localStream.current.getTracks().forEach(track => {
                 pc.addTrack(track, localStream.current!);
             });
         }
 
-        pc.ontrack = (event) => {
-            event.streams[0].getTracks().forEach((track) => {
+        pc.ontrack = event => {
+            event.streams[0].getTracks().forEach(track => {
                 if (remoteStream.current) {
                     remoteStream.current.addTrack(track);
                 }
@@ -372,8 +392,9 @@ const VideoChat: React.FC = () => {
             }
         };
 
-        const callerCandidatesCollection = roomRef.collection('callerCandidates');
-        pc.onicecandidate = (event) => {
+        const callerCandidatesCollection =
+            roomRef.collection('callerCandidates');
+        pc.onicecandidate = event => {
             if (event.candidate) {
                 callerCandidatesCollection.add(event.candidate.toJSON());
             }
@@ -392,25 +413,29 @@ const VideoChat: React.FC = () => {
         await roomRef.set(roomWithOffer);
         setRoomId(roomRef.id);
 
-        roomRef.onSnapshot(async (snapshot) => {
+        roomRef.onSnapshot(async snapshot => {
             const data = snapshot.data();
             if (data?.callEnded) {
                 hangUp();
             }
             if (data?.answer && !pc.currentRemoteDescription) {
-                const rtcSessionDescription = new RTCSessionDescription(data.answer);
+                const rtcSessionDescription = new RTCSessionDescription(
+                    data.answer
+                );
                 await pc.setRemoteDescription(rtcSessionDescription);
             }
         });
 
-        roomRef.collection('calleeCandidates').onSnapshot((snapshot: { docChanges: () => any[] }) => {
-            snapshot.docChanges().forEach(async (change) => {
-                if (change.type === 'added') {
-                    const data = change.doc.data();
-                    await pc.addIceCandidate(new RTCIceCandidate(data));
-                }
+        roomRef
+            .collection('calleeCandidates')
+            .onSnapshot((snapshot: { docChanges: () => any[] }) => {
+                snapshot.docChanges().forEach(async change => {
+                    if (change.type === 'added') {
+                        const data = change.doc.data();
+                        await pc.addIceCandidate(new RTCIceCandidate(data));
+                    }
+                });
             });
-        });
     };
 
     const joinRoomById = async (roomId: string) => {
@@ -419,7 +444,7 @@ const VideoChat: React.FC = () => {
         const roomRef = db.collection('rooms').doc(`${roomId}`);
         const roomSnapshot = await roomRef.get();
 
-        roomRef.onSnapshot(async (snapshot) => {
+        roomRef.onSnapshot(async snapshot => {
             const data = snapshot.data();
             if (data?.callEnded) {
                 hangUp();
@@ -429,8 +454,8 @@ const VideoChat: React.FC = () => {
         if (roomSnapshot.exists) {
             const pc = new RTCPeerConnection(configuration);
 
-            pc.ontrack = (event) => {
-                event.streams[0].getTracks().forEach((track) => {
+            pc.ontrack = event => {
+                event.streams[0].getTracks().forEach(track => {
                     remoteStream.current?.addTrack(track);
                 });
                 if (remoteVideoRef.current) {
@@ -440,10 +465,10 @@ const VideoChat: React.FC = () => {
                     setBothUsersJoined(true);
                 }
             };
-            pc.oniceconnectionstatechange = (event) => {};
+            pc.oniceconnectionstatechange = event => {};
             setPeerConnection(pc);
             if (localStream.current) {
-                localStream.current.getTracks().forEach((track) => {
+                localStream.current.getTracks().forEach(track => {
                     pc.addTrack(track, localStream.current!);
                 });
             }
@@ -451,9 +476,11 @@ const VideoChat: React.FC = () => {
             const offer = roomSnapshot.data()?.offer;
             await pc.setRemoteDescription(new RTCSessionDescription(offer));
 
-            pc.onicecandidate = (event) => {
+            pc.onicecandidate = event => {
                 if (event.candidate) {
-                    roomRef.collection('calleeCandidates').add(event.candidate.toJSON());
+                    roomRef
+                        .collection('calleeCandidates')
+                        .add(event.candidate.toJSON());
                 }
             };
             const answer = await pc.createAnswer();
@@ -465,8 +492,8 @@ const VideoChat: React.FC = () => {
                 },
             };
             await roomRef.update(roomWithAnswer);
-            roomRef.collection('callerCandidates').onSnapshot((snapshot) => {
-                snapshot.docChanges().forEach(async (change) => {
+            roomRef.collection('callerCandidates').onSnapshot(snapshot => {
+                snapshot.docChanges().forEach(async change => {
                     if (change.type === 'added') {
                         const data = change.doc.data();
                         await pc.addIceCandidate(new RTCIceCandidate(data));
@@ -518,23 +545,39 @@ const VideoChat: React.FC = () => {
 
     useEffect(() => {
         if (peerConnection) {
-            const handleIceCandidate = async (event: RTCPeerConnectionIceEvent) => {
+            const handleIceCandidate = async (
+                event: RTCPeerConnectionIceEvent
+            ) => {
                 if (event.candidate && roomId) {
                     const roomRef = db.collection('rooms').doc(roomId);
-                    const role = localStream.current && !remoteStream.current?.getTracks().length ? 'caller' : 'callee';
-                    const candidatesCollection = roomRef.collection(`${role}Candidates`);
+                    const role =
+                        localStream.current &&
+                        !remoteStream.current?.getTracks().length
+                            ? 'caller'
+                            : 'callee';
+                    const candidatesCollection = roomRef.collection(
+                        `${role}Candidates`
+                    );
                     await candidatesCollection.add(event.candidate.toJSON());
                 }
             };
             peerConnection.addEventListener('icecandidate', handleIceCandidate);
             return () => {
-                peerConnection.removeEventListener('icecandidate', handleIceCandidate);
+                peerConnection.removeEventListener(
+                    'icecandidate',
+                    handleIceCandidate
+                );
             };
         }
     }, [peerConnection, roomId, localStream, remoteStream]);
 
     useEffect(() => {
-        if (localStream.current && remoteStream.current && localVideoRef.current && remoteVideoRef.current) {
+        if (
+            localStream.current &&
+            remoteStream.current &&
+            localVideoRef.current &&
+            remoteVideoRef.current
+        ) {
             localVideoRef.current.srcObject = localStream.current;
             remoteVideoRef.current.srcObject = remoteStream.current;
         }
@@ -547,10 +590,18 @@ const VideoChat: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        if (prevBothUsersJoined.current && !bothUsersJoined && userInfo?.userType === 'student') {
+        if (
+            prevBothUsersJoined.current &&
+            !bothUsersJoined &&
+            userInfo?.userType === 'student'
+        ) {
             setShowRatingModal(true);
         }
-        if (prevBothUsersJoined.current && !bothUsersJoined && userInfo?.userType === 'teacher') {
+        if (
+            prevBothUsersJoined.current &&
+            !bothUsersJoined &&
+            userInfo?.userType === 'teacher'
+        ) {
             router.push(`/teachers/${userUid}`);
         }
         prevBothUsersJoined.current = bothUsersJoined;
@@ -567,7 +618,8 @@ const VideoChat: React.FC = () => {
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
             if (bothUsersJoined) {
                 event.preventDefault();
-                event.returnValue = '您確定要離開視訊通話嗎？未保存的更改可能會丟失。';
+                event.returnValue =
+                    '您確定要離開視訊通話嗎？未保存的更改可能會丟失。';
             }
         };
         window.addEventListener('beforeunload', handleBeforeUnload);
@@ -584,17 +636,23 @@ const VideoChat: React.FC = () => {
                         <>
                             <TimeAvatarContainer>
                                 <AvatarContainer>
-                                    <Avatar src={userInfo?.avatar} alt='User Avatar' />
+                                    <Avatar
+                                        src={userInfo?.avatar}
+                                        alt="User Avatar"
+                                    />
                                     {classUrlId && (
                                         <TheOtherAvatar
                                             src={anotheruserAvatar}
-                                            alt='User Avatar'
+                                            alt="User Avatar"
                                             TheOtherUserJoined={bothUsersJoined}
                                         />
                                     )}
                                 </AvatarContainer>
                                 <RoomTitle>
-                                    <CountdownTimer initialTime={50 * 60} bothUsersJoined={bothUsersJoined} />
+                                    <CountdownTimer
+                                        initialTime={50 * 60}
+                                        bothUsersJoined={bothUsersJoined}
+                                    />
                                 </RoomTitle>
                             </TimeAvatarContainer>
                         </>
@@ -603,7 +661,7 @@ const VideoChat: React.FC = () => {
                         <VideoContainer>
                             <div style={{ position: 'relative' }}>
                                 <Canvas roomId={roomId} />
-                                <VideoWrapper>
+                                {/* <VideoWrapper>
                                     <VideoScreen
                                         ref={localVideoRef}
                                         autoPlay
@@ -625,16 +683,38 @@ const VideoChat: React.FC = () => {
                                     <UsernameLabel className={!showLocalVideo ? 'visible' : ''}>
                                         {anotherUserName}
                                     </UsernameLabel>
-                                </VideoWrapper>
+                                </VideoWrapper> */}
+                                <VideoComponent
+                                    videoRef={localVideoRef}
+                                    isVisible={showLocalVideo}
+                                    username="你"
+                                />
+                                <VideoComponent
+                                    videoRef={remoteVideoRef}
+                                    isVisible={!showLocalVideo}
+                                    username={anotherUserName}
+                                />
                             </div>
-                            <LiveTextContainer bothUsersJoined={bothUsersJoined}>
-                                <LiveText>{classUrlId ? '上課中' : '試用中'}</LiveText>{' '}
+                            <LiveTextContainer
+                                bothUsersJoined={bothUsersJoined}
+                            >
+                                <LiveText>
+                                    {classUrlId ? '上課中' : '試用中'}
+                                </LiveText>
                             </LiveTextContainer>
                         </VideoContainer>
-                        <RemoteScreen ref={remoteScreenRef} show={!!remoteScreen} autoPlay muted />
+                        <RemoteScreen
+                            ref={remoteScreenRef}
+                            show={!!remoteScreen}
+                            autoPlay
+                            muted
+                        />
                         {showChatroom && (
                             <ChatRoomContainer>
-                                <ClassChatroom roomId={roomId} toggleChat={toggleChat} />
+                                <ClassChatroom
+                                    roomId={roomId}
+                                    toggleChat={toggleChat}
+                                />
                             </ChatRoomContainer>
                         )}
                     </ClassContainer>
@@ -670,4 +750,4 @@ const VideoChat: React.FC = () => {
     );
 };
 
-export default VideoChat;
+export default Classroom;

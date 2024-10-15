@@ -71,7 +71,7 @@ const Message = styled.div<MessageProps>`
     word-wrap: break-word;
     width: fit-content;
     font-size: 14px;
-    ${(props) =>
+    ${props =>
         props.position === 'incoming'
             ? `
         background-color: #c4c4c4;
@@ -119,7 +119,7 @@ const SendButton = styled.button`
 `;
 
 const SendIcon = styled(BsFillSendFill)<SendIconProps>`
-    color: ${(props) => (props.active ? '#000' : '#ccc')};
+    color: ${props => (props.active ? '#000' : '#ccc')};
 `;
 
 const DeleteButton = styled.button`
@@ -173,10 +173,15 @@ const ChatRoom = () => {
         setInputMessage('');
         setIsTyping(true);
         await processMessageToChatGPT(newMessages);
-        messageListRef.current?.scrollTo(0, messageListRef.current?.scrollHeight);
+        messageListRef.current?.scrollTo(
+            0,
+            messageListRef.current?.scrollHeight
+        );
     };
 
-    const handleInputChange = (e: { target: { value: SetStateAction<string> } }) => {
+    const handleInputChange = (e: {
+        target: { value: SetStateAction<string> };
+    }) => {
         setInputMessage(e.target.value);
     };
 
@@ -186,14 +191,21 @@ const ChatRoom = () => {
         }
     };
 
-    async function storeQuestionAndAnswer(question: { message: string }, answer: { message: string; sender?: string }) {
+    async function storeQuestionAndAnswer(
+        question: { message: string },
+        answer: { message: string; sender?: string }
+    ) {
         try {
             if (userUid) {
-                await db.collection('users').doc(userUid).collection('gpt_solutions').add({
-                    question: question.message,
-                    answer: answer.message,
-                    timestamp: firebase.firestore.Timestamp.now(),
-                });
+                await db
+                    .collection('users')
+                    .doc(userUid)
+                    .collection('gpt_solutions')
+                    .add({
+                        question: question.message,
+                        answer: answer.message,
+                        timestamp: firebase.firestore.Timestamp.now(),
+                    });
             } else {
                 console.error('User ID not found.');
             }
@@ -204,7 +216,7 @@ const ChatRoom = () => {
 
     async function processMessageToChatGPT(chatMessages: any[]) {
         let apiMessages = [PROMPT].concat(
-            chatMessages.map((messageObject) => {
+            chatMessages.map(messageObject => {
                 let role = '';
                 if (messageObject.sender === 'ChatGPT') {
                     role = 'assistant';
@@ -226,7 +238,7 @@ const ChatRoom = () => {
             },
             body: JSON.stringify(apiRequestBody),
         })
-            .then((data) => {
+            .then(data => {
                 if (data.status === 504) {
                     notification.warning({
                         message: '請確認問題是否與學習有關',
@@ -238,17 +250,22 @@ const ChatRoom = () => {
                 }
                 return data.json();
             })
-            .then((data) => {
+            .then(data => {
                 if (data.choices && data.choices.length > 0) {
                     const chatGPTMessage = {
                         message: data.choices[0].message.content,
                         sender: 'ChatGPT',
                     };
                     const lastUserMessage = chatMessages
-                        .filter((messageObject) => messageObject.sender === 'user')
+                        .filter(
+                            messageObject => messageObject.sender === 'user'
+                        )
                         .pop();
                     if (lastUserMessage) {
-                        storeQuestionAndAnswer({ message: lastUserMessage.message }, chatGPTMessage);
+                        storeQuestionAndAnswer(
+                            { message: lastUserMessage.message },
+                            chatGPTMessage
+                        );
                     }
                     setMessages([...chatMessages, chatGPTMessage]);
                 } else {
@@ -256,7 +273,7 @@ const ChatRoom = () => {
                 }
                 setIsTyping(false);
             })
-            .catch((error) => {
+            .catch(error => {
                 console.error('Error fetching API:', error);
                 setIsTyping(false);
             });
@@ -272,25 +289,37 @@ const ChatRoom = () => {
                     .orderBy('timestamp')
                     .get();
                 if (!historySnapshot.empty) {
-                    const historyMessages: { message: string; direction: string; sender: string; sentTime: any }[] = [];
-                    historySnapshot.forEach((doc) => {
+                    const historyMessages: {
+                        message: string;
+                        direction: string;
+                        sender: string;
+                        sentTime: any;
+                    }[] = [];
+                    historySnapshot.forEach(doc => {
                         const data = doc.data();
                         historyMessages.push(
                             {
                                 message: data.question,
                                 direction: 'outgoing',
                                 sender: 'user',
-                                sentTime: data.timestamp.toDate().toLocaleString(),
+                                sentTime: data.timestamp
+                                    .toDate()
+                                    .toLocaleString(),
                             },
                             {
                                 message: data.answer,
                                 direction: 'incoming',
                                 sender: 'ChatGPT',
-                                sentTime: data.timestamp.toDate().toLocaleString(),
+                                sentTime: data.timestamp
+                                    .toDate()
+                                    .toLocaleString(),
                             }
                         );
                     });
-                    setMessages((prevMessages) => [...prevMessages, ...historyMessages]);
+                    setMessages(prevMessages => [
+                        ...prevMessages,
+                        ...historyMessages,
+                    ]);
                 }
             } catch (error) {
                 console.error('Error fetching user history:', error);
@@ -301,9 +330,13 @@ const ChatRoom = () => {
     async function clearHistory() {
         if (userUid) {
             try {
-                const historySnapshot = await db.collection('users').doc(userUid).collection('gpt_solutions').get();
+                const historySnapshot = await db
+                    .collection('users')
+                    .doc(userUid)
+                    .collection('gpt_solutions')
+                    .get();
                 const batch = db.batch();
-                historySnapshot.forEach((doc) => {
+                historySnapshot.forEach(doc => {
                     batch.delete(doc.ref);
                 });
 
@@ -317,7 +350,8 @@ const ChatRoom = () => {
 
     const scrollToBottom = () => {
         if (messageListRef.current) {
-            messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+            messageListRef.current.scrollTop =
+                messageListRef.current.scrollHeight;
         }
     };
 
@@ -336,25 +370,38 @@ const ChatRoom = () => {
                     <ChatRoomTitle>智慧解題助教</ChatRoomTitle>
                     <MessageList ref={messageListRef}>
                         {messages.map((message, i) => (
-                            <Message key={i} position={message.sender === 'ChatGPT' ? 'outgoing' : 'incoming'}>
+                            <Message
+                                key={i}
+                                position={
+                                    message.sender === 'ChatGPT'
+                                        ? 'outgoing'
+                                        : 'incoming'
+                                }
+                            >
                                 {message.message}
                             </Message>
                         ))}
                     </MessageList>
                     {isTyping && (
                         <TypingIndicator>
-                            <Spin indicator={<DotLoadingIcon />} style={{ marginRight: 8 }} />
+                            <Spin
+                                indicator={<DotLoadingIcon />}
+                                style={{ marginRight: 8 }}
+                            />
                         </TypingIndicator>
                     )}
                     <MessageInputContainer>
                         <MessageInput
-                            placeholder='輸入問題'
+                            placeholder="輸入問題"
                             value={inputMessage}
                             onChange={handleInputChange}
                             onKeyPress={handleKeyPress}
                         />
                         <SendButton onClick={handleSend}>
-                            <SendIcon size={ICON_SIZE} active={inputMessage.trim() ? true : false} />
+                            <SendIcon
+                                size={ICON_SIZE}
+                                active={inputMessage.trim() ? true : false}
+                            />
                         </SendButton>
                         <DeleteButton onClick={clearHistory}>
                             <AiFillDelete size={ICON_SIZE + 4} />
